@@ -65,7 +65,7 @@ export const content: Record<Lang, Content> = {
   pl: {
     htmlLang: 'pl',
     meta: {
-      title: 'Handyman Karkonosze – złota rączka dla pensjonatów, hoteli i domów',
+      title: 'handyman.karkonosze – serwis dla pensjonatów, hoteli i domów',
       description:
         'Hydraulika, elektryka, montaż i drobne remonty oraz stała opieka nad obiektem. Dla pensjonatów, małych hoteli, firm i osób prywatnych w Karkonoszach.',
     },
