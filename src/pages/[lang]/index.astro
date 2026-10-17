@@ -11,18 +11,57 @@ const lang = Astro.params.lang as Lang;
 const t = content[lang];
 const tel = site.phone.replace(/\s/g, '');
 const gallery = site.gallery;
+const brandSub: Record<Lang, string> = { pl: 'Złota rączka · Karkonosze', de: 'Hausmeisterservice · Riesengebirge', en: 'Handyman services · Karkonosze' };
+const bandText: Record<Lang, string> = {
+  pl: 'Jelenia Góra, Lubomierz, Szklarska Poręba i okolice',
+  de: 'Jelenia Góra, Lubomierz, Szklarska Poręba und Umgebung',
+  en: 'Jelenia Góra, Lubomierz, Szklarska Poręba and around',
+};
+const realizacje: Record<Lang, string> = { pl: 'Realizacje', de: 'Referenzen', en: 'Work' };
 const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt springen', en: 'Skip to content' };
-const locale = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' }[lang];
+
+// Proste ikony usług (kolejność jak w content.services.items)
+const icons = [
+  // kropla
+  '<path d="M24 6c6 9 12 15 12 23a12 12 0 0 1-24 0c0-8 6-14 12-23z"/><path d="M18 30a6 6 0 0 0 6 6"/>',
+  // piorun
+  '<path d="M27 5 12 27h11l-3 16 16-23H25z"/>',
+  // młotek
+  '<path d="M8 14h20l4 4v4H24l-3-3h-5l-4 4-4-4z"/><path d="M22 22 38 40a3 3 0 0 1-4 4L18 26"/>',
+  // dom z kluczem
+  '<path d="M6 22 24 7l18 15"/><path d="M11 18v22h26V18"/><circle cx="24" cy="26" r="4"/><path d="M24 30v7m0-3h3"/>',
+];
 ---
 <Base lang={lang} htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description}>
   <a class="skip" href="#main">{skip[lang]}</a>
 
   <header class="top">
     <div class="wrap top__in">
-      <a class="brand" href={`/${lang}/`} aria-label={site.name}><span class="wordmark" aria-hidden="true">handyman<span class="wordmark__dot">.</span></span></a>
+      <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub[lang]}`}>
+        <svg class="brand__mark" viewBox="-2 0 126 100" aria-hidden="true">
+          <!-- świerk -->
+          <path d="M14 96V78" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+          <path d="M14 6 3 26h6L1 42h7L0 60h8L-1 79h30L20 60h8L20 42h7l-8-16h6z" fill="currentColor"/>
+          <!-- dom z kominem -->
+          <path d="M34 98V52l32-28 32 28v46z" fill="currentColor"/>
+          <rect x="80" y="26" width="9" height="18" fill="currentColor"/>
+          <rect x="56" y="70" width="14" height="28" fill="var(--paper)"/>
+          <!-- klucz -->
+          <g transform="translate(97 70) rotate(40)">
+            <rect x="-4.5" y="-6" width="9" height="40" rx="4.5" fill="var(--paper)"/>
+            <rect x="-3" y="-4" width="6" height="36" rx="3" fill="currentColor"/>
+            <path d="M-13 -14a13 13 0 1 0 26 0l-6-10v12h-14v-12z" fill="var(--paper)"/>
+            <path d="M-10.5 -14a10.5 10.5 0 1 0 21 0l-3.5-6v8h-14v-8z" fill="currentColor"/>
+          </g>
+        </svg>
+        <span class="brand__text">
+          <span class="brand__name">{site.name}</span>
+          <span class="brand__sub">{brandSub[lang]}</span>
+        </span>
+      </a>
       <nav class="nav" aria-label="Main">
         <a href="#uslugi">{t.nav.services}</a>
-        <a href="#realizacja">{t.work.title}</a>
+        <a href="#realizacja">{realizacje[lang]}</a>
         <a href="#opieka">{t.nav.care}</a>
         <a href="#jak">{t.nav.process}</a>
       </nav>
@@ -32,69 +71,63 @@ const locale = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' }[lang];
             <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
           ))}
         </ul>
-        <a class="btn btn--small" href="#kontakt">{t.nav.contact}</a>
+        <a class="btn btn--small" href="#kontakt">{t.hero.primary}</a>
       </div>
     </div>
   </header>
 
   <main id="main">
-    <!-- Hero: kwit zlecenia na zielonym polu -->
+    <section class="band">
+      <div class="wrap"><p>{bandText[lang]}</p></div>
+    </section>
+
     <section class="hero">
-      <div class="wrap">
-        <div class="ticket reveal">
-          <div class="ticket__main">
-            <h1>{t.hero.title}</h1>
-            <p class="hero__lead">{t.hero.lead}</p>
+      <div class="wrap hero__in">
+        <h1>{t.hero.title}</h1>
+        <div class="hero__side">
+          <p class="lead">{t.hero.lead}</p>
+          <div class="actions">
             <a class="btn" href="#kontakt">{t.hero.primary}</a>
+            <a class="btn btn--ghost" href="#opieka">{t.hero.secondary}</a>
           </div>
-          <div class="ticket__stub" aria-label={t.ticket.title}>
-            <p class="stub__title">{t.ticket.title}</p>
-            <ul class="stub__list">
-              {t.services.items.map((s) => <li>{s.name}</li>)}
-            </ul>
-            <p class="stub__place">Karkonosze</p>
-          </div>
-        </div>
-        <ul class="audience reveal">
-          {t.hero.audience.map((a) => <li>{a}</li>)}
-        </ul>
-      </div>
-    </section>
-
-    <!-- Usługi: arkusz zlecenia -->
-    <section id="uslugi" class="sheet-wrap">
-      <div class="wrap">
-        <div class="sheet">
-          <div class="sheet__head reveal">
-            <h2>{t.services.title}</h2>
-            <p>{t.services.lead}</p>
-          </div>
-          <ul class="jobs">
-            {t.services.items.map((s) => (
-              <li class="job reveal">
-                <span class="job__box" aria-hidden="true"></span>
-                <div>
-                  <h3>{s.name}</h3>
-                  <p>{s.text}</p>
-                  <p class="job__ex">{s.examples}</p>
-                </div>
-              </li>
-            ))}
+          <ul class="audience">
+            {t.hero.audience.map((a) => <li>{a}</li>)}
           </ul>
-          <p class="sheet__note reveal">{t.services.note}</p>
         </div>
+      </div>
+      <svg class="ridge" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 120V92l110-34 70 22 120-58 90 40 80-26 140 62 120-70 60 30 90-44 110 54 90-20 120 40 120-30 120 30v52z" fill="var(--deep)"/>
+      </svg>
+    </section>
+
+    <section id="uslugi" class="services-wrap">
+      <div class="wrap">
+        <div class="section__head section__head--light">
+          <h2>{t.services.title}</h2>
+          <p>{t.services.lead}</p>
+        </div>
+        <ul class="cards">
+          {t.services.items.map((s, i) => (
+            <li class="card">
+              <svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true" set:html={icons[i]} />
+              <h3>{s.name}</h3>
+              <p>{s.text}</p>
+              <p class="card__tags">{s.examples}</p>
+            </li>
+          ))}
+        </ul>
+        <p class="fine fine--light">{t.services.note}</p>
       </div>
     </section>
 
-    <!-- Z ostatniego zlecenia: zdjęcia z realizacji -->
     <section id="realizacja" class="work">
+      <div class="work__band">
+        <div class="wrap"><h2>{t.work.title}</h2></div>
+      </div>
       <div class="wrap">
         <div class="work__head">
-          <div class="reveal">
-            <h2>{t.work.title}</h2>
-            <p>{t.work.lead}</p>
-          </div>
-          <dl class="work__facts reveal">
+          <p class="lead">{t.work.lead}</p>
+          <dl class="work__facts">
             {t.work.facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
           </dl>
         </div>
@@ -105,11 +138,11 @@ const locale = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' }[lang];
             { id: 'tasma', cls: 'w-c', w: 1600, h: 1200 },
             { id: 'detal', cls: 'w-d', w: 1200, h: 1600 },
           ].map((p) => (
-            <figure class={`work__photo ${p.cls} reveal`}>
+            <figure class={`work__photo ${p.cls}`}>
               <img
                 src={`/img/mural-${p.id}-1600.webp`}
                 srcset={`/img/mural-${p.id}-900.webp 900w, /img/mural-${p.id}-1600.webp 1600w`}
-                sizes="(min-width: 60rem) 50vw, 100vw"
+                sizes="(min-width: 64rem) 50vw, 100vw"
                 width={p.w} height={p.h}
                 alt={t.work.photos[p.id as keyof typeof t.work.photos]}
                 loading="lazy" decoding="async"
@@ -120,47 +153,54 @@ const locale = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' }[lang];
       </div>
     </section>
 
-    <!-- Stała opieka: strona z zeszytu usterek -->
-    <section id="opieka" class="care">
-      <div class="wrap care__in">
-        <div class="care__copy">
-          <h2 class="reveal">{t.care.title}</h2>
-          <p class="care__lead reveal">{t.care.lead}</p>
+    <section id="opieka" class="section">
+      <div class="wrap care">
+        <div class="care__lead">
+          <p class="eyebrow">{t.care.eyebrow}</p>
+          <h2>{t.care.title}</h2>
+          <p class="lead">{t.care.lead}</p>
           <ul class="care__points">
             {t.care.points.map((p) => (
-              <li class="reveal">
+              <li>
                 <h3>{p.title}</h3>
                 <p>{p.text}</p>
               </li>
             ))}
           </ul>
-          <a class="btn btn--paper reveal" href="#kontakt">{t.care.cta}</a>
+          <a class="btn" href="#kontakt">{t.care.cta}</a>
         </div>
 
-        <figure class="logbook reveal" aria-label={t.log.title}>
-          <p class="logbook__title">{t.log.title}</p>
-          <ol class="logbook__rows">
-            {t.log.entries.map((e) => (
-              <li>
-                <span class="lb__when">{e.when}</span>
-                <span class="lb__where">{e.where}</span>
-                <span class="lb__what">{e.what}</span>
-                <span class="lb__done">{e.done}</span>
-              </li>
-            ))}
-          </ol>
-          <figcaption>{t.log.note}</figcaption>
-        </figure>
+        <aside class="log" aria-label={t.log.title}>
+          <div class="log__head">
+            <span class="log__title">{t.log.title}</span>
+            <span class="log__dot" aria-hidden="true"></span>
+          </div>
+          <div class="log__window" aria-hidden="true">
+            <ol class="log__list">
+              {[...t.log.entries, ...t.log.entries].map((e) => (
+                <li>
+                  <span class="log__when">{e.when}</span>
+                  <span class="log__where">{e.where}</span>
+                  <span class="log__what">{e.what}</span>
+                  <span class="log__done">{e.done}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <p class="log__note">{t.log.note}</p>
+          <ul class="sr-only">
+            {t.log.entries.map((e) => <li>{e.where}: {e.what}, {e.done}</li>)}
+          </ul>
+        </aside>
       </div>
     </section>
 
-    <!-- Jak to idzie: odcinki kwitu -->
-    <section id="jak" class="route">
+    <section id="jak" class="section section--tint">
       <div class="wrap">
-        <h2 class="reveal">{t.process.title}</h2>
-        <ol class="stubs">
+        <h2>{t.process.title}</h2>
+        <ol class="steps">
           {t.process.steps.map((s) => (
-            <li class="stubs__item reveal">
+            <li>
               <h3>{s.title}</h3>
               <p>{s.text}</p>
             </li>
@@ -169,163 +209,97 @@ const locale = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' }[lang];
       </div>
     </section>
 
-    <!-- Zaufanie -->
-    <section id="zaufanie" class="trust">
+    <section id="zaufanie" class="section">
       <div class="wrap">
-        <h2 class="reveal">{t.trust.title}</h2>
-        <ul class="trust__list">
+        <h2>{t.trust.title}</h2>
+        <ul class="trust">
           {t.trust.items.map((i) => (
-            <li class="reveal">
+            <li>
               <h3>{i.title}</h3>
               <p>{i.text}</p>
             </li>
           ))}
         </ul>
         {gallery.length > 0 && (
-          <ul class="gallery">
-            {gallery.map((g) => (
-              <li><img src={g.src} alt={g.alt[lang]} loading="lazy" /></li>
-            ))}
-          </ul>
+          <div class="gallery">
+            <h3>{t.gallery.title}</h3>
+            <ul>
+              {gallery.map((g) => (
+                <li><img src={g.src} alt={g.alt[lang]} loading="lazy" /></li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </section>
 
-    <!-- Kontakt: żywe zlecenie -->
-    <section id="kontakt" class="order">
-      <div class="wrap">
-        <div class="order__head reveal">
+    <section id="kontakt" class="contact">
+      <div class="wrap contact__in">
+        <div class="contact__lead">
           <h2>{t.contact.title}</h2>
           <p>{t.contact.lead}</p>
+          <p class="direct">
+            <span>{t.contact.direct}</span>
+            <a href={`tel:${tel}`}>{site.phone}</a>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
+          <p class="fine fine--light">{t.contact.area}</p>
         </div>
 
-        <div class="order__in">
-          <form id="lead" class="form reveal" novalidate data-wa={site.whatsapp} data-mail={site.email} data-locale={locale}
-            data-l-number={t.ticket.number} data-l-date={t.ticket.date} data-l-from={t.ticket.from} data-l-property={t.ticket.property}
-            data-l-place={t.ticket.place} data-l-issue={t.ticket.issue} data-l-phone={t.contact.form.phone} data-l-title={t.ticket.title}>
-            <label>
-              <span>{t.contact.form.name} <small>({t.contact.form.required})</small></span>
-              <input name="name" autocomplete="name" required aria-describedby="form-error" />
-            </label>
-            <label>
-              <span>{t.contact.form.phone}</span>
-              <input name="phone" type="tel" autocomplete="tel" inputmode="tel" />
-            </label>
-            <label>
-              <span>{t.contact.form.who}</span>
-              <select name="who">
-                {t.contact.form.whoOptions.map((o) => <option value={o}>{o}</option>)}
-              </select>
-            </label>
-            <label>
-              <span>{t.contact.form.where}</span>
-              <input name="where" placeholder={t.contact.form.wherePlaceholder} />
-            </label>
-            <label class="form__wide">
-              <span>{t.contact.form.what} <small>({t.contact.form.required})</small></span>
-              <textarea name="what" rows="3" required aria-describedby="form-error" placeholder={t.contact.form.whatPlaceholder}></textarea>
-            </label>
-            <p id="form-error" class="form__error form__wide" role="alert" hidden>{t.contact.form.error}</p>
-            <div class="actions form__wide">
-              <button class="btn" type="button" data-send="wa">{t.contact.form.whatsapp}</button>
-              <button class="btn btn--quiet" type="button" data-send="mail">{t.contact.form.email}</button>
-            </div>
-            <p class="form__hint form__wide">{t.contact.form.hint}</p>
-          </form>
-
-          <aside class="slip reveal" aria-live="polite" aria-label={t.ticket.title}>
-            <p class="slip__title">{t.ticket.title}</p>
-            <dl class="slip__rows">
-              <div><dt>{t.ticket.number}</dt><dd data-slip="number">HM-0000</dd></div>
-              <div><dt>{t.ticket.date}</dt><dd data-slip="date">{t.ticket.empty}</dd></div>
-              <div><dt>{t.ticket.from}</dt><dd data-slip="name">{t.ticket.empty}</dd></div>
-              <div><dt>{t.ticket.property}</dt><dd data-slip="who">{t.contact.form.whoOptions[0]}</dd></div>
-              <div><dt>{t.ticket.place}</dt><dd data-slip="where">{t.ticket.empty}</dd></div>
-              <div class="slip__issue"><dt>{t.ticket.issue}</dt><dd data-slip="what">{t.ticket.empty}</dd></div>
-              <div><dt>{t.ticket.status}</dt><dd class="slip__status">{t.ticket.statusValue}</dd></div>
-            </dl>
-          </aside>
-        </div>
-
-        <div class="direct reveal">
-          <p>{t.contact.direct} <a href={`tel:${tel}`}>{site.phone}</a> · <a href={`mailto:${site.email}`}>{site.email}</a></p>
-          <p>{t.contact.area}</p>
-        </div>
+        <form id="lead" class="form" novalidate data-wa={site.whatsapp} data-mail={site.email}
+          data-l-name={t.contact.form.name} data-l-phone={t.contact.form.phone} data-l-who={t.contact.form.who} data-l-what={t.contact.form.what}>
+          <label>
+            <span>{t.contact.form.name} <small>({t.contact.form.required})</small></span>
+            <input name="name" autocomplete="name" required aria-describedby="form-error" />
+          </label>
+          <label>
+            <span>{t.contact.form.phone}</span>
+            <input name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+          </label>
+          <label>
+            <span>{t.contact.form.who}</span>
+            <select name="who">
+              {t.contact.form.whoOptions.map((o) => <option value={o}>{o}</option>)}
+            </select>
+          </label>
+          <label>
+            <span>{t.contact.form.what} <small>({t.contact.form.required})</small></span>
+            <textarea name="what" rows="4" required aria-describedby="form-error" placeholder={t.contact.form.whatPlaceholder}></textarea>
+          </label>
+          <p id="form-error" class="form__error" role="alert" hidden>{t.contact.form.error}</p>
+          <div class="actions">
+            <button class="btn" type="button" data-send="wa">{t.contact.form.whatsapp}</button>
+            <button class="btn btn--ghost" type="button" data-send="mail">{t.contact.form.email}</button>
+          </div>
+          <p class="fine">{t.contact.form.hint}</p>
+        </form>
       </div>
     </section>
   </main>
 
-  <!-- Stopka: odwrocie kwitu -->
   <footer class="foot">
-    <div class="wrap">
-      <p class="foot__name wordmark" aria-hidden="true">handyman<span class="wordmark__dot">.</span></p>
-      <div class="foot__row">
-        <span>{t.footer.area}</span>
-        <span>© {new Date().getFullYear()} {site.company || site.name}. {t.footer.rights}</span>
-      </div>
+    <div class="wrap foot__in">
+      <span class="foot__brand">{site.name}</span>
+      <span>{t.footer.area}</span>
+      <span>© {new Date().getFullYear()} {site.company || site.name}. {t.footer.rights}</span>
     </div>
   </footer>
 
   <script>
-    // Wejścia sekcji: treść widoczna bez JS, animacja tylko gdy JS działa
-    const root = document.documentElement;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduce && 'IntersectionObserver' in window) {
-      root.classList.add('js-reveal');
-      const io = new IntersectionObserver(
-        (entries) => entries.forEach((e) => {
-          if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
-        }),
-        { rootMargin: '0px 0px -8% 0px' },
-      );
-      document.querySelectorAll('.reveal').forEach((el) => {
-        const sibs = el.parentElement ? [...el.parentElement.children].filter((c) => c.classList.contains('reveal')) : [];
-        (el as HTMLElement).style.setProperty('--d', `${Math.max(0, sibs.indexOf(el)) * 75}ms`);
-        io.observe(el);
-      });
-    }
-
-    // Żywe zlecenie
     const form = document.getElementById('lead') as HTMLFormElement | null;
     if (form) {
-      const d = form.dataset;
-      const now = new Date();
-      const pad = (n: number) => String(n).padStart(2, '0');
-      const number = `HM-${String(now.getFullYear()).slice(2)}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
-      const date = now.toLocaleDateString(d.locale, { day: 'numeric', month: 'long', year: 'numeric' });
-      const slip = (k: string) => document.querySelector<HTMLElement>(`[data-slip="${k}"]`);
-      const empty = slip('name')?.textContent || '…';
-      slip('number')!.textContent = number;
-      slip('date')!.textContent = date;
-      const val = (n: string) => ((form.elements.namedItem(n) as HTMLInputElement).value || '').trim();
-      const sync = () => {
-        for (const k of ['name', 'who', 'where', 'what']) {
-          const el = slip(k);
-          if (!el) continue;
-          const v = val(k) || empty;
-          if (el.textContent !== v) {
-            el.textContent = v;
-            el.classList.remove('is-ink');
-            void el.offsetWidth;
-            el.classList.add('is-ink');
-          }
-        }
+      const build = () => {
+        const f = new FormData(form);
+        const d = form.dataset;
+        return [
+          `${d.lName}: ${f.get('name') || ''}`,
+          `${d.lPhone}: ${f.get('phone') || ''}`,
+          `${d.lWho}: ${f.get('who') || ''}`,
+          '',
+          `${d.lWhat}:`,
+          `${f.get('what') || ''}`,
+        ].join('\n');
       };
-      form.addEventListener('input', sync);
-      form.addEventListener('change', sync);
-
-      const build = () => [
-        `${d.lTitle} ${number}`,
-        `${d.lDate}: ${date}`,
-        `${d.lFrom}: ${val('name')}`,
-        `${d.lPhone}: ${val('phone')}`,
-        `${d.lProperty}: ${val('who')}`,
-        `${d.lPlace}: ${val('where')}`,
-        '',
-        `${d.lIssue}:`,
-        val('what'),
-      ].join('\n');
-
       const valid = () => {
         const name = form.elements.namedItem('name') as HTMLInputElement;
         const what = form.elements.namedItem('what') as HTMLTextAreaElement;
@@ -342,9 +316,10 @@ const locale = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' }[lang];
           if (!valid()) return;
           const text = build();
           if (b.dataset.send === 'wa') {
-            window.open(`https://wa.me/${d.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+            window.open(`https://wa.me/${form.dataset.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
           } else {
-            location.href = `mailto:${d.mail}?subject=${encodeURIComponent(`${d.lTitle} ${number}`)}&body=${encodeURIComponent(text)}`;
+            const subject = `Handyman – ${(form.elements.namedItem('who') as HTMLSelectElement).value}`;
+            location.href = `mailto:${form.dataset.mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
           }
         }),
       );

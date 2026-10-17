@@ -146,7 +146,7 @@ export const content: Record<Lang, Content> = {
       cta: 'Zapytaj o stałą opiekę',
     },
     process: {
-      title: 'Jak to idzie',
+      title: 'Jak pracuję',
       steps: [
         { title: 'Opisujesz usterkę', text: 'Telefonem, na WhatsAppie albo formularzem. Najlepiej ze zdjęciem.' },
         { title: 'Dostajesz wycenę', text: 'Orientacyjną na podstawie zdjęcia, dokładną po oględzinach na miejscu.' },
@@ -155,7 +155,7 @@ export const content: Record<Lang, Content> = {
       ],
     },
     trust: {
-      title: 'Dlaczego ja',
+      title: 'Dlaczego mi zaufasz',
       items: [
         { title: 'Uprawnienia SEP do 1 kV', text: 'Instalacje, montaż i konserwacja urządzeń elektrycznych. Świadectwo pokażę przed rozpoczęciem pracy.' },
         { title: 'Wycena ze zdjęcia', text: 'Wiesz, czego się spodziewać, zanim ktokolwiek przyjedzie.' },
@@ -176,8 +176,8 @@ export const content: Record<Lang, Content> = {
     ticket: { title: 'Zlecenie naprawy', number: 'Nr', date: 'Data', from: 'Zgłasza', property: 'Obiekt', place: 'Miejsce', issue: 'Usterka', status: 'Status', statusValue: 'czeka na wycenę', empty: '…' },
     gallery: { title: 'Realizacje' },
     contact: {
-      title: 'Wypisz zlecenie',
-      lead: 'Uzupełnij pola, a zlecenie po prawej wypełni się samo. Wyślesz je jednym kliknięciem, przez WhatsApp albo e-mail.',
+      title: 'Opisz, co się dzieje.',
+      lead: 'Wypełnij krótki formularz. Po kliknięciu otworzy się wiadomość do mnie z gotowym opisem, wystarczy ją wysłać.',
       form: {
         name: 'Imię i nazwisko',
         phone: 'Telefon',
@@ -278,7 +278,7 @@ export const content: Record<Lang, Content> = {
       ],
     },
     trust: {
-      title: 'Warum ich',
+      title: 'Warum Sie mir vertrauen können',
       items: [
         { title: 'SEP-Qualifikation bis 1 kV', text: 'Polnischer Elektro-Befähigungsnachweis für Installation, Montage und Wartung. Den Nachweis zeige ich vor Arbeitsbeginn.' },
         { title: 'Angebot per Foto', text: 'Sie wissen, was auf Sie zukommt, bevor jemand anreist.' },
@@ -299,8 +299,8 @@ export const content: Record<Lang, Content> = {
     ticket: { title: 'Reparaturauftrag', number: 'Nr.', date: 'Datum', from: 'Auftraggeber', property: 'Objekt', place: 'Ort', issue: 'Schaden', status: 'Status', statusValue: 'wartet auf Angebot', empty: '…' },
     gallery: { title: 'Referenzen' },
     contact: {
-      title: 'Auftrag ausfüllen',
-      lead: 'Füllen Sie die Felder aus, der Auftrag rechts füllt sich von selbst. Senden Sie ihn mit einem Klick per WhatsApp oder E-Mail.',
+      title: 'Beschreiben Sie, was los ist.',
+      lead: 'Füllen Sie das kurze Formular aus. Danach öffnet sich eine Nachricht an mich mit fertiger Beschreibung, Sie müssen sie nur absenden.',
       form: {
         name: 'Name',
         phone: 'Telefon',
@@ -401,7 +401,7 @@ export const content: Record<Lang, Content> = {
       ],
     },
     trust: {
-      title: 'Why me',
+      title: 'Why you can trust me',
       items: [
         { title: 'SEP electrical licence up to 1 kV', text: 'Polish certification for electrical installation, fitting and maintenance. I will show the certificate before work starts.' },
         { title: 'Quote from a photo', text: 'You know what to expect before anyone drives out.' },
@@ -422,8 +422,8 @@ export const content: Record<Lang, Content> = {
     ticket: { title: 'Job ticket', number: 'No.', date: 'Date', from: 'From', property: 'Property', place: 'Where', issue: 'Problem', status: 'Status', statusValue: 'awaiting quote', empty: '…' },
     gallery: { title: 'Selected work' },
     contact: {
-      title: 'Fill in a job ticket',
-      lead: 'Fill in the fields and the ticket fills itself in. Send it with one click, by WhatsApp or email.',
+      title: 'Tell me what is going on.',
+      lead: 'Fill in the short form. A message to me will open with the description ready, you only need to send it.',
       form: {
         name: 'Name',
         phone: 'Phone',

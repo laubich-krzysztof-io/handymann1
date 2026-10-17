@@ -1,5 +1,8 @@
 ---
 import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource/space-mono/400.css';
+import '@fontsource/space-mono/700.css';
+import '@fontsource/space-mono/700-italic.css';
 import '../styles/global.css';
 import { locales, site, type Lang } from '../config';
 
@@ -29,7 +32,7 @@ const ld = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#24463A" />
+    <meta name="theme-color" content="#F6F4E6" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={canonical} />
     {locales.map((l) => <link rel="alternate" hreflang={l} href={`${base}/${l}/`} />)}
