@@ -38,24 +38,7 @@ const icons = [
   <header class="top">
     <div class="wrap top__in">
       <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub[lang]}`}>
-        <svg class="brand__mark" viewBox="0 0 132 100" aria-hidden="true">
-          <!-- świerk -->
-          <path d="M15 97V80" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
-          <path d="M15 4 5 22h6L2 38h7L1 55h8L0 82h30L21 55h8L21 38h7L19 22h6z" fill="currentColor"/>
-          <!-- dom -->
-          <path d="M36 98V52l34-30 34 30v46z" fill="currentColor"/>
-          <rect x="84" y="28" width="9" height="16" fill="currentColor"/>
-          <!-- stetoskop: słuchawki, przewód i głowica na ścianie domu -->
-          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M104 10c-3 14 0 24 9 30m15-30c3 14 0 24-9 30m-3 0c1 22 6 38-10 48-11 7-25 3-28-6" stroke="var(--paper)" stroke-width="10"/>
-            <path d="M104 10c-3 14 0 24 9 30m15-30c3 14 0 24-9 30m-3 0c1 22 6 38-10 48-11 7-25 3-28-6" stroke="currentColor" stroke-width="4.5"/>
-          </g>
-          <circle cx="104" cy="9" r="3.6" fill="currentColor"/>
-          <circle cx="128" cy="9" r="3.6" fill="currentColor"/>
-          <circle cx="78" cy="80" r="9.5" fill="var(--paper)"/>
-          <circle cx="78" cy="80" r="7" fill="currentColor"/>
-          <circle cx="78" cy="80" r="3" fill="var(--paper)"/>
-        </svg>
+        <img class="brand__mark" src="/img/logo-160.webp" srcset="/img/logo-160.webp 160w, /img/logo-256.webp 256w" sizes="5.2rem" width="160" height="160" alt="" />
         <span class="brand__text">
           <span class="brand__name">{site.name}</span>
           <span class="brand__sub">{brandSub[lang]}</span>
@@ -281,7 +264,7 @@ const icons = [
 
   <footer class="foot">
     <div class="wrap foot__in">
-      <span class="foot__brand">{site.name}</span>
+      <span class="foot__brand"><img src="/img/logo-160.webp" width="48" height="48" alt="" />{site.name}</span>
       <span>{t.footer.area}</span>
       <span>© {new Date().getFullYear()} {site.company || site.name}. {t.footer.rights}</span>
     </div>

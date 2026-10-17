@@ -33,7 +33,9 @@ const ld = {
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#F6F4E6" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:image" content={`${base}/img/logo-512.png`} />
     <link rel="canonical" href={canonical} />
     {locales.map((l) => <link rel="alternate" hreflang={l} href={`${base}/${l}/`} />)}
     <link rel="alternate" hreflang="x-default" href={`${base}/pl/`} />
