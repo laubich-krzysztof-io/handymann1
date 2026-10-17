@@ -6,7 +6,6 @@ export interface Content {
   nav: { services: string; care: string; process: string; trust: string; contact: string };
   call: string;
   hero: {
-    eyebrow: string;
     title: string;
     lead: string;
     primary: string;
@@ -21,7 +20,6 @@ export interface Content {
     note: string;
   };
   care: {
-    eyebrow: string;
     title: string;
     lead: string;
     points: { title: string; text: string }[];
@@ -37,18 +35,6 @@ export interface Content {
     lead: string;
     facts: [string, string][];
     photos: { tasma: string; malowanie: string; detal: string; gotowe: string };
-  };
-  ticket: {
-    title: string;
-    number: string;
-    date: string;
-    from: string;
-    property: string;
-    place: string;
-    issue: string;
-    status: string;
-    statusValue: string;
-    empty: string;
   };
   gallery: { title: string };
   contact: {
@@ -86,7 +72,6 @@ export const content: Record<Lang, Content> = {
     nav: { services: 'Usługi', care: 'Stała opieka', process: 'Jak pracuję', trust: 'Zaufanie', contact: 'Kontakt' },
     call: 'Zadzwoń',
     hero: {
-      eyebrow: 'Złota rączka · Karkonosze',
       title: 'Naprawię, zanim gość zauważy.',
       lead: 'Hydraulika, elektryka, montaż i drobne remonty. Dla pensjonatów, małych hoteli, firm i domów w Karkonoszach, jednorazowo albo na stałe.',
       primary: 'Opisz usterkę',
@@ -135,7 +120,6 @@ export const content: Record<Lang, Content> = {
       note: 'Prace elektryczne wykonuję na podstawie uprawnień SEP do 1 kV.',
     },
     care: {
-      eyebrow: 'Dla pensjonatów i małych hoteli',
       title: 'Stała opieka nad obiektem',
       lead: 'Gość nie zapamięta, że kran kapał. Zapamięta, że kapał trzy dni. Przy stałej opiece usterki trafiają na listę i są usuwane, zanim zrobią się problemem.',
       points: [
@@ -173,7 +157,6 @@ export const content: Record<Lang, Content> = {
         gotowe: 'Gotowa ściana z zielonymi, niebieskimi i pomarańczowymi górami, obok wykonawca',
       },
     },
-    ticket: { title: 'Zlecenie naprawy', number: 'Nr', date: 'Data', from: 'Zgłasza', property: 'Obiekt', place: 'Miejsce', issue: 'Usterka', status: 'Status', statusValue: 'czeka na wycenę', empty: '…' },
     gallery: { title: 'Realizacje' },
     contact: {
       title: 'Opisz, co się dzieje.',
@@ -209,7 +192,6 @@ export const content: Record<Lang, Content> = {
     nav: { services: 'Leistungen', care: 'Objektbetreuung', process: 'Ablauf', trust: 'Vertrauen', contact: 'Kontakt' },
     call: 'Anrufen',
     hero: {
-      eyebrow: 'Handyman · Riesengebirge',
       title: 'Repariert, bevor Gäste es merken.',
       lead: 'Sanitär, Elektro, Montage und kleine Renovierungen. Für Pensionen, kleine Hotels, Firmen und Häuser im Riesengebirge, einmalig oder dauerhaft.',
       primary: 'Schaden beschreiben',
@@ -258,7 +240,6 @@ export const content: Record<Lang, Content> = {
       note: 'Elektroarbeiten führe ich auf Grundlage meiner SEP-Qualifikation bis 1 kV aus.',
     },
     care: {
-      eyebrow: 'Für Pensionen und kleine Hotels',
       title: 'Feste Objektbetreuung',
       lead: 'Ein Gast vergisst, dass ein Hahn getropft hat. Er erinnert sich, dass er drei Tage getropft hat. Bei fester Betreuung landen Mängel auf einer Liste und werden behoben, bevor sie zum Problem werden.',
       points: [
@@ -296,7 +277,6 @@ export const content: Record<Lang, Content> = {
         gotowe: 'Fertige Wand mit grünen, blauen und orangefarbenen Bergen, daneben der Handwerker',
       },
     },
-    ticket: { title: 'Reparaturauftrag', number: 'Nr.', date: 'Datum', from: 'Auftraggeber', property: 'Objekt', place: 'Ort', issue: 'Schaden', status: 'Status', statusValue: 'wartet auf Angebot', empty: '…' },
     gallery: { title: 'Referenzen' },
     contact: {
       title: 'Beschreiben Sie, was los ist.',
@@ -332,7 +312,6 @@ export const content: Record<Lang, Content> = {
     nav: { services: 'Services', care: 'Property care', process: 'How it works', trust: 'Trust', contact: 'Contact' },
     call: 'Call',
     hero: {
-      eyebrow: 'Handyman · Karkonosze',
       title: 'Fixed before your guest notices.',
       lead: 'Plumbing, electrics, installation and small renovations. For guesthouses, small hotels, businesses and homes in the Karkonosze, one-off or on a regular basis.',
       primary: 'Describe the problem',
@@ -381,7 +360,6 @@ export const content: Record<Lang, Content> = {
       note: 'Electrical work is carried out under my SEP licence up to 1 kV.',
     },
     care: {
-      eyebrow: 'For guesthouses and small hotels',
       title: 'Regular property care',
       lead: 'A guest will not remember that a tap dripped. They will remember it dripped for three days. With regular care, defects go on a list and get fixed before they become a problem.',
       points: [
@@ -419,7 +397,6 @@ export const content: Record<Lang, Content> = {
         gotowe: 'The finished wall with green, blue and orange mountains, the painter beside it',
       },
     },
-    ticket: { title: 'Job ticket', number: 'No.', date: 'Date', from: 'From', property: 'Property', place: 'Where', issue: 'Problem', status: 'Status', statusValue: 'awaiting quote', empty: '…' },
     gallery: { title: 'Selected work' },
     contact: {
       title: 'Tell me what is going on.',

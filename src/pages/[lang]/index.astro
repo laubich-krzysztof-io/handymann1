@@ -18,6 +18,8 @@ const bandText: Record<Lang, string> = {
   en: 'Jelenia Góra, Lubomierz, Szklarska Poręba and around',
 };
 const realizacje: Record<Lang, string> = { pl: 'Realizacje', de: 'Referenzen', en: 'Work' };
+const navLabel: Record<Lang, string> = { pl: 'Menu główne', de: 'Hauptmenü', en: 'Main menu' };
+const langLabel: Record<Lang, string> = { pl: 'Język', de: 'Sprache', en: 'Language' };
 const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt springen', en: 'Skip to content' };
 
 // Proste ikony usług (kolejność jak w content.services.items)
@@ -44,14 +46,14 @@ const icons = [
           <span class="brand__sub">{brandSub[lang]}</span>
         </span>
       </a>
-      <nav class="nav" aria-label="Main">
+      <nav class="nav" aria-label={navLabel[lang]}>
         <a href="#uslugi">{t.nav.services}</a>
         <a href="#realizacja">{realizacje[lang]}</a>
         <a href="#opieka">{t.nav.care}</a>
         <a href="#jak">{t.nav.process}</a>
       </nav>
       <div class="top__end">
-        <ul class="lang" aria-label="Language">
+        <ul class="lang" aria-label={langLabel[lang]}>
           {locales.map((l) => (
             <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
           ))}
@@ -141,7 +143,6 @@ const icons = [
     <section id="opieka" class="section">
       <div class="wrap care">
         <div class="care__lead">
-          <p class="eyebrow">{t.care.eyebrow}</p>
           <h2>{t.care.title}</h2>
           <p class="lead">{t.care.lead}</p>
           <ul class="care__points">
