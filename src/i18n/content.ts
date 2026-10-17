@@ -32,6 +32,12 @@ export interface Content {
     title: string;
     items: { title: string; text: string }[];
   };
+  work: {
+    title: string;
+    lead: string;
+    facts: [string, string][];
+    photos: { tasma: string; malowanie: string; detal: string; gotowe: string };
+  };
   ticket: {
     title: string;
     number: string;
@@ -156,6 +162,17 @@ export const content: Record<Lang, Content> = {
         { title: 'Ta sama osoba za każdym razem', text: 'Nie pośrednik i nie zmieniająca się ekipa. Znam Twój obiekt.' },
       ],
     },
+    work: {
+      title: 'Z ostatniego zlecenia',
+      lead: 'Ściana z górami w pokoju. Dwa dni pracy, od pierwszego paska taśmy do ostatniego szczytu.',
+      facts: [['Zakres', 'Taśmowanie i malowanie'], ['Czas', '2 dni'], ['Termin', '19–20 września 2026']],
+      photos: {
+        tasma: 'Wyznaczanie szczytów gór taśmą malarską na białej ścianie',
+        malowanie: 'Malowanie pomarańczowego szczytu pędzlem przy samej krawędzi taśmy',
+        detal: 'Zdejmowanie taśmy z niebieskiego szczytu, widoczna ostra krawędź farby',
+        gotowe: 'Gotowa ściana z zielonymi, niebieskimi i pomarańczowymi górami, obok wykonawca',
+      },
+    },
     ticket: { title: 'Zlecenie naprawy', number: 'Nr', date: 'Data', from: 'Zgłasza', property: 'Obiekt', place: 'Miejsce', issue: 'Usterka', status: 'Status', statusValue: 'czeka na wycenę', empty: '…' },
     gallery: { title: 'Realizacje' },
     contact: {
@@ -268,6 +285,17 @@ export const content: Record<Lang, Content> = {
         { title: 'Jedes Mal dieselbe Person', text: 'Kein Vermittler und kein wechselndes Team. Ich kenne Ihr Haus.' },
       ],
     },
+    work: {
+      title: 'Aus dem letzten Auftrag',
+      lead: 'Eine Wand mit Bergen im Zimmer. Zwei Arbeitstage, vom ersten Streifen Klebeband bis zum letzten Gipfel.',
+      facts: [['Umfang', 'Abkleben und Streichen'], ['Dauer', '2 Tage'], ['Termin', '19.–20. September 2026']],
+      photos: {
+        tasma: 'Berggipfel werden mit Malerkrepp auf der weißen Wand angezeichnet',
+        malowanie: 'Ein orangefarbener Gipfel wird mit dem Pinsel bis an die Klebekante gestrichen',
+        detal: 'Klebeband wird von einem blauen Gipfel abgezogen, die Farbkante ist scharf',
+        gotowe: 'Fertige Wand mit grünen, blauen und orangefarbenen Bergen, daneben der Handwerker',
+      },
+    },
     ticket: { title: 'Reparaturauftrag', number: 'Nr.', date: 'Datum', from: 'Auftraggeber', property: 'Objekt', place: 'Ort', issue: 'Schaden', status: 'Status', statusValue: 'wartet auf Angebot', empty: '…' },
     gallery: { title: 'Referenzen' },
     contact: {
@@ -379,6 +407,17 @@ export const content: Record<Lang, Content> = {
         { title: 'Quote from a photo', text: 'You know what to expect before anyone drives out.' },
         { title: 'The same person every time', text: 'Not a middleman and not a rotating crew. I know your property.' },
       ],
+    },
+    work: {
+      title: 'From the last job',
+      lead: 'A mountain wall in a room. Two days of work, from the first strip of tape to the last peak.',
+      facts: [['Scope', 'Taping and painting'], ['Time', '2 days'], ['Dates', '19–20 September 2026']],
+      photos: {
+        tasma: 'Marking mountain peaks on a white wall with masking tape',
+        malowanie: 'Painting an orange peak with a brush right up to the tape edge',
+        detal: 'Pulling tape off a blue peak, leaving a crisp paint edge',
+        gotowe: 'The finished wall with green, blue and orange mountains, the painter beside it',
+      },
     },
     ticket: { title: 'Job ticket', number: 'No.', date: 'Date', from: 'From', property: 'Property', place: 'Where', issue: 'Problem', status: 'Status', statusValue: 'awaiting quote', empty: '…' },
     gallery: { title: 'Selected work' },

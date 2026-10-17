@@ -135,6 +135,28 @@ main { position: relative; z-index: 1; background: var(--cream); }
 .sheet__note { font-size: .95rem; color: var(--ink-soft); }
 @media (min-width: 48rem) { .jobs { grid-template-columns: 1fr 1fr; } }
 
+/* ---------- Z ostatniego zlecenia: zdjęcia w nierównych rozmiarach ---------- */
+.work { background: var(--cream-2); padding-block: var(--gap-section); }
+.work__head { display: grid; gap: 2rem; margin-bottom: clamp(2rem, 5vw, 3.5rem); align-items: end; }
+.work__head p { max-width: 40ch; font-size: 1.15rem; margin-top: 1rem; }
+.work__facts { display: grid; gap: .2rem; }
+.work__facts > div { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; padding: .55rem .8rem; background: var(--paper); }
+.work__facts > div:nth-child(even) { background: var(--cream); }
+.work__facts dt { color: var(--ink-soft); }
+.work__facts dd { font-weight: 700; }
+.work__grid { display: grid; gap: clamp(.8rem, 1.6vw, 1.4rem); }
+.work__photo { overflow: hidden; background: var(--cream); }
+.work__photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+.work__photo:hover img { transform: scale(1.03); }
+@media (min-width: 60rem) {
+  .work__head { grid-template-columns: 1.3fr 1fr; }
+  .work__grid { grid-template-columns: repeat(12, 1fr); align-items: start; }
+  .w-a { grid-column: 1 / 8; }
+  .w-b { grid-column: 8 / 13; grid-row: span 2; }
+  .w-c { grid-column: 1 / 5; }
+  .w-d { grid-column: 5 / 8; }
+}
+
 /* ---------- Stała opieka: zeszyt usterek ---------- */
 .care { background: var(--ink); color: var(--on-ground); padding-block: var(--gap-section); }
 .care__in { display: grid; gap: clamp(2.5rem, 6vw, 5rem); align-items: start; }
@@ -239,7 +261,7 @@ main { position: relative; z-index: 1; background: var(--cream); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .btn, .form input, .form select, .form textarea, .job__box::after { transition: none; }
+  .btn, .form input, .form select, .form textarea, .job__box::after, .work__photo img { transition: none; }
   .btn:hover, .btn:active { transform: none; }
   .is-ink { animation: none; }
   .foot { position: static; }

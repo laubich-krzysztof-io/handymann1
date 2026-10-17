@@ -22,6 +22,7 @@ const locale = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' }[lang];
       <a class="brand" href={`/${lang}/`}>{site.name}</a>
       <nav class="nav" aria-label="Main">
         <a href="#uslugi">{t.nav.services}</a>
+        <a href="#realizacja">{t.work.title}</a>
         <a href="#opieka">{t.nav.care}</a>
         <a href="#jak">{t.nav.process}</a>
       </nav>
@@ -81,6 +82,40 @@ const locale = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' }[lang];
             ))}
           </ul>
           <p class="sheet__note reveal">{t.services.note}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Z ostatniego zlecenia: zdjęcia z realizacji -->
+    <section id="realizacja" class="work">
+      <div class="wrap">
+        <div class="work__head">
+          <div class="reveal">
+            <h2>{t.work.title}</h2>
+            <p>{t.work.lead}</p>
+          </div>
+          <dl class="work__facts reveal">
+            {t.work.facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+          </dl>
+        </div>
+        <div class="work__grid">
+          {[
+            { id: 'malowanie', cls: 'w-a', w: 1600, h: 1200 },
+            { id: 'gotowe', cls: 'w-b', w: 1200, h: 1600 },
+            { id: 'tasma', cls: 'w-c', w: 1600, h: 1200 },
+            { id: 'detal', cls: 'w-d', w: 1200, h: 1600 },
+          ].map((p) => (
+            <figure class={`work__photo ${p.cls} reveal`}>
+              <img
+                src={`/img/mural-${p.id}-1600.webp`}
+                srcset={`/img/mural-${p.id}-900.webp 900w, /img/mural-${p.id}-1600.webp 1600w`}
+                sizes="(min-width: 60rem) 50vw, 100vw"
+                width={p.w} height={p.h}
+                alt={t.work.photos[p.id as keyof typeof t.work.photos]}
+                loading="lazy" decoding="async"
+              />
+            </figure>
+          ))}
         </div>
       </div>
     </section>
