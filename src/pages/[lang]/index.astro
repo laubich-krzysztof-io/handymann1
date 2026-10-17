@@ -256,8 +256,8 @@ const icons = [
         <form id="lead" class="form" novalidate data-wa={site.whatsapp} data-mail={site.email}
           data-l-name={t.contact.form.name} data-l-phone={t.contact.form.phone} data-l-who={t.contact.form.who} data-l-what={t.contact.form.what}>
           <label>
-            <span>{t.contact.form.name}</span>
-            <input name="name" autocomplete="name" required />
+            <span>{t.contact.form.name} <small>({t.contact.form.required})</small></span>
+            <input name="name" autocomplete="name" required aria-describedby="form-error" />
           </label>
           <label>
             <span>{t.contact.form.phone}</span>
@@ -270,9 +270,10 @@ const icons = [
             </select>
           </label>
           <label>
-            <span>{t.contact.form.what}</span>
-            <textarea name="what" rows="4" required placeholder={t.contact.form.whatPlaceholder}></textarea>
+            <span>{t.contact.form.what} <small>({t.contact.form.required})</small></span>
+            <textarea name="what" rows="4" required aria-describedby="form-error" placeholder={t.contact.form.whatPlaceholder}></textarea>
           </label>
+          <p id="form-error" class="form__error" role="alert" hidden>{t.contact.form.error}</p>
           <div class="actions">
             <button class="btn" type="button" data-send="wa">{t.contact.form.whatsapp}</button>
             <button class="btn btn--ghost" type="button" data-send="mail">{t.contact.form.email}</button>
@@ -300,6 +301,8 @@ const icons = [
       const off = () => g.classList.remove('is-on');
       li.addEventListener('mouseenter', on);
       li.addEventListener('mouseleave', off);
+      li.addEventListener('focus', on);
+      li.addEventListener('blur', off);
     });
 
     const form = document.getElementById('lead') as HTMLFormElement | null;
@@ -322,6 +325,8 @@ const icons = [
         const ok = name.value.trim() !== '' && what.value.trim() !== '';
         name.setAttribute('aria-invalid', String(name.value.trim() === ''));
         what.setAttribute('aria-invalid', String(what.value.trim() === ''));
+        const err = document.getElementById('form-error');
+        if (err) err.hidden = ok;
         if (!ok) (name.value.trim() === '' ? name : what).focus();
         return ok;
       };

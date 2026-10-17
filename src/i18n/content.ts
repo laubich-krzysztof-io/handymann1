@@ -55,6 +55,8 @@ export interface Content {
       whatsapp: string;
       email: string;
       hint: string;
+      error: string;
+      required: string;
     };
     direct: string;
     area: string;
@@ -119,7 +121,7 @@ export const content: Record<Lang, Content> = {
           examples: 'obchody · usterki · sezon',
         },
       ],
-      note: 'Prace elektryczne wykonuję w zakresie posiadanych uprawnień.',
+      note: 'Prace elektryczne wykonuję na podstawie uprawnień SEP do 1 kV.',
     },
     care: {
       eyebrow: 'Dla pensjonatów i małych hoteli',
@@ -144,7 +146,7 @@ export const content: Record<Lang, Content> = {
     trust: {
       title: 'Dlaczego mi zaufasz',
       items: [
-        { title: 'Uprawnienia do wglądu', text: 'Dokumenty potwierdzające kwalifikacje pokażę przed rozpoczęciem pracy.' },
+        { title: 'Uprawnienia SEP do 1 kV', text: 'Instalacje, montaż i konserwacja urządzeń elektrycznych. Świadectwo pokażę przed rozpoczęciem pracy.' },
         { title: 'Wycena ze zdjęcia', text: 'Wiesz, czego się spodziewać, zanim ktokolwiek przyjedzie.' },
         { title: 'Ta sama osoba za każdym razem', text: 'Nie pośrednik i nie zmieniająca się ekipa. Znam Twój obiekt.' },
       ],
@@ -172,6 +174,8 @@ export const content: Record<Lang, Content> = {
         whatsapp: 'Wyślij przez WhatsApp',
         email: 'Wyślij e-mailem',
         hint: 'Zdjęcie dołączysz już w otwartej wiadomości.',
+        error: 'Wpisz imię i opisz, co jest do zrobienia.',
+        required: 'wymagane',
       },
       direct: 'Wolisz zadzwonić?',
       area: 'Karkonosze i okolice: Jelenia Góra, Lubomierz, Szklarska Poręba i dalej na zapytanie.',
@@ -235,7 +239,7 @@ export const content: Record<Lang, Content> = {
           examples: 'Rundgänge · Mängel · Saison',
         },
       ],
-      note: 'Elektroarbeiten führe ich im Rahmen meiner vorhandenen Befugnisse aus.',
+      note: 'Elektroarbeiten führe ich auf Grundlage meiner SEP-Qualifikation bis 1 kV aus.',
     },
     care: {
       eyebrow: 'Für Pensionen und kleine Hotels',
@@ -260,7 +264,7 @@ export const content: Record<Lang, Content> = {
     trust: {
       title: 'Warum Sie mir vertrauen können',
       items: [
-        { title: 'Nachweise auf Wunsch', text: 'Dokumente zu meinen Qualifikationen zeige ich vor Arbeitsbeginn.' },
+        { title: 'SEP-Qualifikation bis 1 kV', text: 'Polnischer Elektro-Befähigungsnachweis für Installation, Montage und Wartung. Den Nachweis zeige ich vor Arbeitsbeginn.' },
         { title: 'Angebot per Foto', text: 'Sie wissen, was auf Sie zukommt, bevor jemand anreist.' },
         { title: 'Jedes Mal dieselbe Person', text: 'Kein Vermittler und kein wechselndes Team. Ich kenne Ihr Haus.' },
       ],
@@ -288,6 +292,8 @@ export const content: Record<Lang, Content> = {
         whatsapp: 'Per WhatsApp senden',
         email: 'Per E-Mail senden',
         hint: 'Ein Foto fügen Sie in der geöffneten Nachricht hinzu.',
+        error: 'Bitte geben Sie Ihren Namen ein und beschreiben Sie, was zu tun ist.',
+        required: 'Pflichtfeld',
       },
       direct: 'Lieber anrufen?',
       area: 'Riesengebirge und Umgebung: Jelenia Góra, Lubomierz, Szklarska Poręba und weiter auf Anfrage.',
@@ -351,7 +357,7 @@ export const content: Record<Lang, Content> = {
           examples: 'walk-rounds · defects · season',
         },
       ],
-      note: 'Electrical work is carried out within the scope of my qualifications.',
+      note: 'Electrical work is carried out under my SEP licence up to 1 kV.',
     },
     care: {
       eyebrow: 'For guesthouses and small hotels',
@@ -376,7 +382,7 @@ export const content: Record<Lang, Content> = {
     trust: {
       title: 'Why you can trust me',
       items: [
-        { title: 'Qualifications on request', text: 'I will show documents confirming my qualifications before work starts.' },
+        { title: 'SEP electrical licence up to 1 kV', text: 'Polish certification for electrical installation, fitting and maintenance. I will show the certificate before work starts.' },
         { title: 'Quote from a photo', text: 'You know what to expect before anyone drives out.' },
         { title: 'The same person every time', text: 'Not a middleman and not a rotating crew. I know your property.' },
       ],
@@ -404,6 +410,8 @@ export const content: Record<Lang, Content> = {
         whatsapp: 'Send via WhatsApp',
         email: 'Send by email',
         hint: 'You can attach a photo in the message that opens.',
+        error: 'Enter your name and describe what needs doing.',
+        required: 'required',
       },
       direct: 'Prefer to call?',
       area: 'Karkonosze and surroundings: Jelenia Góra, Lubomierz, Szklarska Poręba and further on request.',
