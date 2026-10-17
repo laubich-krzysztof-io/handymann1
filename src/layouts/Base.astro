@@ -1,0 +1,48 @@
+---
+import '@fontsource/gloock/400.css';
+import '@fontsource-variable/hanken-grotesk';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
+import { locales, site, type Lang } from '../config';
+
+interface Props {
+  lang: Lang;
+  htmlLang: string;
+  title: string;
+  description: string;
+}
+const { lang, htmlLang, title, description } = Astro.props;
+const base = Astro.site ? Astro.site.origin : '';
+const canonical = `${base}/${lang}/`;
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: site.name,
+  description,
+  url: canonical,
+  areaServed: 'Karkonosze, Lower Silesia, Poland',
+};
+---
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ECEFEC" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={`${base}/${l}/`} />)}
+    <link rel="alternate" hreflang="x-default" href={`${base}/pl/`} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,248 @@
+---
+import Base from '../../layouts/Base.astro';
+import { content } from '../../i18n/content';
+import { locales, site, type Lang } from '../../config';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = content[lang];
+const tel = site.phone.replace(/\s/g, '');
+const gallery = site.gallery;
+const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt springen', en: 'Skip to content' };
+---
+<Base lang={lang} htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description}>
+  <a class="skip" href="#main">{skip[lang]}</a>
+
+  <header class="top">
+    <div class="wrap top__in">
+      <a class="brand" href={`/${lang}/`} aria-label={site.name}>
+        <svg class="brand__key" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="6"/><path d="M32 29v26M32 43h10M32 52h7" stroke="currentColor" stroke-width="6" stroke-linecap="round" fill="none"/></svg>
+        <span class="brand__name">{site.name}</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="#uslugi">{t.nav.services}</a>
+        <a href="#opieka">{t.nav.care}</a>
+        <a href="#jak">{t.nav.process}</a>
+        <a href="#kontakt">{t.nav.contact}</a>
+      </nav>
+      <div class="top__end">
+        <ul class="lang" aria-label="Language">
+          {locales.map((l) => (
+            <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
+          ))}
+        </ul>
+        <a class="btn btn--small" href={`tel:${tel}`}>{t.call}</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="wrap hero__in">
+        <div class="hero__copy">
+          <p class="eyebrow">{t.hero.eyebrow}</p>
+          <h1>{t.hero.title}</h1>
+          <p class="lead">{t.hero.lead}</p>
+          <div class="actions">
+            <a class="btn" href="#kontakt">{t.hero.primary}</a>
+            <a class="btn btn--ghost" href="#opieka">{t.hero.secondary}</a>
+          </div>
+          <ul class="audience">
+            {t.hero.audience.map((a) => <li>{a}</li>)}
+          </ul>
+        </div>
+
+        <aside class="log" aria-label={t.log.title}>
+          <div class="log__head">
+            <span class="log__title">{t.log.title}</span>
+            <span class="log__dot" aria-hidden="true"></span>
+          </div>
+          <div class="log__window" aria-hidden="true">
+            <ol class="log__list">
+              {[...t.log.entries, ...t.log.entries].map((e) => (
+                <li>
+                  <span class="log__when">{e.when}</span>
+                  <span class="log__where">{e.where}</span>
+                  <span class="log__what">{e.what}</span>
+                  <span class="log__done">{e.done}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <p class="log__note">{t.log.note}</p>
+          <ul class="sr-only">
+            {t.log.entries.map((e) => <li>{e.where}: {e.what}, {e.done}</li>)}
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="uslugi" class="section">
+      <div class="wrap">
+        <div class="section__head">
+          <h2>{t.services.title}</h2>
+          <p class="lead">{t.services.lead}</p>
+        </div>
+        <ul class="services">
+          {t.services.items.map((s) => (
+            <li class="service">
+              <h3>{s.name}</h3>
+              <p>{s.text}</p>
+              <p class="service__tags">{s.examples}</p>
+            </li>
+          ))}
+        </ul>
+        <p class="fine">{t.services.note}</p>
+      </div>
+    </section>
+
+    <section id="opieka" class="care">
+      <div class="wrap care__in">
+        <div class="care__lead">
+          <p class="eyebrow eyebrow--light">{t.care.eyebrow}</p>
+          <h2>{t.care.title}</h2>
+          <p>{t.care.lead}</p>
+          <a class="btn btn--brass" href="#kontakt">{t.care.cta}</a>
+        </div>
+        <ul class="care__points">
+          {t.care.points.map((p) => (
+            <li>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section id="jak" class="section">
+      <div class="wrap">
+        <h2>{t.process.title}</h2>
+        <ol class="steps">
+          {t.process.steps.map((s) => (
+            <li>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section id="zaufanie" class="section section--tint">
+      <div class="wrap">
+        <h2>{t.trust.title}</h2>
+        <ul class="trust">
+          {t.trust.items.map((i) => (
+            <li>
+              <h3>{i.title}</h3>
+              <p>{i.text}</p>
+            </li>
+          ))}
+        </ul>
+        {gallery.length > 0 && (
+          <div class="gallery">
+            <h3>{t.gallery.title}</h3>
+            <ul>
+              {gallery.map((g) => (
+                <li><img src={g.src} alt={g.alt[lang]} loading="lazy" /></li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <section id="kontakt" class="section contact">
+      <div class="wrap contact__in">
+        <div>
+          <h2>{t.contact.title}</h2>
+          <p class="lead">{t.contact.lead}</p>
+          <p class="direct">
+            <span>{t.contact.direct}</span>
+            <a href={`tel:${tel}`}>{site.phone}</a>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
+          <p class="fine">{t.contact.area}</p>
+        </div>
+
+        <form id="lead" class="form" novalidate data-wa={site.whatsapp} data-mail={site.email}
+          data-l-name={t.contact.form.name} data-l-phone={t.contact.form.phone} data-l-who={t.contact.form.who} data-l-what={t.contact.form.what}>
+          <label>
+            <span>{t.contact.form.name}</span>
+            <input name="name" autocomplete="name" required />
+          </label>
+          <label>
+            <span>{t.contact.form.phone}</span>
+            <input name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+          </label>
+          <label>
+            <span>{t.contact.form.who}</span>
+            <select name="who">
+              {t.contact.form.whoOptions.map((o) => <option value={o}>{o}</option>)}
+            </select>
+          </label>
+          <label>
+            <span>{t.contact.form.what}</span>
+            <textarea name="what" rows="4" required placeholder={t.contact.form.whatPlaceholder}></textarea>
+          </label>
+          <div class="actions">
+            <button class="btn" type="button" data-send="wa">{t.contact.form.whatsapp}</button>
+            <button class="btn btn--ghost" type="button" data-send="mail">{t.contact.form.email}</button>
+          </div>
+          <p class="fine">{t.contact.form.hint}</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__in">
+      <span>© {new Date().getFullYear()} {site.company || site.name}. {t.footer.rights}</span>
+      <span>{t.footer.area}</span>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('lead') as HTMLFormElement | null;
+    if (form) {
+      const build = () => {
+        const f = new FormData(form);
+        const d = form.dataset;
+        const lines = [
+          `${d.lName}: ${f.get('name') || ''}`,
+          `${d.lPhone}: ${f.get('phone') || ''}`,
+          `${d.lWho}: ${f.get('who') || ''}`,
+          '',
+          `${d.lWhat}:`,
+          `${f.get('what') || ''}`,
+        ];
+        return lines.join('\n');
+      };
+      const valid = () => {
+        const name = form.elements.namedItem('name') as HTMLInputElement;
+        const what = form.elements.namedItem('what') as HTMLTextAreaElement;
+        const ok = name.value.trim() !== '' && what.value.trim() !== '';
+        name.setAttribute('aria-invalid', String(name.value.trim() === ''));
+        what.setAttribute('aria-invalid', String(what.value.trim() === ''));
+        if (!ok) (name.value.trim() === '' ? name : what).focus();
+        return ok;
+      };
+      form.querySelectorAll<HTMLButtonElement>('[data-send]').forEach((b) =>
+        b.addEventListener('click', () => {
+          if (!valid()) return;
+          const text = build();
+          if (b.dataset.send === 'wa') {
+            window.open(`https://wa.me/${form.dataset.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+          } else {
+            const subject = `Handyman – ${(form.elements.namedItem('who') as HTMLSelectElement).value}`;
+            location.href = `mailto:${form.dataset.mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+          }
+        }),
+      );
+    }
+  </script>
+</Base>
