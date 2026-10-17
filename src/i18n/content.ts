@@ -32,6 +32,18 @@ export interface Content {
     title: string;
     items: { title: string; text: string }[];
   };
+  ticket: {
+    title: string;
+    number: string;
+    date: string;
+    from: string;
+    property: string;
+    place: string;
+    issue: string;
+    status: string;
+    statusValue: string;
+    empty: string;
+  };
   gallery: { title: string };
   contact: {
     title: string;
@@ -46,6 +58,8 @@ export interface Content {
       whatsapp: string;
       email: string;
       hint: string;
+      where: string;
+      wherePlaceholder: string;
       error: string;
       required: string;
     };
@@ -67,7 +81,7 @@ export const content: Record<Lang, Content> = {
     call: 'Zadzwoń',
     hero: {
       eyebrow: 'Złota rączka · Karkonosze',
-      title: 'Jedna osoba, która naprawia, zanim gość zauważy.',
+      title: 'Naprawię, zanim gość zauważy.',
       lead: 'Hydraulika, elektryka, montaż i drobne remonty. Dla pensjonatów, małych hoteli, firm i domów w Karkonoszach, jednorazowo albo na stałe.',
       primary: 'Opisz usterkę',
       secondary: 'Zobacz stałą opiekę',
@@ -116,7 +130,7 @@ export const content: Record<Lang, Content> = {
     },
     care: {
       eyebrow: 'Dla pensjonatów i małych hoteli',
-      title: 'Stała opieka zamiast gaszenia pożarów.',
+      title: 'Stała opieka nad obiektem',
       lead: 'Gość nie zapamięta, że kran kapał. Zapamięta, że kapał trzy dni. Przy stałej opiece usterki trafiają na listę i są usuwane, zanim zrobią się problemem.',
       points: [
         { title: 'Obchód w ustalonym rytmie', text: 'Przechodzę przez pokoje, łazienki, kotłownię i części wspólne. Częstotliwość ustalamy pod Twój obiekt i sezon.' },
@@ -126,7 +140,7 @@ export const content: Record<Lang, Content> = {
       cta: 'Zapytaj o stałą opiekę',
     },
     process: {
-      title: 'Jak pracuję',
+      title: 'Jak to idzie',
       steps: [
         { title: 'Opisujesz usterkę', text: 'Telefonem, na WhatsAppie albo formularzem. Najlepiej ze zdjęciem.' },
         { title: 'Dostajesz wycenę', text: 'Orientacyjną na podstawie zdjęcia, dokładną po oględzinach na miejscu.' },
@@ -135,27 +149,30 @@ export const content: Record<Lang, Content> = {
       ],
     },
     trust: {
-      title: 'Dlaczego mi zaufasz',
+      title: 'Dlaczego ja',
       items: [
         { title: 'Uprawnienia SEP do 1 kV', text: 'Instalacje, montaż i konserwacja urządzeń elektrycznych. Świadectwo pokażę przed rozpoczęciem pracy.' },
         { title: 'Wycena ze zdjęcia', text: 'Wiesz, czego się spodziewać, zanim ktokolwiek przyjedzie.' },
         { title: 'Ta sama osoba za każdym razem', text: 'Nie pośrednik i nie zmieniająca się ekipa. Znam Twój obiekt.' },
       ],
     },
+    ticket: { title: 'Zlecenie naprawy', number: 'Nr', date: 'Data', from: 'Zgłasza', property: 'Obiekt', place: 'Miejsce', issue: 'Usterka', status: 'Status', statusValue: 'czeka na wycenę', empty: '…' },
     gallery: { title: 'Realizacje' },
     contact: {
-      title: 'Opisz, co się dzieje.',
-      lead: 'Wypełnij krótki formularz. Po kliknięciu otworzy się wiadomość do mnie z gotowym opisem, wystarczy ją wysłać.',
+      title: 'Wypisz zlecenie',
+      lead: 'Uzupełnij pola, a zlecenie po prawej wypełni się samo. Wyślesz je jednym kliknięciem, przez WhatsApp albo e-mail.',
       form: {
         name: 'Imię i nazwisko',
         phone: 'Telefon',
         who: 'Kim jesteś',
         whoOptions: ['Pensjonat / hotel', 'Firma', 'Osoba prywatna'],
         what: 'Co jest do zrobienia',
-        whatPlaceholder: 'Np. w pokoju 4 cieknie bateria, od wczoraj. Zdjęcie wyślę w wiadomości.',
+        whatPlaceholder: 'Np. cieknie bateria prysznicowa, od wczoraj.',
         whatsapp: 'Wyślij przez WhatsApp',
         email: 'Wyślij e-mailem',
         hint: 'Zdjęcie dołączysz już w otwartej wiadomości.',
+        where: 'Gdzie',
+        wherePlaceholder: 'Np. pokój 4, łazienka',
         error: 'Wpisz imię i opisz, co jest do zrobienia.',
         required: 'wymagane',
       },
@@ -176,7 +193,7 @@ export const content: Record<Lang, Content> = {
     call: 'Anrufen',
     hero: {
       eyebrow: 'Handyman · Riesengebirge',
-      title: 'Eine Ansprechperson, die repariert, bevor der Gast es bemerkt.',
+      title: 'Repariert, bevor Gäste es merken.',
       lead: 'Sanitär, Elektro, Montage und kleine Renovierungen. Für Pensionen, kleine Hotels, Firmen und Häuser im Riesengebirge, einmalig oder dauerhaft.',
       primary: 'Schaden beschreiben',
       secondary: 'Objektbetreuung ansehen',
@@ -225,7 +242,7 @@ export const content: Record<Lang, Content> = {
     },
     care: {
       eyebrow: 'Für Pensionen und kleine Hotels',
-      title: 'Feste Betreuung statt Feuerwehreinsatz.',
+      title: 'Feste Objektbetreuung',
       lead: 'Ein Gast vergisst, dass ein Hahn getropft hat. Er erinnert sich, dass er drei Tage getropft hat. Bei fester Betreuung landen Mängel auf einer Liste und werden behoben, bevor sie zum Problem werden.',
       points: [
         { title: 'Rundgang im festen Rhythmus', text: 'Ich gehe durch Zimmer, Bäder, Heizraum und Gemeinschaftsflächen. Den Takt legen wir passend zu Ihrem Haus und der Saison fest.' },
@@ -244,27 +261,30 @@ export const content: Record<Lang, Content> = {
       ],
     },
     trust: {
-      title: 'Warum Sie mir vertrauen können',
+      title: 'Warum ich',
       items: [
         { title: 'SEP-Qualifikation bis 1 kV', text: 'Polnischer Elektro-Befähigungsnachweis für Installation, Montage und Wartung. Den Nachweis zeige ich vor Arbeitsbeginn.' },
         { title: 'Angebot per Foto', text: 'Sie wissen, was auf Sie zukommt, bevor jemand anreist.' },
         { title: 'Jedes Mal dieselbe Person', text: 'Kein Vermittler und kein wechselndes Team. Ich kenne Ihr Haus.' },
       ],
     },
+    ticket: { title: 'Reparaturauftrag', number: 'Nr.', date: 'Datum', from: 'Auftraggeber', property: 'Objekt', place: 'Ort', issue: 'Schaden', status: 'Status', statusValue: 'wartet auf Angebot', empty: '…' },
     gallery: { title: 'Referenzen' },
     contact: {
-      title: 'Beschreiben Sie, was los ist.',
-      lead: 'Füllen Sie das kurze Formular aus. Danach öffnet sich eine Nachricht an mich mit fertiger Beschreibung, Sie müssen sie nur absenden.',
+      title: 'Auftrag ausfüllen',
+      lead: 'Füllen Sie die Felder aus, der Auftrag rechts füllt sich von selbst. Senden Sie ihn mit einem Klick per WhatsApp oder E-Mail.',
       form: {
         name: 'Name',
         phone: 'Telefon',
         who: 'Wer sind Sie',
         whoOptions: ['Pension / Hotel', 'Firma', 'Privatperson'],
         what: 'Was ist zu tun',
-        whatPlaceholder: 'Z. B. in Zimmer 4 tropft die Armatur seit gestern. Ein Foto sende ich mit.',
+        whatPlaceholder: 'Z. B. Duscharmatur tropft seit gestern.',
         whatsapp: 'Per WhatsApp senden',
         email: 'Per E-Mail senden',
         hint: 'Ein Foto fügen Sie in der geöffneten Nachricht hinzu.',
+        where: 'Wo',
+        wherePlaceholder: 'Z. B. Zimmer 4, Bad',
         error: 'Bitte geben Sie Ihren Namen ein und beschreiben Sie, was zu tun ist.',
         required: 'Pflichtfeld',
       },
@@ -285,7 +305,7 @@ export const content: Record<Lang, Content> = {
     call: 'Call',
     hero: {
       eyebrow: 'Handyman · Karkonosze',
-      title: 'One person who fixes it before your guest notices.',
+      title: 'Fixed before your guest notices.',
       lead: 'Plumbing, electrics, installation and small renovations. For guesthouses, small hotels, businesses and homes in the Karkonosze, one-off or on a regular basis.',
       primary: 'Describe the problem',
       secondary: 'See property care',
@@ -334,7 +354,7 @@ export const content: Record<Lang, Content> = {
     },
     care: {
       eyebrow: 'For guesthouses and small hotels',
-      title: 'Regular care instead of firefighting.',
+      title: 'Regular property care',
       lead: 'A guest will not remember that a tap dripped. They will remember it dripped for three days. With regular care, defects go on a list and get fixed before they become a problem.',
       points: [
         { title: 'Walk-rounds on a fixed rhythm', text: 'I go through rooms, bathrooms, the boiler room and shared areas. We set the frequency to suit your property and season.' },
@@ -353,27 +373,30 @@ export const content: Record<Lang, Content> = {
       ],
     },
     trust: {
-      title: 'Why you can trust me',
+      title: 'Why me',
       items: [
         { title: 'SEP electrical licence up to 1 kV', text: 'Polish certification for electrical installation, fitting and maintenance. I will show the certificate before work starts.' },
         { title: 'Quote from a photo', text: 'You know what to expect before anyone drives out.' },
         { title: 'The same person every time', text: 'Not a middleman and not a rotating crew. I know your property.' },
       ],
     },
+    ticket: { title: 'Job ticket', number: 'No.', date: 'Date', from: 'From', property: 'Property', place: 'Where', issue: 'Problem', status: 'Status', statusValue: 'awaiting quote', empty: '…' },
     gallery: { title: 'Selected work' },
     contact: {
-      title: 'Tell me what is going on.',
-      lead: 'Fill in the short form. A message to me will open with the description ready, you only need to send it.',
+      title: 'Fill in a job ticket',
+      lead: 'Fill in the fields and the ticket fills itself in. Send it with one click, by WhatsApp or email.',
       form: {
         name: 'Name',
         phone: 'Phone',
         who: 'Who you are',
         whoOptions: ['Guesthouse / hotel', 'Business', 'Private owner'],
         what: 'What needs doing',
-        whatPlaceholder: 'E.g. the mixer in room 4 has been dripping since yesterday. I will attach a photo.',
+        whatPlaceholder: 'E.g. shower mixer dripping since yesterday.',
         whatsapp: 'Send via WhatsApp',
         email: 'Send by email',
         hint: 'You can attach a photo in the message that opens.',
+        where: 'Where',
+        wherePlaceholder: 'E.g. room 4, bathroom',
         error: 'Enter your name and describe what needs doing.',
         required: 'required',
       },
