@@ -3,7 +3,7 @@ import type { Lang } from '../config';
 export interface Content {
   htmlLang: string;
   meta: { title: string; description: string };
-  nav: { services: string; care: string; area: string; process: string; trust: string; contact: string };
+  nav: { services: string; care: string; process: string; trust: string; contact: string };
   call: string;
   hero: {
     eyebrow: string;
@@ -31,15 +31,6 @@ export interface Content {
   trust: {
     title: string;
     items: { title: string; text: string }[];
-  };
-  area: {
-    title: string;
-    lead: string;
-    core: string;
-    extended: string;
-    missing: string;
-    missingLink: string;
-    border: string;
   };
   gallery: { title: string };
   contact: {
@@ -72,7 +63,7 @@ export const content: Record<Lang, Content> = {
       description:
         'Hydraulika, elektryka, montaż i drobne remonty oraz stała opieka nad obiektem. Dla pensjonatów, małych hoteli, firm i osób prywatnych w Karkonoszach.',
     },
-    nav: { services: 'Usługi', care: 'Stała opieka', area: 'Obszar', process: 'Jak pracuję', trust: 'Zaufanie', contact: 'Kontakt' },
+    nav: { services: 'Usługi', care: 'Stała opieka', process: 'Jak pracuję', trust: 'Zaufanie', contact: 'Kontakt' },
     call: 'Zadzwoń',
     hero: {
       eyebrow: 'Złota rączka · Karkonosze',
@@ -151,15 +142,6 @@ export const content: Record<Lang, Content> = {
         { title: 'Ta sama osoba za każdym razem', text: 'Nie pośrednik i nie zmieniająca się ekipa. Znam Twój obiekt.' },
       ],
     },
-    area: {
-      title: 'Obszar działania',
-      lead: 'Dojeżdżam do pensjonatów, firm i domów w Kotlinie Jeleniogórskiej, na Pogórzu Izerskim i pod samymi Karkonoszami.',
-      core: 'Na co dzień',
-      extended: 'Na zapytanie',
-      missing: 'Nie ma Twojej miejscowości?',
-      missingLink: 'Napisz, sprawdzimy dojazd.',
-      border: 'Czechy',
-    },
     gallery: { title: 'Realizacje' },
     contact: {
       title: 'Opisz, co się dzieje.',
@@ -190,7 +172,7 @@ export const content: Record<Lang, Content> = {
       description:
         'Sanitär, Elektro, Montage und kleine Renovierungen sowie feste Objektbetreuung. Für Pensionen, kleine Hotels, Firmen und Privatkunden im Riesengebirge.',
     },
-    nav: { services: 'Leistungen', care: 'Objektbetreuung', area: 'Einsatzgebiet', process: 'Ablauf', trust: 'Vertrauen', contact: 'Kontakt' },
+    nav: { services: 'Leistungen', care: 'Objektbetreuung', process: 'Ablauf', trust: 'Vertrauen', contact: 'Kontakt' },
     call: 'Anrufen',
     hero: {
       eyebrow: 'Handyman · Riesengebirge',
@@ -269,15 +251,6 @@ export const content: Record<Lang, Content> = {
         { title: 'Jedes Mal dieselbe Person', text: 'Kein Vermittler und kein wechselndes Team. Ich kenne Ihr Haus.' },
       ],
     },
-    area: {
-      title: 'Einsatzgebiet',
-      lead: 'Ich fahre zu Pensionen, Firmen und Häusern im Hirschberger Tal, im Isergebirgsvorland und direkt am Fuß des Riesengebirges.',
-      core: 'Regelmäßig',
-      extended: 'Auf Anfrage',
-      missing: 'Ihr Ort fehlt?',
-      missingLink: 'Schreiben Sie mir, wir prüfen die Anfahrt.',
-      border: 'Tschechien',
-    },
     gallery: { title: 'Referenzen' },
     contact: {
       title: 'Beschreiben Sie, was los ist.',
@@ -308,7 +281,7 @@ export const content: Record<Lang, Content> = {
       description:
         'Plumbing, electrics, installation and small renovations, plus ongoing property care. For guesthouses, small hotels, businesses and homeowners in the Karkonosze mountains.',
     },
-    nav: { services: 'Services', care: 'Property care', area: 'Area', process: 'How it works', trust: 'Trust', contact: 'Contact' },
+    nav: { services: 'Services', care: 'Property care', process: 'How it works', trust: 'Trust', contact: 'Contact' },
     call: 'Call',
     hero: {
       eyebrow: 'Handyman · Karkonosze',
@@ -386,15 +359,6 @@ export const content: Record<Lang, Content> = {
         { title: 'Quote from a photo', text: 'You know what to expect before anyone drives out.' },
         { title: 'The same person every time', text: 'Not a middleman and not a rotating crew. I know your property.' },
       ],
-    },
-    area: {
-      title: 'Service area',
-      lead: 'I travel to guesthouses, businesses and homes in the Jelenia Góra valley, the Izera foothills and right below the Karkonosze ridge.',
-      core: 'Regularly',
-      extended: 'On request',
-      missing: 'Don\'t see your town?',
-      missingLink: 'Write to me and we\'ll check the distance.',
-      border: 'Czechia',
     },
     gallery: { title: 'Selected work' },
     contact: {

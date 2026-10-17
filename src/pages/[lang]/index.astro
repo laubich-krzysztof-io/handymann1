@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { content } from '../../i18n/content';
-import { locales, site, towns, type Lang } from '../../config';
+import { locales, site, type Lang } from '../../config';
 
 export function getStaticPaths() {
   return locales.map((lang) => ({ params: { lang } }));
@@ -12,8 +12,6 @@ const t = content[lang];
 const tel = site.phone.replace(/\s/g, '');
 const gallery = site.gallery;
 const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt springen', en: 'Skip to content' };
-const core = towns.filter((x) => x.tier === 'core');
-const extended = towns.filter((x) => x.tier === 'extended');
 
 // Proste ikony usług (kolejność jak w content.services.items)
 const icons = [
@@ -46,7 +44,6 @@ const icons = [
       <nav class="nav" aria-label="Main">
         <a href="#uslugi">{t.nav.services}</a>
         <a href="#opieka">{t.nav.care}</a>
-        <a href="#obszar">{t.nav.area}</a>
         <a href="#jak">{t.nav.process}</a>
       </nav>
       <div class="top__end">
@@ -72,7 +69,7 @@ const icons = [
           <p class="lead">{t.hero.lead}</p>
           <div class="actions">
             <a class="btn" href="#kontakt">{t.hero.primary}</a>
-            <a class="btn btn--ghost" href="#obszar">{t.area.title}</a>
+            <a class="btn btn--ghost" href="#opieka">{t.hero.secondary}</a>
           </div>
           <ul class="audience">
             {t.hero.audience.map((a) => <li>{a}</li>)}
@@ -143,62 +140,6 @@ const icons = [
             {t.log.entries.map((e) => <li>{e.where}: {e.what}, {e.done}</li>)}
           </ul>
         </aside>
-      </div>
-    </section>
-
-    <section id="obszar" class="area">
-      <div class="area__band">
-        <div class="wrap"><h2>{t.area.title}</h2></div>
-      </div>
-      <div class="wrap area__in">
-        <figure class="map">
-          <svg viewBox="0 0 600 690" role="img" aria-label={`${t.area.title}: ${towns.map((x) => x.name).join(', ')}`}>
-            <rect width="600" height="690" fill="var(--paper-2)"/>
-            {/* strefy dojazdu */}
-            <g class="zone zone--ext">{extended.map((x) => <circle cx={x.x} cy={x.y} r="72" />)}</g>
-            <g class="zone zone--core">{core.map((x) => <circle cx={x.x} cy={x.y} r="72" />)}</g>
-            {/* grzbiet Karkonoszy i granica */}
-            <path class="czech" d="M0 690V600l90-30 70-14 70-4 70 22 70 26 75 35 75 15 70 6 80-4v134z"/>
-            <path class="ridge-line" d="M0 600l90-30 70-14 70-4 70 22 70 26 75 35 75 15 70 6 80-4"/>
-            <g class="peak" transform="translate(445 635)">
-              <path d="M-11 9 0-10 11 9z"/>
-              <text x="16" y="5">Śnieżka 1603</text>
-            </g>
-            <text class="border" x="300" y="672" text-anchor="middle">{t.area.border}</text>
-            {/* miejscowości */}
-            {towns.map((x) => {
-              const side = x.label ?? (x.x > 470 ? 'left' : 'right');
-              const tx = side === 'left' ? x.x - 12 : side === 'right' ? x.x + 12 : x.x;
-              const ty = side === 'above' ? x.y - 14 : x.y + 5;
-              const anchor = side === 'left' ? 'end' : side === 'right' ? 'start' : 'middle';
-              return (
-                <g class={`town town--${x.tier}`} data-town={x.name}>
-                  <circle cx={x.x} cy={x.y} r={x.tier === 'core' ? 7 : 6} />
-                  <text x={tx} y={ty} text-anchor={anchor}>{x.name}</text>
-                </g>
-              );
-            })}
-          </svg>
-          <figcaption class="legend">
-            <span><i class="sw sw--core"></i>{t.area.core}</span>
-            <span><i class="sw sw--ext"></i>{t.area.extended}</span>
-          </figcaption>
-        </figure>
-
-        <div class="area__lists">
-          <p class="lead">{t.area.lead}</p>
-          <div class="area__cols">
-            <div>
-              <h3>{t.area.core}</h3>
-              <ul class="towns">{core.map((x) => <li data-town={x.name}>{x.name}</li>)}</ul>
-            </div>
-            <div>
-              <h3>{t.area.extended}</h3>
-              <ul class="towns">{extended.map((x) => <li data-town={x.name}>{x.name}</li>)}</ul>
-            </div>
-          </div>
-          <p class="missing"><strong>{t.area.missing}</strong> <a href="#kontakt">{t.area.missingLink}</a></p>
-        </div>
       </div>
     </section>
 
@@ -293,18 +234,6 @@ const icons = [
   </footer>
 
   <script>
-    // Podświetlanie miejscowości: lista ↔ mapa
-    document.querySelectorAll<HTMLElement>('.towns li').forEach((li) => {
-      const g = document.querySelector(`.town[data-town="${li.dataset.town}"]`);
-      if (!g) return;
-      const on = () => g.classList.add('is-on');
-      const off = () => g.classList.remove('is-on');
-      li.addEventListener('mouseenter', on);
-      li.addEventListener('mouseleave', off);
-      li.addEventListener('focus', on);
-      li.addEventListener('blur', off);
-    });
-
     const form = document.getElementById('lead') as HTMLFormElement | null;
     if (form) {
       const build = () => {

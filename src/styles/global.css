@@ -7,7 +7,6 @@
   --muted: #4b5f57;
   --lake: #4e9fae;
   --lake-deep: #2f7484;
-  --lake-ink: #245f6c;
   --on-dark: #c9d6cf;
   --on-dark-muted: #8fa69d;
   --ok: #7fd3a3;
@@ -153,42 +152,6 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 .log__note { font-size: .74rem; color: var(--on-dark-muted); padding: .7rem .3rem 0; border-top: 1px dashed #ffffff33; }
 @keyframes scroll { to { transform: translateY(-50%); } }
 
-/* ---------- Obszar działania ---------- */
-.area { padding-bottom: clamp(3.5rem, 8vw, 6rem); }
-.area__band { background: var(--forest); color: var(--paper); padding-block: clamp(1.6rem, 4vw, 2.6rem); text-align: center; margin-bottom: clamp(2rem, 5vw, 3.5rem); }
-.area__band h2 { color: var(--paper); }
-.area__in { display: grid; gap: clamp(2rem, 5vw, 3.5rem); align-items: start; }
-.map { margin: 0; border: 3px solid var(--deep); border-radius: var(--radius); overflow: hidden; background: var(--paper-2); }
-.map svg { display: block; width: 100%; height: auto; }
-.zone--core { fill: var(--forest); opacity: .2; }
-.zone--ext { fill: var(--lake); opacity: .3; }
-.czech { fill: #dcd9c3; }
-.ridge-line { fill: none; stroke: var(--deep); stroke-width: 3; stroke-linejoin: round; }
-.peak path { fill: var(--deep); }
-.peak text, .border { font-family: var(--mono); font-size: 15px; fill: var(--muted); }
-.border { letter-spacing: .2em; text-transform: uppercase; font-size: 13px; }
-.town circle { stroke: var(--paper); stroke-width: 3; transition: r .2s; }
-.town--core circle { fill: var(--deep); }
-.town--ext circle { fill: var(--lake-deep); }
-.town text { font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: 16px; fill: var(--deep); paint-order: stroke; stroke: var(--paper-2); stroke-width: 4px; stroke-linejoin: round; }
-.town.is-on circle { r: 11; }
-.town.is-on text { fill: var(--lake-ink); }
-.legend { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; padding: .8rem 1rem; border-top: 3px solid var(--deep); background: var(--paper); font-size: .8rem; }
-.legend span { display: inline-flex; align-items: center; gap: .5rem; }
-.sw { width: .9rem; height: .9rem; border-radius: 50%; display: inline-block; }
-.sw--core { background: var(--deep); }
-.sw--ext { background: var(--lake-deep); }
-
-.area__lists { display: grid; gap: 1.6rem; }
-.area__cols { display: grid; gap: 1.6rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
-.area__cols h3 { text-transform: uppercase; font-stretch: 125%; font-size: 1.05rem; padding-bottom: .5rem; border-bottom: 2px solid var(--deep); margin-bottom: .7rem; }
-.towns li { padding: .15rem 0 .15rem 1.1rem; position: relative; cursor: default; }
-.towns li::before { content: '•'; position: absolute; left: 0; color: var(--lake-deep); }
-.towns li:hover { color: var(--lake-ink); }
-.missing { padding: 1rem 1.1rem; background: var(--paper-2); border-left: 4px solid var(--lake); font-size: .92rem; }
-.missing a { font-weight: 700; }
-@media (min-width: 64rem) { .area__in { grid-template-columns: 1.05fr .95fr; } }
-
 /* Kroki */
 .steps { counter-reset: step; display: grid; margin-top: clamp(1.8rem, 4vw, 3rem); gap: 1rem; }
 .steps li { counter-increment: step; display: grid; gap: .45rem; background: var(--paper); border-radius: var(--radius); padding: 1.3rem 1.3rem 1.4rem; border: 1.5px solid var(--line); }
@@ -241,5 +204,5 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
   html { scroll-behavior: auto; }
   .log__list { animation: none; }
   .log__window { overflow-y: auto; }
-  .btn, .town circle { transition: none; }
+  .btn { transition: none; }
 }
