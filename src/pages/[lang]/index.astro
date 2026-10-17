@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { content } from '../../i18n/content';
-import { locales, site, type Lang } from '../../config';
+import { locales, site, towns, type Lang } from '../../config';
 
 export function getStaticPaths() {
   return locales.map((lang) => ({ params: { lang } }));
@@ -12,6 +12,20 @@ const t = content[lang];
 const tel = site.phone.replace(/\s/g, '');
 const gallery = site.gallery;
 const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt springen', en: 'Skip to content' };
+const core = towns.filter((x) => x.tier === 'core');
+const extended = towns.filter((x) => x.tier === 'extended');
+
+// Proste ikony usług (kolejność jak w content.services.items)
+const icons = [
+  // kropla
+  '<path d="M24 6c6 9 12 15 12 23a12 12 0 0 1-24 0c0-8 6-14 12-23z"/><path d="M18 30a6 6 0 0 0 6 6"/>',
+  // piorun
+  '<path d="M27 5 12 27h11l-3 16 16-23H25z"/>',
+  // młotek
+  '<path d="M8 14h20l4 4v4H24l-3-3h-5l-4 4-4-4z"/><path d="M22 22 38 40a3 3 0 0 1-4 4L18 26"/>',
+  // dom z kluczem
+  '<path d="M6 22 24 7l18 15"/><path d="M11 18v22h26V18"/><circle cx="24" cy="26" r="4"/><path d="M24 30v7m0-3h3"/>',
+];
 ---
 <Base lang={lang} htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description}>
   <a class="skip" href="#main">{skip[lang]}</a>
@@ -19,14 +33,21 @@ const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt 
   <header class="top">
     <div class="wrap top__in">
       <a class="brand" href={`/${lang}/`} aria-label={site.name}>
-        <svg class="brand__key" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="6"/><path d="M32 29v26M32 43h10M32 52h7" stroke="currentColor" stroke-width="6" stroke-linecap="round" fill="none"/></svg>
-        <span class="brand__name">{site.name}</span>
+        <svg class="brand__mark" viewBox="0 0 64 56" aria-hidden="true">
+          <path d="M18 54V31l20-17 20 17v23z" fill="currentColor"/>
+          <rect x="40" y="38" width="9" height="16" fill="var(--paper)"/>
+          <path d="M2 54l9-14H6l7-11H9l8-13 8 13h-4l7 11h-5l9 14z" fill="var(--deep)"/>
+        </svg>
+        <span class="brand__text">
+          <span class="brand__name">{site.name}</span>
+          <span class="brand__sub">Karkonosze</span>
+        </span>
       </a>
       <nav class="nav" aria-label="Main">
         <a href="#uslugi">{t.nav.services}</a>
         <a href="#opieka">{t.nav.care}</a>
+        <a href="#obszar">{t.nav.area}</a>
         <a href="#jak">{t.nav.process}</a>
-        <a href="#kontakt">{t.nav.contact}</a>
       </nav>
       <div class="top__end">
         <ul class="lang" aria-label="Language">
@@ -34,25 +55,70 @@ const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt 
             <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
           ))}
         </ul>
-        <a class="btn btn--small" href={`tel:${tel}`}>{t.call}</a>
+        <a class="btn btn--small" href="#kontakt">{t.nav.contact}</a>
       </div>
     </div>
   </header>
 
   <main id="main">
+    <section class="band">
+      <div class="wrap"><p>{t.hero.eyebrow}</p></div>
+    </section>
+
     <section class="hero">
       <div class="wrap hero__in">
-        <div class="hero__copy">
-          <p class="eyebrow">{t.hero.eyebrow}</p>
-          <h1>{t.hero.title}</h1>
+        <h1>{t.hero.title}</h1>
+        <div class="hero__side">
           <p class="lead">{t.hero.lead}</p>
           <div class="actions">
             <a class="btn" href="#kontakt">{t.hero.primary}</a>
-            <a class="btn btn--ghost" href="#opieka">{t.hero.secondary}</a>
+            <a class="btn btn--ghost" href="#obszar">{t.area.title}</a>
           </div>
           <ul class="audience">
             {t.hero.audience.map((a) => <li>{a}</li>)}
           </ul>
+        </div>
+      </div>
+      <svg class="ridge" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 120V92l110-34 70 22 120-58 90 40 80-26 140 62 120-70 60 30 90-44 110 54 90-20 120 40 120-30 120 30v52z" fill="var(--deep)"/>
+      </svg>
+    </section>
+
+    <section id="uslugi" class="services-wrap">
+      <div class="wrap">
+        <div class="section__head section__head--light">
+          <h2>{t.services.title}</h2>
+          <p>{t.services.lead}</p>
+        </div>
+        <ul class="cards">
+          {t.services.items.map((s, i) => (
+            <li class="card">
+              <svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true" set:html={icons[i]} />
+              <h3>{s.name}</h3>
+              <p>{s.text}</p>
+              <p class="card__tags">{s.examples}</p>
+            </li>
+          ))}
+        </ul>
+        <p class="fine fine--light">{t.services.note}</p>
+      </div>
+    </section>
+
+    <section id="opieka" class="section">
+      <div class="wrap care">
+        <div class="care__lead">
+          <p class="eyebrow">{t.care.eyebrow}</p>
+          <h2>{t.care.title}</h2>
+          <p class="lead">{t.care.lead}</p>
+          <ul class="care__points">
+            {t.care.points.map((p) => (
+              <li>
+                <h3>{p.title}</h3>
+                <p>{p.text}</p>
+              </li>
+            ))}
+          </ul>
+          <a class="btn" href="#kontakt">{t.care.cta}</a>
         </div>
 
         <aside class="log" aria-label={t.log.title}>
@@ -80,45 +146,63 @@ const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt 
       </div>
     </section>
 
-    <section id="uslugi" class="section">
-      <div class="wrap">
-        <div class="section__head">
-          <h2>{t.services.title}</h2>
-          <p class="lead">{t.services.lead}</p>
+    <section id="obszar" class="area">
+      <div class="area__band">
+        <div class="wrap"><h2>{t.area.title}</h2></div>
+      </div>
+      <div class="wrap area__in">
+        <figure class="map">
+          <svg viewBox="0 0 600 690" role="img" aria-label={`${t.area.title}: ${towns.map((x) => x.name).join(', ')}`}>
+            <rect width="600" height="690" fill="var(--paper-2)"/>
+            {/* strefy dojazdu */}
+            <g class="zone zone--ext">{extended.map((x) => <circle cx={x.x} cy={x.y} r="72" />)}</g>
+            <g class="zone zone--core">{core.map((x) => <circle cx={x.x} cy={x.y} r="72" />)}</g>
+            {/* grzbiet Karkonoszy i granica */}
+            <path class="czech" d="M0 690V600l90-30 70-14 70-4 70 22 70 26 75 35 75 15 70 6 80-4v134z"/>
+            <path class="ridge-line" d="M0 600l90-30 70-14 70-4 70 22 70 26 75 35 75 15 70 6 80-4"/>
+            <g class="peak" transform="translate(445 635)">
+              <path d="M-11 9 0-10 11 9z"/>
+              <text x="16" y="5">Śnieżka 1603</text>
+            </g>
+            <text class="border" x="300" y="672" text-anchor="middle">{t.area.border}</text>
+            {/* miejscowości */}
+            {towns.map((x) => {
+              const side = x.label ?? (x.x > 470 ? 'left' : 'right');
+              const tx = side === 'left' ? x.x - 12 : side === 'right' ? x.x + 12 : x.x;
+              const ty = side === 'above' ? x.y - 14 : x.y + 5;
+              const anchor = side === 'left' ? 'end' : side === 'right' ? 'start' : 'middle';
+              return (
+                <g class={`town town--${x.tier}`} data-town={x.name}>
+                  <circle cx={x.x} cy={x.y} r={x.tier === 'core' ? 7 : 6} />
+                  <text x={tx} y={ty} text-anchor={anchor}>{x.name}</text>
+                </g>
+              );
+            })}
+          </svg>
+          <figcaption class="legend">
+            <span><i class="sw sw--core"></i>{t.area.core}</span>
+            <span><i class="sw sw--ext"></i>{t.area.extended}</span>
+          </figcaption>
+        </figure>
+
+        <div class="area__lists">
+          <p class="lead">{t.area.lead}</p>
+          <div class="area__cols">
+            <div>
+              <h3>{t.area.core}</h3>
+              <ul class="towns">{core.map((x) => <li data-town={x.name}>{x.name}</li>)}</ul>
+            </div>
+            <div>
+              <h3>{t.area.extended}</h3>
+              <ul class="towns">{extended.map((x) => <li data-town={x.name}>{x.name}</li>)}</ul>
+            </div>
+          </div>
+          <p class="missing"><strong>{t.area.missing}</strong> <a href="#kontakt">{t.area.missingLink}</a></p>
         </div>
-        <ul class="services">
-          {t.services.items.map((s) => (
-            <li class="service">
-              <h3>{s.name}</h3>
-              <p>{s.text}</p>
-              <p class="service__tags">{s.examples}</p>
-            </li>
-          ))}
-        </ul>
-        <p class="fine">{t.services.note}</p>
       </div>
     </section>
 
-    <section id="opieka" class="care">
-      <div class="wrap care__in">
-        <div class="care__lead">
-          <p class="eyebrow eyebrow--light">{t.care.eyebrow}</p>
-          <h2>{t.care.title}</h2>
-          <p>{t.care.lead}</p>
-          <a class="btn btn--brass" href="#kontakt">{t.care.cta}</a>
-        </div>
-        <ul class="care__points">
-          {t.care.points.map((p) => (
-            <li>
-              <h3>{p.title}</h3>
-              <p>{p.text}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-
-    <section id="jak" class="section">
+    <section id="jak" class="section section--tint">
       <div class="wrap">
         <h2>{t.process.title}</h2>
         <ol class="steps">
@@ -132,7 +216,7 @@ const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt 
       </div>
     </section>
 
-    <section id="zaufanie" class="section section--tint">
+    <section id="zaufanie" class="section">
       <div class="wrap">
         <h2>{t.trust.title}</h2>
         <ul class="trust">
@@ -156,17 +240,17 @@ const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt 
       </div>
     </section>
 
-    <section id="kontakt" class="section contact">
+    <section id="kontakt" class="contact">
       <div class="wrap contact__in">
-        <div>
+        <div class="contact__lead">
           <h2>{t.contact.title}</h2>
-          <p class="lead">{t.contact.lead}</p>
+          <p>{t.contact.lead}</p>
           <p class="direct">
             <span>{t.contact.direct}</span>
             <a href={`tel:${tel}`}>{site.phone}</a>
             <a href={`mailto:${site.email}`}>{site.email}</a>
           </p>
-          <p class="fine">{t.contact.area}</p>
+          <p class="fine fine--light">{t.contact.area}</p>
         </div>
 
         <form id="lead" class="form" novalidate data-wa={site.whatsapp} data-mail={site.email}
@@ -201,26 +285,36 @@ const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt 
 
   <footer class="foot">
     <div class="wrap foot__in">
-      <span>© {new Date().getFullYear()} {site.company || site.name}. {t.footer.rights}</span>
+      <span class="foot__brand">{site.name}</span>
       <span>{t.footer.area}</span>
+      <span>© {new Date().getFullYear()} {site.company || site.name}. {t.footer.rights}</span>
     </div>
   </footer>
 
   <script>
+    // Podświetlanie miejscowości: lista ↔ mapa
+    document.querySelectorAll<HTMLElement>('.towns li').forEach((li) => {
+      const g = document.querySelector(`.town[data-town="${li.dataset.town}"]`);
+      if (!g) return;
+      const on = () => g.classList.add('is-on');
+      const off = () => g.classList.remove('is-on');
+      li.addEventListener('mouseenter', on);
+      li.addEventListener('mouseleave', off);
+    });
+
     const form = document.getElementById('lead') as HTMLFormElement | null;
     if (form) {
       const build = () => {
         const f = new FormData(form);
         const d = form.dataset;
-        const lines = [
+        return [
           `${d.lName}: ${f.get('name') || ''}`,
           `${d.lPhone}: ${f.get('phone') || ''}`,
           `${d.lWho}: ${f.get('who') || ''}`,
           '',
           `${d.lWhat}:`,
           `${f.get('what') || ''}`,
-        ];
-        return lines.join('\n');
+        ].join('\n');
       };
       const valid = () => {
         const name = form.elements.namedItem('name') as HTMLInputElement;
