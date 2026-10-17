@@ -11,6 +11,7 @@
   --on-ground: #eef2e8;
   --on-ground-soft: #c5d3ca;
   --error: #9e2f1a;
+  --dot: #ef3a2c;        /* jedyny akcent: kropka w logo */
 
   --face: 'Archivo Variable', 'Archivo', 'Arial Narrow', system-ui, sans-serif;
 
@@ -71,7 +72,10 @@ h3 { font-size: clamp(1.5rem, 2.2vw, 2rem); font-weight: 800; line-height: 1; }
 /* ---------- Nagłówek: zwykły pasek ---------- */
 .top { position: sticky; top: 0; z-index: 50; background: var(--ground); color: var(--on-ground); }
 .top__in { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4.4rem; }
-.brand { font-stretch: 68%; font-weight: 900; font-size: 1.9rem; letter-spacing: -0.01em; text-decoration: none; line-height: 1; display: inline-flex; align-items: center; min-height: 2.75rem; }
+.brand { text-decoration: none; display: inline-flex; align-items: center; min-height: 2.75rem; color: #fff; }
+.wordmark { font-family: var(--face); font-stretch: 100%; font-weight: 800; text-transform: lowercase; letter-spacing: -0.045em; line-height: 1; }
+.brand .wordmark { font-size: 1.85rem; }
+.wordmark__dot { color: var(--dot); }
 .nav { display: none; gap: 1.8rem; }
 .nav a { text-decoration: none; font-weight: 600; }
 .nav a:hover { text-decoration: underline; text-underline-offset: .3em; text-decoration-thickness: 2px; }
@@ -80,7 +84,7 @@ h3 { font-size: clamp(1.5rem, 2.2vw, 2rem); font-weight: 800; line-height: 1; }
 .lang a { display: inline-grid; place-items: center; min-width: 2.4rem; min-height: 2.75rem; text-decoration: none; font-weight: 600; font-size: .95rem; color: var(--on-ground-soft); }
 .lang a[aria-current='true'] { color: var(--on-ground); text-decoration: underline; text-underline-offset: .3em; text-decoration-thickness: 2px; }
 .lang a:hover { color: var(--on-ground); }
-@media (max-width: 30rem) { .top__end .btn--small { display: none; } .brand { font-size: 1.6rem; } }
+@media (max-width: 30rem) { .top__end .btn--small { display: none; } .brand .wordmark { font-size: 1.6rem; } }
 @media (min-width: 60rem) { .nav { display: flex; } }
 
 main { position: relative; z-index: 1; background: var(--cream); }
@@ -250,7 +254,7 @@ main { position: relative; z-index: 1; background: var(--cream); }
 
 /* ---------- Stopka: odwrocie kwitu, odsłaniana kurtyną ---------- */
 .foot { position: sticky; bottom: 0; z-index: 0; background: var(--ink); color: var(--on-ground-soft); padding-block: clamp(2.5rem, 6vw, 4rem) 2rem; }
-.foot__name { font-stretch: 62%; font-weight: 900; color: var(--on-ground); font-size: clamp(5rem, 22vw, 20rem); line-height: .8; letter-spacing: -0.03em; margin-left: -.04em; }
+.foot__name { color: #fff; font-size: clamp(4rem, 16vw, 14.5rem); line-height: .85; margin-left: -.05em; }
 .foot__row { display: flex; flex-wrap: wrap; gap: .5rem 2rem; justify-content: space-between; margin-top: 1.5rem; }
 
 /* ---------- Ruch ---------- */
