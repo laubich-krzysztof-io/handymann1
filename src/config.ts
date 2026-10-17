@@ -1,6 +1,6 @@
 // Dane kontaktowe i ustawienia strony. ZMIEŃ przed publikacją.
 export const site = {
-  name: 'Handyman',
+  name: 'handyman.karkonosze',
   // TODO: wpisz prawdziwy numer (format międzynarodowy) i e-mail
   phone: '+48 000 000 000',
   whatsapp: '48000000000', // sam numer, bez + i spacji

@@ -11,7 +11,7 @@ const lang = Astro.params.lang as Lang;
 const t = content[lang];
 const tel = site.phone.replace(/\s/g, '');
 const gallery = site.gallery;
-const brandSub: Record<Lang, string> = { pl: 'Złota rączka · Karkonosze', de: 'Hausmeisterservice · Riesengebirge', en: 'Handyman services · Karkonosze' };
+const brandSub: Record<Lang, string> = { pl: 'Złota rączka dla domu i pensjonatu', de: 'Hausmeisterservice für Haus und Pension', en: 'Handyman services for homes and guesthouses' };
 const bandText: Record<Lang, string> = {
   pl: 'Jelenia Góra, Lubomierz, Szklarska Poręba i okolice',
   de: 'Jelenia Góra, Lubomierz, Szklarska Poręba und Umgebung',
@@ -38,21 +38,23 @@ const icons = [
   <header class="top">
     <div class="wrap top__in">
       <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub[lang]}`}>
-        <svg class="brand__mark" viewBox="-2 0 126 100" aria-hidden="true">
+        <svg class="brand__mark" viewBox="0 0 132 100" aria-hidden="true">
           <!-- świerk -->
-          <path d="M14 96V78" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
-          <path d="M14 6 3 26h6L1 42h7L0 60h8L-1 79h30L20 60h8L20 42h7l-8-16h6z" fill="currentColor"/>
-          <!-- dom z kominem -->
-          <path d="M34 98V52l32-28 32 28v46z" fill="currentColor"/>
-          <rect x="80" y="26" width="9" height="18" fill="currentColor"/>
-          <rect x="56" y="70" width="14" height="28" fill="var(--paper)"/>
-          <!-- klucz -->
-          <g transform="translate(97 70) rotate(40)">
-            <rect x="-4.5" y="-6" width="9" height="40" rx="4.5" fill="var(--paper)"/>
-            <rect x="-3" y="-4" width="6" height="36" rx="3" fill="currentColor"/>
-            <path d="M-13 -14a13 13 0 1 0 26 0l-6-10v12h-14v-12z" fill="var(--paper)"/>
-            <path d="M-10.5 -14a10.5 10.5 0 1 0 21 0l-3.5-6v8h-14v-8z" fill="currentColor"/>
+          <path d="M15 97V80" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+          <path d="M15 4 5 22h6L2 38h7L1 55h8L0 82h30L21 55h8L21 38h7L19 22h6z" fill="currentColor"/>
+          <!-- dom -->
+          <path d="M36 98V52l34-30 34 30v46z" fill="currentColor"/>
+          <rect x="84" y="28" width="9" height="16" fill="currentColor"/>
+          <!-- stetoskop: słuchawki, przewód i głowica na ścianie domu -->
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M104 10c-3 14 0 24 9 30m15-30c3 14 0 24-9 30m-3 0c1 22 6 38-10 48-11 7-25 3-28-6" stroke="var(--paper)" stroke-width="10"/>
+            <path d="M104 10c-3 14 0 24 9 30m15-30c3 14 0 24-9 30m-3 0c1 22 6 38-10 48-11 7-25 3-28-6" stroke="currentColor" stroke-width="4.5"/>
           </g>
+          <circle cx="104" cy="9" r="3.6" fill="currentColor"/>
+          <circle cx="128" cy="9" r="3.6" fill="currentColor"/>
+          <circle cx="78" cy="80" r="9.5" fill="var(--paper)"/>
+          <circle cx="78" cy="80" r="7" fill="currentColor"/>
+          <circle cx="78" cy="80" r="3" fill="var(--paper)"/>
         </svg>
         <span class="brand__text">
           <span class="brand__name">{site.name}</span>

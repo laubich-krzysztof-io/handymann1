@@ -76,9 +76,9 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 .top .wrap { max-width: 90rem; }
 .top__in { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 6rem; padding-block: .6rem; }
 .brand { display: inline-flex; align-items: center; gap: .7rem; min-height: 2.75rem; text-decoration: none; color: var(--forest); }
-.brand__mark { width: 5.4rem; height: auto; flex: none; }
+.brand__mark { width: 5.6rem; height: auto; flex: none; }
 .brand__text { display: grid; line-height: .9; }
-.brand__name { font-family: var(--mono); font-weight: 700; font-size: 3.1rem; letter-spacing: -0.04em; text-transform: uppercase; color: var(--forest); }
+.brand__name { font-family: var(--mono); font-weight: 700; font-size: 2.35rem; letter-spacing: -0.05em; text-transform: uppercase; color: var(--forest); }
 .brand__sub { font-family: var(--mono); font-style: italic; font-weight: 700; font-size: 1.1rem; letter-spacing: -0.01em; color: var(--forest); margin-top: .35rem; white-space: nowrap; }
 .nav { display: none; gap: 1.6rem; }
 .nav a { text-decoration: none; font-family: var(--mono); font-size: .98rem; color: var(--deep); }
@@ -88,18 +88,18 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 .lang a { display: inline-grid; place-items: center; min-width: 2.2rem; min-height: 2.75rem; padding: 0 .3rem; text-decoration: none; color: var(--muted); border-radius: 4px; }
 .lang a[aria-current='true'] { background: var(--deep); color: var(--paper); }
 .lang a:not([aria-current]):hover { background: var(--paper-2); }
-@media (max-width: 75rem) { .brand__name { font-size: 2.4rem; } .brand__mark { width: 4.3rem; } .brand__sub { font-size: .92rem; } }
+@media (max-width: 75rem) { .brand__name { font-size: 1.9rem; } .brand__mark { width: 4.5rem; } .brand__sub { font-size: .88rem; } }
 @media (max-width: 40rem) {
   .top__in { min-height: 4.8rem; gap: .4rem; }
   .brand { gap: .45rem; }
   .brand__mark { width: 2.7rem; }
-  .brand__name { font-size: 1.45rem; }
-  .brand__sub { font-size: .66rem; }
+  .brand__name { font-size: 1.02rem; letter-spacing: -0.06em; }
+  .brand__sub { font-size: .62rem; white-space: normal; }
   .top__end { gap: .3rem; }
   .lang a { min-width: 1.9rem; }
   .top__end .btn--small { display: none; }
 }
-@media (min-width: 80rem) { .nav { display: flex; } }
+@media (min-width: 86rem) { .nav { display: flex; } }
 .nav a { white-space: nowrap; }
 .top__end { flex: none; }
 
