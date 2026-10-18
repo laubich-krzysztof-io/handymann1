@@ -72,19 +72,17 @@ const links = [
             <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
           ))}
         </ul>
-        <a class="cta" href="#kontakt">{ctaLabel[lang]}<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h12.5M11 4.8 16.2 10 11 15.2" /></svg></a>
+        <a class="cta" href="#kontakt">{ctaLabel[lang]}</a>
       </div>
     </nav>
 
     <div class="top__end">
-      <span class="top__rule" aria-hidden="true"></span>
       <ul class="lang" aria-label={langLabel[lang]}>
         {locales.map((l) => (
           <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
         ))}
       </ul>
-      <span class="top__rule" aria-hidden="true"></span>
-      <a class="cta" href="#kontakt">{ctaLabel[lang]}<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h12.5M11 4.8 16.2 10 11 15.2" /></svg></a>
+      <a class="cta" href="#kontakt">{ctaLabel[lang]}</a>
       <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel[lang].open} data-burger>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path class="burger__a" d="M4 7h16" /><path class="burger__b" d="M4 12h16" /><path class="burger__c" d="M4 17h16" /></svg>
       </button>
