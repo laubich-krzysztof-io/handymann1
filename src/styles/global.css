@@ -101,12 +101,24 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 }
 .top__scene { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 /* Pejzaż stoi w miejscu; przy zwijaniu pasek nasuwa się na niego, a góry miękko opadają i rozmywają się */
-.top__strip {
+.top__strip, .top__forest {
   position: absolute; left: 0; right: 0; top: calc(var(--top-h) - var(--strip)); height: var(--strip);
   background: url('/img/header-landscape-2172.webp') center bottom / cover no-repeat;
   transform-origin: 50% 100%;
   transition: transform .9s var(--ease-out), opacity .7s var(--ease-out), filter .8s var(--ease-out);
 }
+.top__forest { background-image: url('/img/header-forest-2172.webp'); }
+/* Śnieżka ze Spodkiem: między górami w tle a lasem; wymiary liczone od wysokości pasa */
+.top__sniezka {
+  --h: calc(var(--strip) * 1.113);
+  position: absolute; height: var(--h); aspect-ratio: 242 / 87;
+  top: calc(var(--top-h) - var(--h)); left: calc(50% + var(--strip) * .735);
+  background: url('/img/sniezka.webp') center bottom / contain no-repeat;
+  transform-origin: 50% 100%;
+  transition: transform 1s var(--ease-out), opacity .7s var(--ease-out), filter .8s var(--ease-out);
+}
+.top.is-intro .top__sniezka { animation: sniezka-rise 1.8s var(--ease-out) .35s backwards; }
+@keyframes sniezka-rise { from { opacity: 0; transform: translateY(18%) scale(.97); filter: blur(7px); } 40% { opacity: .55; } }
 .top { isolation: isolate; }
 .top-space { height: var(--top-h); }
 .top__in {
@@ -197,7 +209,9 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 
 /* Compact bar after scrolling */
 .top.is-compact { height: var(--top-h-compact); box-shadow: 0 1px 0 var(--line), 0 10px 24px -18px rgba(10, 51, 34, .35); }
-.top.is-compact .top__strip { opacity: 0; transform: translateY(24%) scale(1.035); filter: blur(4px); }
+.top.is-compact .top__strip { opacity: 0; transform: translateY(18%) scale(1.03); filter: blur(4px); }
+.top.is-compact .top__sniezka { opacity: 0; transform: translateY(26%) scale(.96); filter: blur(5px); }
+.top.is-compact .top__forest { opacity: 0; transform: translateY(34%) scale(1.04); filter: blur(3px); }
 .top.is-compact .top__in { height: var(--top-h-compact); }
 .top.is-compact .brand__mark { width: 6.1rem; margin-top: .55rem; }
 .top.is-compact .brand__sub { opacity: 0; transform: translateY(-.25rem); }
@@ -396,7 +410,8 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .top, .top__strip, .top__in, .brand__mark, .brand__sub, .nav, .nav__menu, .nav__link::after, .nav__chev, .cta, .cta svg, .burger path { transition: none !important; }
+  .top__sniezka { animation: none !important; }
+  .top, .top__strip, .top__sniezka, .top__forest, .top__in, .brand__mark, .brand__sub, .nav, .nav__menu, .nav__link::after, .nav__chev, .cta, .cta svg, .burger path { transition: none !important; }
   .log__list { animation: none; }
   .log__window { overflow-y: auto; }
   .btn { transition: none; }

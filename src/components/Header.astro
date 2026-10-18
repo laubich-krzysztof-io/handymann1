@@ -30,7 +30,11 @@ const links = [
 ];
 ---
 <header class="top" data-top data-label-open={menuLabel[lang].open} data-label-close={menuLabel[lang].close}>
-  <div class="top__scene" aria-hidden="true"><span class="top__strip"></span></div>
+  <div class="top__scene" aria-hidden="true">
+    <span class="top__strip"></span>
+    <span class="top__sniezka"></span>
+    <span class="top__forest"></span>
+  </div>
   <div class="top__in">
     <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub[lang]}`}>
       <Mark class="brand__mark" />
@@ -106,6 +110,8 @@ const links = [
       if (!ticking) { ticking = true; requestAnimationFrame(compact); }
     }, { passive: true });
     compact();
+    // Wejście pejzażu (Śnieżka z mgły) tylko gdy strona startuje u góry
+    if (window.scrollY < 56) top.classList.add('is-intro');
 
     // "Usługi" disclosure
     const item = top.querySelector<HTMLElement>('[data-menu]');
