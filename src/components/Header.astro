@@ -30,11 +30,12 @@ const links = [
 ];
 ---
 <header class="top" data-top data-label-open={menuLabel[lang].open} data-label-close={menuLabel[lang].close}>
+  <div class="top__scene" aria-hidden="true"><span class="top__strip"></span></div>
   <div class="top__in">
     <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub[lang]}`}>
       <Mark class="brand__mark" />
       <span class="brand__text">
-        <span class="brand__name">{word1}<span class="brand__dot" aria-hidden="true"></span>{word2}</span>
+        <span class="brand__name">{word1}<span class="brand__dot">.</span>{word2}</span>
         <span class="brand__sub">{brandSub[lang]}</span>
       </span>
     </a>
@@ -93,8 +94,12 @@ const links = [
   if (top) {
     // Compact bar after the first scroll
     let ticking = false;
+    // Hysteresis: collapse past 56px, expand only back near the top (no flicker on small scrolls)
     const compact = () => {
-      top.classList.toggle('is-compact', window.scrollY > 16);
+      const y = window.scrollY;
+      const on = top.classList.contains('is-compact');
+      if (!on && y > 56) top.classList.add('is-compact');
+      else if (on && y < 8) top.classList.remove('is-compact');
       ticking = false;
     };
     window.addEventListener('scroll', () => {
