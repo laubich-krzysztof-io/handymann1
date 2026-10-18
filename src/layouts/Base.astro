@@ -3,9 +3,9 @@ import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource-variable/archivo/wdth-italic.css';
 import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
-import '@fontsource/space-mono/700-italic.css';
 import '../styles/global.css';
 import { locales, site, type Lang } from '../config';
+import { ORIGIN, jsonLd, ogLocale } from '../lib/seo';
 
 interface Props {
   lang: Lang;
@@ -14,16 +14,9 @@ interface Props {
   description: string;
 }
 const { lang, htmlLang, title, description } = Astro.props;
-const base = Astro.site ? Astro.site.origin : '';
-const canonical = `${base}/${lang}/`;
-const ld = {
-  '@context': 'https://schema.org',
-  '@type': 'HomeAndConstructionBusiness',
-  name: site.name,
-  description,
-  url: canonical,
-  areaServed: 'Karkonosze, Lower Silesia, Poland',
-};
+const canonical = `${ORIGIN}/${lang}/`;
+const ogImage = `${ORIGIN}/img/og.png`;
+const ld = jsonLd(lang);
 ---
 <!doctype html>
 <html lang={htmlLang}>
@@ -32,18 +25,29 @@ const ld = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content="noindex, nofollow" />
+    <meta name="robots" content={site.indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow'} />
     <meta name="theme-color" content="#F9F6EB" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta property="og:image" content={`${base}/img/logo-512.png`} />
     <link rel="canonical" href={canonical} />
-    {locales.map((l) => <link rel="alternate" hreflang={l} href={`${base}/${l}/`} />)}
-    <link rel="alternate" hreflang="x-default" href={`${base}/pl/`} />
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={`${ORIGIN}/${l}/`} />)}
+    <link rel="alternate" hreflang="x-default" href={`${ORIGIN}/pl/`} />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={ogLocale[lang]} />
+    {locales.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={ogLocale[l]} />)}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name} – ${title}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <script type="application/ld+json" set:html={JSON.stringify(ld)} />
   </head>
   <body>

@@ -185,7 +185,7 @@ export const content: Record<Lang, Content> = {
   de: {
     htmlLang: 'de',
     meta: {
-      title: 'Handyman Riesengebirge – Handwerker für Pensionen, Hotels und Häuser',
+      title: 'handyman.karkonosze – Service für Pensionen, Hotels und Häuser im Riesengebirge',
       description:
         'Sanitär, Elektro, Montage und kleine Renovierungen sowie feste Objektbetreuung. Für Pensionen, kleine Hotels, Firmen und Privatkunden im Riesengebirge.',
     },
@@ -305,9 +305,9 @@ export const content: Record<Lang, Content> = {
   en: {
     htmlLang: 'en',
     meta: {
-      title: 'Handyman Karkonosze – repairs for guesthouses, small hotels and homes',
+      title: 'handyman.karkonosze – service for guesthouses, small hotels and homes',
       description:
-        'Plumbing, electrics, installation and small renovations, plus ongoing property care. For guesthouses, small hotels, businesses and homeowners in the Karkonosze mountains.',
+        'Plumbing, electrics, installation and small repairs, plus ongoing property care for guesthouses, small hotels, businesses and homes in the Karkonosze mountains.',
     },
     nav: { services: 'Services', care: 'Property care', process: 'How it works', trust: 'Trust', contact: 'Contact' },
     call: 'Call',

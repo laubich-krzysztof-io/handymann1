@@ -1,13 +1,20 @@
 ---
-// Strona główna przekierowuje na wersję językową.
+// Strona główna: wybór języka. Przekierowuje według języka przeglądarki, bez JS przez meta refresh.
+import { locales, site } from '../config';
+import { ORIGIN } from '../lib/seo';
+const names = { pl: 'Polski', de: 'Deutsch', en: 'English' } as const;
 ---
 <!doctype html>
 <html lang="pl">
   <head>
     <meta charset="utf-8" />
-    <title>Handyman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{site.name}</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href={`${ORIGIN}/pl/`} />
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={`${ORIGIN}/${l}/`} />)}
+    <link rel="alternate" hreflang="x-default" href={`${ORIGIN}/pl/`} />
     <meta http-equiv="refresh" content="0; url=/pl/" />
-    <link rel="canonical" href="/pl/" />
     <script is:inline>
       try {
         var l = (navigator.language || 'pl').slice(0, 2).toLowerCase();
@@ -15,5 +22,7 @@
       } catch (e) {}
     </script>
   </head>
-  <body><a href="/pl/">Handyman</a></body>
+  <body>
+    <ul>{locales.map((l) => <li><a href={`/${l}/`} hreflang={l} lang={l}>{names[l]}</a></li>)}</ul>
+  </body>
 </html>

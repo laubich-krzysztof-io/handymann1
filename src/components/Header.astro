@@ -107,9 +107,12 @@ const links = [
     window.addEventListener('scroll', () => {
       if (!ticking) { ticking = true; requestAnimationFrame(compact); }
     }, { passive: true });
-    compact();
-    // Wejście pejzażu (Śnieżka z mgły) tylko gdy strona startuje u góry
-    if (window.scrollY < 56) top.classList.add('is-intro');
+    // Pierwszy odczyt w klatce animacji: bez wymuszonego przeliczania układu przy starcie
+    requestAnimationFrame(() => {
+      compact();
+      // Wejście pejzażu (Śnieżka z mgły) tylko gdy strona startuje u góry
+      if (window.scrollY < 56) top.classList.add('is-intro');
+    });
 
     // "Usługi" disclosure
     const item = top.querySelector<HTMLElement>('[data-menu]');
