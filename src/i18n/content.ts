@@ -189,7 +189,7 @@ export const content: Record<Lang, Content> = {
       description:
         'Sanitär, Elektro, Montage und kleine Renovierungen sowie feste Objektbetreuung. Für Pensionen, kleine Hotels, Firmen und Privatkunden im Riesengebirge.',
     },
-    nav: { services: 'Leistungen', care: 'Objektbetreuung', process: 'Ablauf', trust: 'Vertrauen', contact: 'Kontakt' },
+    nav: { services: 'Leistungen', care: 'Betreuung', process: 'Ablauf', trust: 'Vertrauen', contact: 'Kontakt' },
     call: 'Anrufen',
     hero: {
       title: 'Repariert, bevor Gäste es merken.',

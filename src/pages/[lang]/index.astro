@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
 import { content } from '../../i18n/content';
 import { locales, site, type Lang } from '../../config';
 
@@ -11,15 +12,11 @@ const lang = Astro.params.lang as Lang;
 const t = content[lang];
 const tel = site.phone.replace(/\s/g, '');
 const gallery = site.gallery;
-const brandSub: Record<Lang, string> = { pl: 'Serwis dla domu i pensjonatu', de: 'Hausmeisterservice für Haus und Pension', en: 'Handyman services for homes and guesthouses' };
 const bandText: Record<Lang, string> = {
   pl: 'Jelenia Góra, Lubomierz, Szklarska Poręba i okolice',
   de: 'Jelenia Góra, Lubomierz, Szklarska Poręba und Umgebung',
   en: 'Jelenia Góra, Lubomierz, Szklarska Poręba and around',
 };
-const realizacje: Record<Lang, string> = { pl: 'Realizacje', de: 'Referenzen', en: 'Work' };
-const navLabel: Record<Lang, string> = { pl: 'Menu główne', de: 'Hauptmenü', en: 'Main menu' };
-const langLabel: Record<Lang, string> = { pl: 'Język', de: 'Sprache', en: 'Language' };
 const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt springen', en: 'Skip to content' };
 
 // Proste ikony usług (kolejność jak w content.services.items)
@@ -37,31 +34,7 @@ const icons = [
 <Base lang={lang} htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description}>
   <a class="skip" href="#main">{skip[lang]}</a>
 
-  <header class="top">
-    <div class="wrap top__in">
-      <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub[lang]}`}>
-        <img class="brand__mark" src="/img/logo-160.webp" srcset="/img/logo-160.webp 160w, /img/logo-256.webp 256w" sizes="5.2rem" width="160" height="160" alt="" />
-        <span class="brand__text">
-          <span class="brand__name">{site.name}</span>
-          <span class="brand__sub">{brandSub[lang]}</span>
-        </span>
-      </a>
-      <nav class="nav" aria-label={navLabel[lang]}>
-        <a href="#uslugi">{t.nav.services}</a>
-        <a href="#realizacja">{realizacje[lang]}</a>
-        <a href="#opieka">{t.nav.care}</a>
-        <a href="#jak">{t.nav.process}</a>
-      </nav>
-      <div class="top__end">
-        <ul class="lang" aria-label={langLabel[lang]}>
-          {locales.map((l) => (
-            <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
-          ))}
-        </ul>
-        <a class="btn btn--small" href="#kontakt">{t.hero.primary}</a>
-      </div>
-    </div>
-  </header>
+  <Header lang={lang} />
 
   <main id="main">
     <section class="band">
@@ -95,7 +68,7 @@ const icons = [
         </div>
         <ul class="cards">
           {t.services.items.map((s, i) => (
-            <li class="card">
+            <li class="card" id={`usluga-${i + 1}`}>
               <svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true" set:html={icons[i]} />
               <h3>{s.name}</h3>
               <p>{s.text}</p>
