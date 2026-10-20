@@ -19,16 +19,16 @@ const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt 
 const quickLabel: Record<Lang, string> = { pl: 'Szybki kontakt', de: 'Schnellkontakt', en: 'Quick contact' };
 const sample = t.log.entries[0];
 
-// Ikony usług (kolejność jak w content.services.items), jedna grubość linii
+// Ikony usług z biblioteki Lucide (ISC), jedna siatka 24 px i jedna grubość linii; kolejność jak w content.services.items
 const icons = [
-  // kropla
-  '<path d="M24 6c6 9 12 15 12 23a12 12 0 0 1-24 0c0-8 6-14 12-23z"/><path d="M18 30a6 6 0 0 0 6 6"/>',
-  // piorun
-  '<path d="M27 5 12 27h11l-3 16 16-23H25z"/>',
-  // młotek
-  '<path d="M8 14h20l4 4v4H24l-3-3h-5l-4 4-4-4z"/><path d="M22 22 38 40a3 3 0 0 1-4 4L18 26"/>',
-  // dom z kluczem
-  '<path d="M6 22 24 7l18 15"/><path d="M11 18v22h26V18"/><circle cx="24" cy="26" r="4"/><path d="M24 30v7m0-3h3"/>',
+  // klucz (hydraulika)
+  '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  // wtyczka z iskrą (elektryka)
+  '<path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"/><path d="m2 22 3-3"/><path d="M7.5 13.5 10 11"/><path d="M10.5 16.5 13 14"/><path d="m18 3-4 4h6l-4 4"/>',
+  // wiertarka (montaż)
+  '<path d="M10 18a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H5a3 3 0 0 1-3-3 1 1 0 0 1 1-1z"/><path d="M13 10H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1l-.81 3.242a1 1 0 0 1-.97.758H8"/><path d="M14 4h3a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-3"/><path d="M18 6h4"/><path d="m5 10-2 8"/><path d="m7 18 2-8"/>',
+  // lista z odhaczeniem (stała opieka, jak Dziennik obiektu)
+  '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
 ];
 const iconPhone = '<path d="M6.5 3.5h3l1.8 4.6-2.3 1.5a11.5 11.5 0 0 0 5.4 5.4l1.5-2.3 4.6 1.8v3a2 2 0 0 1-2 2A16.5 16.5 0 0 1 4.5 5.5a2 2 0 0 1 2-2z"/>';
 const iconChat = '<path d="M4.5 5.5h15v10.5H10l-5.5 4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/>';
@@ -85,7 +85,7 @@ const photos = [
         <ul class="svc">
           {t.services.items.map((s, i) => (
             <li class="svc__item" id={`usluga-${i + 1}`}>
-              <svg class="svc__icon" viewBox="0 0 48 48" aria-hidden="true" set:html={icons[i]} />
+              <svg class="svc__icon" viewBox="0 0 24 24" aria-hidden="true" set:html={icons[i]} />
               <div>
                 <h3>{i === 3 ? <a href="#opieka">{s.name}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconArrow} /></a> : s.name}</h3>
                 <p>{s.text}</p>

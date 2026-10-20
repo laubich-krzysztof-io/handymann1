@@ -318,7 +318,7 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 .section__head--light p { color: var(--on-dark); max-width: 36rem; }
 .svc { display: grid; border-top: 1px solid #f9f6eb2e; }
 .svc__item { display: grid; grid-template-columns: 2.4rem 1fr; gap: 1.1rem; padding-block: 1.4rem; border-bottom: 1px solid #f9f6eb2e; }
-.svc__icon { width: 2.4rem; height: 2.4rem; fill: none; stroke: var(--paper); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.svc__icon { width: 2.2rem; height: 2.2rem; margin-top: .1rem; fill: none; stroke: var(--paper); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
 .svc__item h3 { color: var(--paper); margin-bottom: .35rem; }
 .svc__item h3 a { display: inline-flex; align-items: center; gap: .35rem; padding-block: .75rem; margin-block: -.75rem; color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .25em; }
 .svc__item h3 a:hover { text-decoration-thickness: 2px; }
