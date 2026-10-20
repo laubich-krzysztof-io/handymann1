@@ -193,6 +193,10 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
   transition: background .3s var(--ease-out);
 }
 .cta:hover { background: var(--pine-ink); }
+/* WhatsApp w pasku: sama ikona w kolorze marki strony, cel dotyku 44 px */
+.wa-link { display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; margin-right: -.6rem; border-radius: 999px; color: var(--pine); transition: background .25s var(--ease-out), color .25s var(--ease-out); }
+.wa-link svg { width: 1.45rem; height: 1.45rem; fill: currentColor; }
+.wa-link:hover { background: color-mix(in oklab, var(--pine) 10%, transparent); color: var(--pine-ink); }
 
 .burger { display: none; width: 2.9rem; height: 2.9rem; place-items: center; border: 0; background: none; color: var(--pine-ink); border-radius: 6px; cursor: pointer; }
 .burger svg { width: 1.6rem; height: 1.6rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
@@ -248,7 +252,7 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
   .nav__link.is-current { color: var(--pine); }
 }
 @media (max-width: 59.99rem) {
-  .top__end .cta { display: none; }
+  .top__end .cta, .top__end .wa-link { display: none; }
   .nav__extra { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 1rem; margin-top: 1.1rem; }
   .nav__extra .lang { display: none; }
 }
