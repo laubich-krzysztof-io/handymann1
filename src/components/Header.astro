@@ -12,7 +12,6 @@ const brandSub: Record<Lang, string> = {
   de: 'Service für Haus und Pension',
   en: 'Service for home and guesthouse',
 };
-const realizacje: Record<Lang, string> = { pl: 'Realizacje', de: 'Referenzen', en: 'Work' };
 const navLabel: Record<Lang, string> = { pl: 'Menu główne', de: 'Hauptmenü', en: 'Main menu' };
 const langLabel: Record<Lang, string> = { pl: 'Język', de: 'Sprache', en: 'Language' };
 const menuLabel: Record<Lang, { open: string; close: string }> = {
@@ -21,12 +20,12 @@ const menuLabel: Record<Lang, { open: string; close: string }> = {
   en: { open: 'Open menu', close: 'Close menu' },
 };
 const [word1, word2] = site.name.split('.');
-// Krótka etykieta przycisku w pasku (ten sam cel co przycisk w hero)
-const ctaLabel: Record<Lang, string> = { pl: t.hero.primary, de: 'Schaden melden', en: 'Report a fault' };
+// Menu w kolejności sekcji na stronie
 const links = [
-  { id: 'realizacja', label: realizacje[lang] },
+  { id: 'uslugi', label: t.nav.services },
   { id: 'opieka', label: t.nav.care },
   { id: 'jak', label: t.nav.process },
+  { id: 'realizacja', label: t.nav.work },
 ];
 ---
 <header class="top" data-top data-label-open={menuLabel[lang].open} data-label-close={menuLabel[lang].close}>
@@ -46,22 +45,6 @@ const links = [
 
     <nav class="nav" id="nav" aria-label={navLabel[lang]}>
       <ul class="nav__list">
-        <li class="nav__item nav__item--menu" data-menu>
-          <button class="nav__link nav__btn" type="button" aria-expanded="false" aria-controls="menu-uslugi" data-spy="uslugi">
-            {t.nav.services}
-            <svg class="nav__chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7.5 10 12.5 15 7.5" /></svg>
-          </button>
-          <ul class="nav__menu" id="menu-uslugi">
-            {t.services.items.map((s, i) => (
-              <li>
-                <a href={`#usluga-${i + 1}`}>
-                  <span class="nav__menu-name">{s.name}</span>
-                  <span class="nav__menu-ex">{s.examples}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </li>
         {links.map((l) => (
           <li class="nav__item"><a class="nav__link" href={`#${l.id}`} data-spy={l.id}>{l.label}</a></li>
         ))}
@@ -72,7 +55,7 @@ const links = [
             <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
           ))}
         </ul>
-        <a class="cta" href="#kontakt">{ctaLabel[lang]}</a>
+        <a class="cta" href="#kontakt">{t.hero.primary}</a>
       </div>
     </nav>
 
@@ -82,7 +65,7 @@ const links = [
           <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
         ))}
       </ul>
-      <a class="cta" href="#kontakt">{ctaLabel[lang]}</a>
+      <a class="cta" href="#kontakt">{t.hero.primary}</a>
       <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel[lang].open} data-burger>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path class="burger__a" d="M4 7h16" /><path class="burger__b" d="M4 12h16" /><path class="burger__c" d="M4 17h16" /></svg>
       </button>
@@ -114,26 +97,6 @@ const links = [
       if (window.scrollY < 56) top.classList.add('is-intro');
     });
 
-    // "Usługi" disclosure
-    const item = top.querySelector<HTMLElement>('[data-menu]');
-    const btn = item?.querySelector<HTMLButtonElement>('button');
-    const setMenu = (open: boolean) => btn?.setAttribute('aria-expanded', String(open));
-    const isOpen = () => btn?.getAttribute('aria-expanded') === 'true';
-    btn?.addEventListener('click', () => setMenu(!isOpen()));
-    let leave: number | undefined;
-    const wide = window.matchMedia('(hover: hover) and (min-width: 80rem)');
-    item?.addEventListener('pointerenter', (e) => {
-      if (e.pointerType !== 'mouse' || !wide.matches) return;
-      window.clearTimeout(leave); setMenu(true);
-    });
-    item?.addEventListener('pointerleave', (e) => {
-      if (e.pointerType !== 'mouse' || !wide.matches) return;
-      leave = window.setTimeout(() => setMenu(false), 160);
-    });
-    item?.addEventListener('focusout', (e) => {
-      if (!item.contains(e.relatedTarget as Node)) setMenu(false);
-    });
-
     // Mobile panel
     const burger = top.querySelector<HTMLButtonElement>('[data-burger]');
     const setPanel = (open: boolean) => {
@@ -144,31 +107,39 @@ const links = [
     burger?.addEventListener('click', () => setPanel(!top.classList.contains('is-open')));
 
     document.addEventListener('click', (e) => {
-      const target = e.target as Node;
-      if (item && !item.contains(target)) setMenu(false);
-      if (!top.contains(target)) setPanel(false);
+      if (!top.contains(e.target as Node)) setPanel(false);
     });
     top.querySelectorAll<HTMLAnchorElement>('.nav a').forEach((a) =>
-      a.addEventListener('click', () => { setMenu(false); setPanel(false); }),
+      a.addEventListener('click', () => setPanel(false)),
     );
     document.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape') return;
-      if (isOpen()) { setMenu(false); btn?.focus(); }
-      else if (top.classList.contains('is-open')) { setPanel(false); burger?.focus(); }
+      if (e.key === 'Escape' && top.classList.contains('is-open')) { setPanel(false); burger?.focus(); }
     });
 
+    // Zmiana języka zostawia czytelnika w tej samej sekcji (kotwice są wspólne dla PL/DE/EN)
+    top.querySelectorAll<HTMLAnchorElement>('.lang a').forEach((a) =>
+      a.addEventListener('click', () => {
+        const current = document.querySelector('main > section.is-seen-last');
+        const hash = current?.id ? `#${current.id}` : location.hash;
+        if (hash) a.href = a.pathname + hash;
+      }),
+    );
+
     // Current section underline
+    // Obserwujemy wszystkie sekcje: te bez linku w menu czyszczą podkreślenie
     const spies = [...top.querySelectorAll<HTMLElement>('[data-spy]')];
-    const sections = spies
-      .map((el) => document.getElementById(el.dataset.spy || ''))
-      .filter((s): s is HTMLElement => !!s);
+    const sections = [...document.querySelectorAll<HTMLElement>('main > section')];
     const mark = (id: string | null) => spies.forEach((el) => {
       const on = el.dataset.spy === id;
       el.classList.toggle('is-current', on);
-      if (el.tagName === 'A') on ? el.setAttribute('aria-current', 'location') : el.removeAttribute('aria-current');
+      on ? el.setAttribute('aria-current', 'location') : el.removeAttribute('aria-current');
     });
     const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => { if (en.isIntersecting) mark(en.target.id); });
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        sections.forEach((s) => s.classList.toggle('is-seen-last', s === en.target));
+        mark((en.target as HTMLElement).id || null);
+      });
     }, { rootMargin: '-40% 0px -55% 0px' });
     sections.forEach((s) => io.observe(s));
     window.addEventListener('scroll', () => { if (window.scrollY < 80) mark(null); }, { passive: true });

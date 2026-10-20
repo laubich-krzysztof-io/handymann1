@@ -12,10 +12,13 @@ export function getStaticPaths() {
 const lang = Astro.params.lang as Lang;
 const t = content[lang];
 const tel = site.phone.replace(/\s/g, '');
+const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreeting)}`;
 const gallery = site.gallery;
 const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt springen', en: 'Skip to content' };
+const quickLabel: Record<Lang, string> = { pl: 'Szybki kontakt', de: 'Schnellkontakt', en: 'Quick contact' };
+const sample = t.log.entries[0];
 
-// Proste ikony usług (kolejność jak w content.services.items)
+// Ikony usług (kolejność jak w content.services.items), jedna grubość linii
 const icons = [
   // kropla
   '<path d="M24 6c6 9 12 15 12 23a12 12 0 0 1-24 0c0-8 6-14 12-23z"/><path d="M18 30a6 6 0 0 0 6 6"/>',
@@ -25,6 +28,15 @@ const icons = [
   '<path d="M8 14h20l4 4v4H24l-3-3h-5l-4 4-4-4z"/><path d="M22 22 38 40a3 3 0 0 1-4 4L18 26"/>',
   // dom z kluczem
   '<path d="M6 22 24 7l18 15"/><path d="M11 18v22h26V18"/><circle cx="24" cy="26" r="4"/><path d="M24 30v7m0-3h3"/>',
+];
+const iconPhone = '<path d="M6.5 3.5h3l1.8 4.6-2.3 1.5a11.5 11.5 0 0 0 5.4 5.4l1.5-2.3 4.6 1.8v3a2 2 0 0 1-2 2A16.5 16.5 0 0 1 4.5 5.5a2 2 0 0 1 2-2z"/>';
+const iconChat = '<path d="M4.5 5.5h15v10.5H10l-5.5 4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/>';
+const iconArrow = '<path d="M4.5 12h14M13 6.5l5.5 5.5-5.5 5.5"/>';
+const photos = [
+  { id: 'malowanie', cls: 'w-a', w: 1600, h: 1200 },
+  { id: 'gotowe', cls: 'w-b', w: 1200, h: 1600 },
+  { id: 'tasma', cls: 'w-c', w: 1600, h: 1200 },
+  { id: 'detal', cls: 'w-d', w: 1200, h: 1600 },
 ];
 ---
 <Base lang={lang} htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description}>
@@ -40,75 +52,52 @@ const icons = [
           <p class="lead">{t.hero.lead}</p>
           <div class="actions">
             <a class="btn" href="#kontakt">{t.hero.primary}</a>
-            <a class="btn btn--ghost" href="#opieka">{t.hero.secondary}</a>
+            <a class="call-link" href={`tel:${tel}`}>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconPhone} />
+              <span>{t.call}: {site.phone}</span>
+            </a>
           </div>
-          <ul class="audience">
-            {t.hero.audience.map((a) => <li>{a}</li>)}
-          </ul>
+          <a class="entry" href="#opieka">
+            <span class="entry__label">{t.hero.entryLabel}</span>
+            <span class="entry__row">
+              <span class="entry__when">{sample.when}</span>
+              <span class="entry__body">
+                <span class="entry__where">{sample.where}</span>
+                <span class="entry__what">{sample.what}</span>
+                <span class="entry__done">{sample.done}</span>
+              </span>
+            </span>
+            <span class="entry__more">{t.hero.entryMore}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconArrow} /></span>
+          </a>
         </div>
       </div>
-      <svg class="ridge" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 120V92l110-34 70 22 120-58 90 40 80-26 140 62 120-70 60 30 90-44 110 54 90-20 120 40 120-30 120 30v52z" fill="var(--deep)"/>
-      </svg>
     </section>
 
-    <section id="uslugi" class="services-wrap">
+    <section id="uslugi" class="services-wrap" aria-labelledby="uslugi-h">
       <div class="wrap">
         <div class="section__head section__head--light">
-          <h2>{t.services.title}</h2>
+          <h2 id="uslugi-h">{t.services.title}</h2>
           <p>{t.services.lead}</p>
         </div>
-        <ul class="cards">
+        <ul class="svc">
           {t.services.items.map((s, i) => (
-            <li class="card" id={`usluga-${i + 1}`}>
-              <svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true" set:html={icons[i]} />
-              <h3>{s.name}</h3>
-              <p>{s.text}</p>
-              <p class="card__tags">{s.examples}</p>
+            <li class="svc__item" id={`usluga-${i + 1}`}>
+              <svg class="svc__icon" viewBox="0 0 48 48" aria-hidden="true" set:html={icons[i]} />
+              <div>
+                <h3>{i === 3 ? <a href="#opieka">{s.name}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconArrow} /></a> : s.name}</h3>
+                <p>{s.text}</p>
+              </div>
             </li>
           ))}
         </ul>
-        <p class="fine fine--light">{t.services.note}</p>
+        <p class="fine fine--light svc__note">{t.services.note}</p>
       </div>
     </section>
 
-    <section id="realizacja" class="work">
-      <div class="work__band">
-        <div class="wrap"><h2>{t.work.title}</h2></div>
-      </div>
-      <div class="wrap">
-        <div class="work__head">
-          <p class="lead">{t.work.lead}</p>
-          <dl class="work__facts">
-            {t.work.facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
-          </dl>
-        </div>
-        <div class="work__grid">
-          {[
-            { id: 'malowanie', cls: 'w-a', w: 1600, h: 1200 },
-            { id: 'gotowe', cls: 'w-b', w: 1200, h: 1600 },
-            { id: 'tasma', cls: 'w-c', w: 1600, h: 1200 },
-            { id: 'detal', cls: 'w-d', w: 1200, h: 1600 },
-          ].map((p) => (
-            <figure class={`work__photo ${p.cls}`}>
-              <img
-                src={`/img/mural-${p.id}-1600.webp`}
-                srcset={`/img/mural-${p.id}-900.webp 900w, /img/mural-${p.id}-1600.webp 1600w`}
-                sizes="(min-width: 64rem) 50vw, 100vw"
-                width={p.w} height={p.h}
-                alt={t.work.photos[p.id as keyof typeof t.work.photos]}
-                loading="lazy" decoding="async"
-              />
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <section id="opieka" class="section">
+    <section id="opieka" class="section" aria-labelledby="opieka-h">
       <div class="wrap care">
         <div class="care__lead">
-          <h2>{t.care.title}</h2>
+          <h2 id="opieka-h">{t.care.title}</h2>
           <p class="lead">{t.care.lead}</p>
           <ul class="care__points">
             {t.care.points.map((p) => (
@@ -121,10 +110,13 @@ const icons = [
           <a class="btn" href="#kontakt">{t.care.cta}</a>
         </div>
 
-        <aside class="log" aria-label={t.log.title}>
+        <aside class="log" aria-label={t.log.title} data-log>
           <div class="log__head">
             <span class="log__title">{t.log.title}</span>
-            <span class="log__dot" aria-hidden="true"></span>
+            <button class="log__toggle" type="button" aria-pressed="false" aria-label={t.log.pause} data-log-toggle>
+              <svg class="log__pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5v11M15 6.5v11" /></svg>
+              <svg class="log__play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 6.5v11l9-5.5z" /></svg>
+            </button>
           </div>
           <div class="log__window" aria-hidden="true">
             <ol class="log__list">
@@ -146,12 +138,16 @@ const icons = [
       </div>
     </section>
 
-    <section id="jak" class="section section--tint">
+    <section id="jak" class="section section--tint" aria-labelledby="jak-h">
       <div class="wrap">
-        <h2>{t.process.title}</h2>
-        <ol class="steps">
+        <div class="section__head">
+          <h2 id="jak-h">{t.process.title}</h2>
+          <p class="lead">{t.process.lead}</p>
+        </div>
+        <ol class="track">
           {t.process.steps.map((s) => (
             <li>
+              <span class="track__status">{s.status}</span>
               <h3>{s.title}</h3>
               <p>{s.text}</p>
             </li>
@@ -160,9 +156,37 @@ const icons = [
       </div>
     </section>
 
-    <section id="zaufanie" class="section">
+    <section id="realizacja" class="section work" aria-labelledby="realizacja-h">
       <div class="wrap">
-        <h2>{t.trust.title}</h2>
+        <div class="work__head">
+          <div class="section__head">
+            <h2 id="realizacja-h">{t.work.title}</h2>
+            <p class="lead">{t.work.lead}</p>
+          </div>
+          <dl class="work__facts">
+            {t.work.facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+          </dl>
+        </div>
+      </div>
+      <div class="work__grid">
+        {photos.map((p) => (
+          <figure class={`work__photo ${p.cls}`}>
+            <img
+              src={`/img/mural-${p.id}-1600.webp`}
+              srcset={`/img/mural-${p.id}-900.webp 900w, /img/mural-${p.id}-1600.webp 1600w`}
+              sizes="(min-width: 64rem) 50vw, 80vw"
+              width={p.w} height={p.h}
+              alt={t.work.photos[p.id as keyof typeof t.work.photos]}
+              loading="lazy" decoding="async"
+            />
+          </figure>
+        ))}
+      </div>
+    </section>
+
+    <section id="zaufanie" class="section" aria-labelledby="zaufanie-h">
+      <div class="wrap">
+        <h2 id="zaufanie-h">{t.trust.title}</h2>
         <ul class="trust">
           {t.trust.items.map((i) => (
             <li>
@@ -184,44 +208,56 @@ const icons = [
       </div>
     </section>
 
-    <section id="kontakt" class="contact">
+    <section id="kontakt" class="contact" aria-labelledby="kontakt-h">
       <div class="wrap contact__in">
         <div class="contact__lead">
-          <h2>{t.contact.title}</h2>
+          <h2 id="kontakt-h">{t.contact.title}</h2>
           <p>{t.contact.lead}</p>
-          <p class="direct">
-            <span>{t.contact.direct}</span>
-            <a href={`tel:${tel}`}>{site.phone}</a>
-            <a href={`mailto:${site.email}`}>{site.email}</a>
-          </p>
+          <div class="direct">
+            <p class="direct__label">{t.contact.direct}</p>
+            <a href={`tel:${tel}`}>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconPhone} />{site.phone}
+            </a>
+            <a href={wa} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconChat} />{t.contact.whatsappDirect}
+            </a>
+          </div>
           <p class="fine fine--light">{t.contact.area}</p>
         </div>
 
         <form id="lead" class="form" novalidate data-wa={site.whatsapp} data-mail={site.email}
-          data-l-name={t.contact.form.name} data-l-phone={t.contact.form.phone} data-l-who={t.contact.form.who} data-l-what={t.contact.form.what}>
-          <label>
-            <span>{t.contact.form.name} <small>({t.contact.form.required})</small></span>
-            <input name="name" autocomplete="name" required aria-describedby="form-error" />
-          </label>
-          <label>
-            <span>{t.contact.form.phone}</span>
-            <input name="phone" type="tel" autocomplete="tel" inputmode="tel" />
-          </label>
-          <label>
-            <span>{t.contact.form.who}</span>
-            <select name="who">
+          data-l-name={t.contact.form.name} data-l-phone={t.contact.form.phone} data-l-who={t.contact.form.who}
+          data-l-where={t.contact.form.where} data-l-what={t.contact.form.what}
+          data-sent-wa={t.contact.form.sentWa} data-sent-mail={t.contact.form.sentMail}>
+          <div class="field">
+            <label for="f-name">{t.contact.form.name} <small>({t.contact.form.required})</small></label>
+            <input id="f-name" name="name" autocomplete="name" required aria-describedby="e-name" />
+            <p id="e-name" class="field__error" hidden>{t.contact.form.errName}</p>
+          </div>
+          <div class="field">
+            <label for="f-phone">{t.contact.form.phone}</label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+          </div>
+          <div class="field">
+            <label for="f-who">{t.contact.form.who}</label>
+            <select id="f-who" name="who">
               {t.contact.form.whoOptions.map((o) => <option value={o}>{o}</option>)}
             </select>
-          </label>
-          <label>
-            <span>{t.contact.form.what} <small>({t.contact.form.required})</small></span>
-            <textarea name="what" rows="4" required aria-describedby="form-error" placeholder={t.contact.form.whatPlaceholder}></textarea>
-          </label>
-          <p id="form-error" class="form__error" role="alert" hidden>{t.contact.form.error}</p>
+          </div>
+          <div class="field">
+            <label for="f-where">{t.contact.form.where}</label>
+            <input id="f-where" name="where" placeholder={t.contact.form.wherePlaceholder} />
+          </div>
+          <div class="field">
+            <label for="f-what">{t.contact.form.what} <small>({t.contact.form.required})</small></label>
+            <textarea id="f-what" name="what" rows="4" required aria-describedby="e-what" placeholder={t.contact.form.whatPlaceholder}></textarea>
+            <p id="e-what" class="field__error" hidden>{t.contact.form.errWhat}</p>
+          </div>
           <div class="actions">
             <button class="btn" type="button" data-send="wa">{t.contact.form.whatsapp}</button>
             <button class="btn btn--ghost" type="button" data-send="mail">{t.contact.form.email}</button>
           </div>
+          <p class="form__status" role="status" aria-live="polite"></p>
           <p class="fine">{t.contact.form.hint}</p>
         </form>
       </div>
@@ -236,44 +272,85 @@ const icons = [
     </div>
   </footer>
 
+  <nav class="quick" aria-label={quickLabel[lang]} data-quick>
+    <a class="quick__btn quick__btn--call" href={`tel:${tel}`}>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconPhone} />{t.call}
+    </a>
+    <a class="quick__btn" href={wa} target="_blank" rel="noopener">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconChat} />WhatsApp
+    </a>
+  </nav>
+
   <script>
+    // --- Formularz: wiadomość do WhatsAppa lub poczty, błędy przy polach ---
     const form = document.getElementById('lead') as HTMLFormElement | null;
     if (form) {
+      const d = form.dataset;
+      const field = (n: string) => form.elements.namedItem(n) as HTMLInputElement | HTMLTextAreaElement;
+      const required = ['name', 'what'];
+      const status = form.querySelector<HTMLElement>('.form__status');
+      const setError = (n: string, on: boolean) => {
+        const el = field(n);
+        el.setAttribute('aria-invalid', String(on));
+        const msg = document.getElementById(`e-${n}`);
+        if (msg) msg.hidden = !on;
+      };
       const build = () => {
         const f = new FormData(form);
-        const d = form.dataset;
+        const line = (label = '', key: string) => `${label}: ${f.get(key) || ''}`;
         return [
-          `${d.lName}: ${f.get('name') || ''}`,
-          `${d.lPhone}: ${f.get('phone') || ''}`,
-          `${d.lWho}: ${f.get('who') || ''}`,
+          line(d.lName, 'name'),
+          line(d.lPhone, 'phone'),
+          line(d.lWho, 'who'),
+          line(d.lWhere, 'where'),
           '',
           `${d.lWhat}:`,
           `${f.get('what') || ''}`,
         ].join('\n');
       };
       const valid = () => {
-        const name = form.elements.namedItem('name') as HTMLInputElement;
-        const what = form.elements.namedItem('what') as HTMLTextAreaElement;
-        const ok = name.value.trim() !== '' && what.value.trim() !== '';
-        name.setAttribute('aria-invalid', String(name.value.trim() === ''));
-        what.setAttribute('aria-invalid', String(what.value.trim() === ''));
-        const err = document.getElementById('form-error');
-        if (err) err.hidden = ok;
-        if (!ok) (name.value.trim() === '' ? name : what).focus();
-        return ok;
+        const empty = required.filter((n) => field(n).value.trim() === '');
+        required.forEach((n) => setError(n, empty.includes(n)));
+        if (empty.length) field(empty[0]).focus();
+        return empty.length === 0;
       };
+      // Błąd znika, gdy tylko pole zostanie uzupełnione
+      required.forEach((n) =>
+        field(n).addEventListener('input', () => {
+          if (field(n).getAttribute('aria-invalid') === 'true' && field(n).value.trim() !== '') setError(n, false);
+        }),
+      );
       form.querySelectorAll<HTMLButtonElement>('[data-send]').forEach((b) =>
         b.addEventListener('click', () => {
+          if (status) status.textContent = '';
           if (!valid()) return;
           const text = build();
           if (b.dataset.send === 'wa') {
-            window.open(`https://wa.me/${form.dataset.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+            window.open(`https://wa.me/${d.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+            if (status) status.textContent = d.sentWa || '';
           } else {
-            const subject = `Handyman – ${(form.elements.namedItem('who') as HTMLSelectElement).value}`;
-            location.href = `mailto:${form.dataset.mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+            const subject = `handyman.karkonosze – ${field('who').value}`;
+            location.href = `mailto:${d.mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+            if (status) status.textContent = d.sentMail || '';
           }
         }),
       );
+    }
+
+    // --- Dziennik: przycisk pauzy (WCAG 2.2.2) ---
+    const log = document.querySelector<HTMLElement>('[data-log]');
+    const toggle = log?.querySelector<HTMLButtonElement>('[data-log-toggle]');
+    toggle?.addEventListener('click', () => {
+      const paused = toggle.getAttribute('aria-pressed') !== 'true';
+      toggle.setAttribute('aria-pressed', String(paused));
+      log?.classList.toggle('is-paused', paused);
+    });
+
+    // --- Pasek szybkiego kontaktu: chowa się, gdy formularz jest na ekranie ---
+    const quick = document.querySelector<HTMLElement>('[data-quick]');
+    const contact = document.getElementById('kontakt');
+    if (quick && contact && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([en]) => quick.classList.toggle('is-hidden', en.isIntersecting), { threshold: 0.15 }).observe(contact);
     }
   </script>
 </Base>

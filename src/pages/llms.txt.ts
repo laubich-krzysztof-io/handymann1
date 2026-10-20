@@ -15,7 +15,7 @@ export const GET: APIRoute = () => {
     '',
     `Obszar działania: ${site.region} (${site.areas.join(', ')}) i okolice.`,
     'Języki obsługi: polski, niemiecki, angielski.',
-    `Dla kogo: ${pl.hero.audience.join(', ')}.`,
+    `Dla kogo: ${pl.contact.form.whoOptions.join(', ')}.`,
     '',
     '## Usługi',
     ...pl.services.items.map((s) => `- ${s.name}: ${s.text}`),

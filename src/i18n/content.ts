@@ -3,20 +3,22 @@ import type { Lang } from '../config';
 export interface Content {
   htmlLang: string;
   meta: { title: string; description: string };
-  nav: { services: string; care: string; process: string; trust: string; contact: string };
+  nav: { services: string; care: string; process: string; work: string };
   call: string;
+  /** Pierwsza linijka wiadomości WhatsApp otwieranej z przycisków szybkiego kontaktu */
+  waGreeting: string;
   hero: {
     title: string;
     lead: string;
     primary: string;
-    secondary: string;
-    audience: string[];
+    entryLabel: string;
+    entryMore: string;
   };
-  log: { title: string; note: string; entries: { when: string; where: string; what: string; done: string }[] };
+  log: { title: string; note: string; pause: string; entries: { when: string; where: string; what: string; done: string }[] };
   services: {
     title: string;
     lead: string;
-    items: { name: string; text: string; examples: string }[];
+    items: { name: string; text: string }[];
     note: string;
   };
   care: {
@@ -25,7 +27,7 @@ export interface Content {
     points: { title: string; text: string }[];
     cta: string;
   };
-  process: { title: string; steps: { title: string; text: string }[] };
+  process: { title: string; lead: string; steps: { status: string; title: string; text: string }[] };
   trust: {
     title: string;
     items: { title: string; text: string }[];
@@ -52,10 +54,14 @@ export interface Content {
       hint: string;
       where: string;
       wherePlaceholder: string;
-      error: string;
+      errName: string;
+      errWhat: string;
+      sentWa: string;
+      sentMail: string;
       required: string;
     };
     direct: string;
+    whatsappDirect: string;
     area: string;
   };
   footer: { area: string; rights: string };
@@ -69,18 +75,20 @@ export const content: Record<Lang, Content> = {
       description:
         'Hydraulika, elektryka, montaż i drobne remonty oraz stała opieka nad obiektem. Dla pensjonatów, małych hoteli, firm i osób prywatnych w Karkonoszach.',
     },
-    nav: { services: 'Usługi', care: 'Stała opieka', process: 'Jak pracuję', trust: 'Zaufanie', contact: 'Kontakt' },
+    nav: { services: 'Usługi', care: 'Stała opieka', process: 'Jak pracuję', work: 'Realizacja' },
     call: 'Zadzwoń',
+    waGreeting: 'Dzień dobry, piszę ze strony handyman.karkonosze.',
     hero: {
       title: 'Naprawię, zanim gość zauważy.',
       lead: 'Hydraulika, elektryka, montaż i drobne remonty. Dla pensjonatów, małych hoteli, firm i domów w Karkonoszach, jednorazowo albo na stałe.',
       primary: 'Opisz usterkę',
-      secondary: 'Zobacz stałą opiekę',
-      audience: ['Pensjonaty', 'Małe hotele', 'Firmy', 'Domy prywatne'],
+      entryLabel: 'Dziennik obiektu · przykładowy wpis',
+      entryMore: 'Tak wygląda stała opieka',
     },
     log: {
       title: 'Dziennik obiektu',
       note: 'Przykładowe wpisy – tak wygląda lista po wizycie.',
+      pause: 'Zatrzymaj przewijanie dziennika',
       entries: [
         { when: 'pn 08:10', where: 'Pok. 7', what: 'Bateria prysznicowa kapie', done: 'wymieniona' },
         { when: 'pn 09:40', where: 'Recepcja', what: 'Spalone oświetlenie nad ladą', done: 'naprawione' },
@@ -99,22 +107,18 @@ export const content: Record<Lang, Content> = {
         {
           name: 'Hydraulika',
           text: 'Kapiące krany, zatkane odpływy, wymiana baterii, WC i syfonów, podłączenia urządzeń.',
-          examples: 'baterie · odpływy · WC · podłączenia',
         },
         {
           name: 'Elektryka',
           text: 'Gniazdka, włączniki, oświetlenie, osprzęt rozdzielnic, szukanie przyczyny usterki.',
-          examples: 'gniazdka · oświetlenie · usterki',
         },
         {
           name: 'Montaż i drobne remonty',
           text: 'Meble, półki, drzwi i zamki, malowanie, drobne naprawy płytek, okien i okuć.',
-          examples: 'meble · drzwi · malowanie · zamki',
         },
         {
           name: 'Stała opieka nad obiektem',
           text: 'Regularne obchody, lista usterek i szybkie naprawy w sezonie. Jeden numer telefonu.',
-          examples: 'obchody · usterki · sezon',
         },
       ],
       note: 'Prace elektryczne wykonuję na podstawie uprawnień SEP do 1 kV.',
@@ -131,11 +135,12 @@ export const content: Record<Lang, Content> = {
     },
     process: {
       title: 'Jak pracuję',
+      lead: 'Jedno zgłoszenie, od wiadomości do rachunku.',
       steps: [
-        { title: 'Opisujesz usterkę', text: 'Telefonem, na WhatsAppie albo formularzem. Najlepiej ze zdjęciem.' },
-        { title: 'Dostajesz wycenę', text: 'Orientacyjną na podstawie zdjęcia, dokładną po oględzinach na miejscu.' },
-        { title: 'Naprawiam w ustalonym terminie', text: 'Dojeżdżam z narzędziami i podstawowymi częściami. Po robocie sprzątam.' },
-        { title: 'Rozliczamy się jasno', text: 'Rachunek lub faktura, z podziałem na robociznę i materiały.' },
+        { status: 'zgłoszone', title: 'Opisujesz usterkę', text: 'Telefonem, na WhatsAppie albo formularzem. Najlepiej ze zdjęciem.' },
+        { status: 'wycenione', title: 'Dostajesz wycenę', text: 'Orientacyjną na podstawie zdjęcia, dokładną po oględzinach na miejscu.' },
+        { status: 'naprawione', title: 'Naprawiam w ustalonym terminie', text: 'Dojeżdżam z narzędziami i podstawowymi częściami. Po robocie sprzątam.' },
+        { status: 'rozliczone', title: 'Rozliczamy się jasno', text: 'Rachunek lub faktura, z podziałem na robociznę i materiały.' },
       ],
     },
     trust: {
@@ -173,10 +178,14 @@ export const content: Record<Lang, Content> = {
         hint: 'Zdjęcie dołączysz już w otwartej wiadomości.',
         where: 'Gdzie',
         wherePlaceholder: 'Np. pokój 4, łazienka',
-        error: 'Wpisz imię i opisz, co jest do zrobienia.',
+        errName: 'Wpisz imię i nazwisko.',
+        errWhat: 'Opisz krótko, co jest do zrobienia.',
+        sentWa: 'Wiadomość czeka w WhatsAppie. Wyślij ją tam, a odezwę się.',
+        sentMail: 'Wiadomość czeka w programie pocztowym. Wyślij ją, a odezwę się.',
         required: 'wymagane',
       },
-      direct: 'Wolisz zadzwonić?',
+      direct: 'Wolisz zadzwonić albo napisać?',
+      whatsappDirect: 'Napisz na WhatsAppie',
       area: 'Karkonosze i okolice: Jelenia Góra, Lubomierz, Szklarska Poręba i dalej na zapytanie.',
     },
     footer: { area: 'Karkonosze, Dolny Śląsk', rights: 'Wszelkie prawa zastrzeżone.' },
@@ -189,18 +198,20 @@ export const content: Record<Lang, Content> = {
       description:
         'Sanitär, Elektro, Montage und kleine Renovierungen sowie feste Objektbetreuung. Für Pensionen, kleine Hotels, Firmen und Privatkunden im Riesengebirge.',
     },
-    nav: { services: 'Leistungen', care: 'Betreuung', process: 'Ablauf', trust: 'Vertrauen', contact: 'Kontakt' },
+    nav: { services: 'Leistungen', care: 'Betreuung', process: 'Ablauf', work: 'Referenz' },
     call: 'Anrufen',
+    waGreeting: 'Guten Tag, ich schreibe über handyman.karkonosze.',
     hero: {
       title: 'Repariert, bevor Gäste es merken.',
       lead: 'Sanitär, Elektro, Montage und kleine Renovierungen. Für Pensionen, kleine Hotels, Firmen und Häuser im Riesengebirge, einmalig oder dauerhaft.',
-      primary: 'Schaden beschreiben',
-      secondary: 'Objektbetreuung ansehen',
-      audience: ['Pensionen', 'Kleine Hotels', 'Firmen', 'Privathäuser'],
+      primary: 'Schaden melden',
+      entryLabel: 'Objektbuch · Beispieleintrag',
+      entryMore: 'So sieht die Objektbetreuung aus',
     },
     log: {
       title: 'Objektbuch',
       note: 'Beispieleinträge – so sieht die Liste nach einem Besuch aus.',
+      pause: 'Laufendes Objektbuch anhalten',
       entries: [
         { when: 'Mo 08:10', where: 'Zi. 7', what: 'Duscharmatur tropft', done: 'ersetzt' },
         { when: 'Mo 09:40', where: 'Rezeption', what: 'Beleuchtung über dem Tresen defekt', done: 'repariert' },
@@ -219,22 +230,18 @@ export const content: Record<Lang, Content> = {
         {
           name: 'Sanitär',
           text: 'Tropfende Hähne, verstopfte Abflüsse, Austausch von Armaturen, WC und Siphons, Geräteanschlüsse.',
-          examples: 'Armaturen · Abflüsse · WC · Anschlüsse',
         },
         {
           name: 'Elektro',
           text: 'Steckdosen, Schalter, Beleuchtung, Zubehör in Verteilern, Fehlersuche.',
-          examples: 'Steckdosen · Licht · Fehlersuche',
         },
         {
           name: 'Montage und kleine Renovierungen',
           text: 'Möbel, Regale, Türen und Schlösser, Malerarbeiten, kleine Reparaturen an Fliesen, Fenstern und Beschlägen.',
-          examples: 'Möbel · Türen · Malern · Schlösser',
         },
         {
           name: 'Feste Objektbetreuung',
           text: 'Regelmäßige Rundgänge, Mängelliste und schnelle Reparaturen in der Saison. Eine Telefonnummer.',
-          examples: 'Rundgänge · Mängel · Saison',
         },
       ],
       note: 'Elektroarbeiten führe ich auf Grundlage meiner SEP-Qualifikation bis 1 kV aus.',
@@ -251,11 +258,12 @@ export const content: Record<Lang, Content> = {
     },
     process: {
       title: 'Ablauf',
+      lead: 'Ein Auftrag, von der Nachricht bis zur Rechnung.',
       steps: [
-        { title: 'Sie beschreiben den Schaden', text: 'Per Telefon, WhatsApp oder Formular. Am besten mit Foto.' },
-        { title: 'Sie erhalten ein Angebot', text: 'Eine Richtschätzung anhand des Fotos, den genauen Preis nach Besichtigung vor Ort.' },
-        { title: 'Ich repariere zum vereinbarten Termin', text: 'Ich komme mit Werkzeug und Grundteilen. Nach der Arbeit räume ich auf.' },
-        { title: 'Klare Abrechnung', text: 'Rechnung mit getrennten Posten für Arbeit und Material.' },
+        { status: 'gemeldet', title: 'Sie beschreiben den Schaden', text: 'Per Telefon, WhatsApp oder Formular. Am besten mit Foto.' },
+        { status: 'angeboten', title: 'Sie erhalten ein Angebot', text: 'Eine Richtschätzung anhand des Fotos, den genauen Preis nach Besichtigung vor Ort.' },
+        { status: 'repariert', title: 'Ich repariere zum vereinbarten Termin', text: 'Ich komme mit Werkzeug und Grundteilen. Nach der Arbeit räume ich auf.' },
+        { status: 'abgerechnet', title: 'Klare Abrechnung', text: 'Rechnung mit getrennten Posten für Arbeit und Material.' },
       ],
     },
     trust: {
@@ -293,10 +301,14 @@ export const content: Record<Lang, Content> = {
         hint: 'Ein Foto fügen Sie in der geöffneten Nachricht hinzu.',
         where: 'Wo',
         wherePlaceholder: 'Z. B. Zimmer 4, Bad',
-        error: 'Bitte geben Sie Ihren Namen ein und beschreiben Sie, was zu tun ist.',
+        errName: 'Bitte geben Sie Ihren Namen ein.',
+        errWhat: 'Beschreiben Sie kurz, was zu tun ist.',
+        sentWa: 'Die Nachricht wartet in WhatsApp. Senden Sie sie dort ab, ich melde mich.',
+        sentMail: 'Die Nachricht wartet in Ihrem E-Mail-Programm. Senden Sie sie ab, ich melde mich.',
         required: 'Pflichtfeld',
       },
-      direct: 'Lieber anrufen?',
+      direct: 'Lieber anrufen oder schreiben?',
+      whatsappDirect: 'Per WhatsApp schreiben',
       area: 'Riesengebirge und Umgebung: Jelenia Góra, Lubomierz, Szklarska Poręba und weiter auf Anfrage.',
     },
     footer: { area: 'Riesengebirge, Niederschlesien', rights: 'Alle Rechte vorbehalten.' },
@@ -309,18 +321,20 @@ export const content: Record<Lang, Content> = {
       description:
         'Plumbing, electrics, installation and small repairs, plus ongoing property care for guesthouses, small hotels, businesses and homes in the Karkonosze mountains.',
     },
-    nav: { services: 'Services', care: 'Property care', process: 'How it works', trust: 'Trust', contact: 'Contact' },
+    nav: { services: 'Services', care: 'Property care', process: 'How it works', work: 'Recent job' },
     call: 'Call',
+    waGreeting: 'Hello, I am writing via handyman.karkonosze.',
     hero: {
       title: 'Fixed before your guest notices.',
       lead: 'Plumbing, electrics, installation and small renovations. For guesthouses, small hotels, businesses and homes in the Karkonosze, one-off or on a regular basis.',
-      primary: 'Describe the problem',
-      secondary: 'See property care',
-      audience: ['Guesthouses', 'Small hotels', 'Businesses', 'Private homes'],
+      primary: 'Report a fault',
+      entryLabel: 'Property log · sample entry',
+      entryMore: 'This is what property care looks like',
     },
     log: {
       title: 'Property log',
       note: 'Sample entries – this is what the list looks like after a visit.',
+      pause: 'Pause the scrolling log',
       entries: [
         { when: 'Mon 08:10', where: 'Room 7', what: 'Shower mixer dripping', done: 'replaced' },
         { when: 'Mon 09:40', where: 'Reception', what: 'Light over the desk dead', done: 'repaired' },
@@ -339,22 +353,18 @@ export const content: Record<Lang, Content> = {
         {
           name: 'Plumbing',
           text: 'Dripping taps, blocked drains, replacing mixers, toilets and traps, appliance connections.',
-          examples: 'mixers · drains · toilets · connections',
         },
         {
           name: 'Electrics',
           text: 'Sockets, switches, lighting, consumer-unit fittings, tracing faults.',
-          examples: 'sockets · lighting · faults',
         },
         {
           name: 'Installation and small renovations',
           text: 'Furniture, shelves, doors and locks, painting, minor repairs to tiles, windows and fittings.',
-          examples: 'furniture · doors · painting · locks',
         },
         {
           name: 'Ongoing property care',
           text: 'Regular walk-rounds, a defect list and quick repairs in season. One phone number.',
-          examples: 'walk-rounds · defects · season',
         },
       ],
       note: 'Electrical work is carried out under my SEP licence up to 1 kV.',
@@ -371,11 +381,12 @@ export const content: Record<Lang, Content> = {
     },
     process: {
       title: 'How it works',
+      lead: 'One job, from your message to the invoice.',
       steps: [
-        { title: 'You describe the problem', text: 'By phone, WhatsApp or the form. A photo helps.' },
-        { title: 'You get a quote', text: 'A rough one from the photo, an exact one after seeing it on site.' },
-        { title: 'I fix it at the agreed time', text: 'I arrive with tools and basic parts, and clean up afterwards.' },
-        { title: 'Clear billing', text: 'An invoice with labour and materials listed separately.' },
+        { status: 'reported', title: 'You describe the problem', text: 'By phone, WhatsApp or the form. A photo helps.' },
+        { status: 'quoted', title: 'You get a quote', text: 'A rough one from the photo, an exact one after seeing it on site.' },
+        { status: 'fixed', title: 'I fix it at the agreed time', text: 'I arrive with tools and basic parts, and clean up afterwards.' },
+        { status: 'invoiced', title: 'Clear billing', text: 'An invoice with labour and materials listed separately.' },
       ],
     },
     trust: {
@@ -413,10 +424,14 @@ export const content: Record<Lang, Content> = {
         hint: 'You can attach a photo in the message that opens.',
         where: 'Where',
         wherePlaceholder: 'E.g. room 4, bathroom',
-        error: 'Enter your name and describe what needs doing.',
+        errName: 'Enter your name.',
+        errWhat: 'Describe briefly what needs doing.',
+        sentWa: 'Your message is ready in WhatsApp. Send it there and I will get back to you.',
+        sentMail: 'Your message is ready in your email app. Send it and I will get back to you.',
         required: 'required',
       },
-      direct: 'Prefer to call?',
+      direct: 'Prefer to call or message?',
+      whatsappDirect: 'Message on WhatsApp',
       area: 'Karkonosze and surroundings: Jelenia Góra, Lubomierz, Szklarska Poręba and further on request.',
     },
     footer: { area: 'Karkonosze, Lower Silesia', rights: 'All rights reserved.' },
