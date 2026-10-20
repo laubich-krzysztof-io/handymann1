@@ -1,21 +1,22 @@
 /* =========================================================================
    handyman.karkonosze – wersja premium: sama typografia, kolor i rytm.
-   Bez ilustracji i grafik. Głęboka zieleń nocnego lasu, porcelanowa biel,
-   szałwia jako jedyny akcent. Brygada 1918 (polski krój z 1918 r.) + Albert Sans.
+   Bez ilustracji i grafik. Grafit, chłodna biel, lodowy błękit jako jedyny akcent.
+   (Nazwy zmiennych zostały po pierwszej palecie: --pine = grafit, --sage = lodowy błękit.) Brygada 1918 (polski krój z 1918 r.) + Albert Sans.
    ========================================================================= */
 :root {
-  --pine: #11251d;
-  --pine-2: #18302a;
-  --pine-3: #21392f;
-  --porcelain: #f2f3ef;
-  --stone: #e4e6e0;
-  --ink: #101a15;
-  --muted: #56625b;
-  --sage: #b4c8b8;
-  --sage-deep: #3f6150;
-  --on-pine: #e9ede9;
-  --on-pine-muted: #a6b6ac;
-  --line: #d2d6cf;
+  --pine: #1f2427;
+  --pine-2: #272d31;
+  --pine-3: #30373c;
+  --pine-deep: #161a1c;
+  --porcelain: #f3f4f3;
+  --stone: #e3e6e6;
+  --ink: #151a1c;
+  --muted: #5b6468;
+  --sage: #b8cdd6;
+  --sage-deep: #3c6170;
+  --on-pine: #e9eef0;
+  --on-pine-muted: #a3afb4;
+  --line: #d4d8d8;
   --line-pine: #ffffff24;
   --error: #a4361f;
 
@@ -45,7 +46,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 ::selection { background: var(--pine); color: var(--porcelain); }
 html { scrollbar-color: var(--pine-3) var(--stone); scrollbar-width: thin; }
 input, select, textarea { caret-color: var(--pine); accent-color: var(--pine); }
-::placeholder { color: #5b6760; opacity: 1; }
+::placeholder { color: #5b6468; opacity: 1; }
 
 .wrap { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -328,7 +329,7 @@ input, select, textarea { caret-color: var(--pine); accent-color: var(--pine); }
 .field { display: grid; gap: .3rem; }
 .field label { font-size: .76rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .field label small { font-size: .72rem; letter-spacing: .04em; text-transform: none; }
-.form input, .form select, .form textarea { width: 100%; min-height: 3rem; padding: .6rem 0; border: 0; border-bottom: 1px solid #8a948d; border-radius: 0; background: transparent; font-family: var(--serif); font-size: 1.12rem; color: var(--ink); }
+.form input, .form select, .form textarea { width: 100%; min-height: 3rem; padding: .6rem 0; border: 0; border-bottom: 1px solid #8a9397; border-radius: 0; background: transparent; font-family: var(--serif); font-size: 1.12rem; color: var(--ink); }
 .form input:focus, .form select:focus, .form textarea:focus { border-bottom-color: var(--pine); }
 .form textarea { resize: vertical; min-height: 6rem; }
 .form [aria-invalid='true'] { border-bottom-color: var(--error); background: #fbeeea; }
@@ -338,10 +339,10 @@ input, select, textarea { caret-color: var(--pine); accent-color: var(--pine); }
 .form .fine a { text-underline-offset: .2em; }
 
 /* ---------- Stopka ---------- */
-.foot { background: #0c1c15; color: var(--on-pine-muted); padding-block: 2.2rem; font-size: .88rem; --focus: var(--sage); }
+.foot { background: var(--pine-deep); color: var(--on-pine-muted); padding-block: 2.2rem; font-size: .88rem; --focus: var(--sage); }
 .foot__in { display: flex; flex-wrap: wrap; gap: .6rem 2.4rem; justify-content: space-between; align-items: center; }
 .foot__brand { display: inline-flex; align-items: center; gap: .6rem; font-family: var(--serif); color: var(--porcelain); font-size: 1.2rem; }
-.foot__mark { width: 4rem; aspect-ratio: 240 / 132; color: var(--porcelain); --mark-knock: #0c1c15; }
+.foot__mark { width: 4rem; aspect-ratio: 240 / 132; color: var(--porcelain); --mark-knock: var(--pine-deep); }
 .foot__link { padding-block: .45rem; color: var(--porcelain); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .25em; text-decoration-color: var(--sage); }
 
 /* ---------- Szybki kontakt na telefonie ---------- */
