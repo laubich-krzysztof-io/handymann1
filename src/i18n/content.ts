@@ -86,6 +86,7 @@ export interface Content {
     photos: { tasma: string; malowanie: string; detal: string; gotowe: string };
   };
   gallery: { title: string };
+  faq: { title: string; lead: string; more: string; items: { q: string; a: string }[] };
   contact: {
     title: string;
     lead: string;
@@ -99,6 +100,8 @@ export interface Content {
       whatsapp: string;
       email: string;
       hint: string;
+      /** link do polityki prywatności pod formularzem */
+      privacy: string;
       where: string;
       wherePlaceholder: string;
       errName: string;
@@ -111,7 +114,7 @@ export interface Content {
     whatsappDirect: string;
     area: string;
   };
-  footer: { area: string; rights: string };
+  footer: { area: string; rights: string; privacy: string };
 }
 
 const raw: Record<Lang, Content> = {
@@ -255,6 +258,21 @@ const raw: Record<Lang, Content> = {
       },
     },
     gallery: { title: 'Realizacje' },
+    faq: {
+      title: 'Częste pytania',
+      lead: 'Krótkie odpowiedzi na to, o co klienci pytają najczęściej.',
+      more: 'Nie ma tu Twojego pytania? Napisz albo zadzwoń',
+      items: [
+        { q: 'Czy dojedziesz do Karpacza, Szklarskiej Poręby albo Świeradowa?', a: `Tak. Pracuję w promieniu ${R}\u00a0km od Jeleniej Góry, a dojazd jest wliczony w pierwszą godzinę pracy.` },
+        { q: 'Ile kosztuje drobna naprawa?', a: `Pierwsza godzina z dojazdem to ${zl(P.firstHour)} netto (${money(gross(P.firstHour), 'pl')} brutto). Każde kolejne rozpoczęte 30\u00a0minut to ${zl(P.halfHour)} netto. Części liczę po cenie zakupu.` },
+        { q: 'Jak dostanę wycenę?', a: 'Wyślij zdjęcie i krótki opis usterki przez WhatsAppa albo formularz. Dostaniesz wycenę orientacyjną, a dokładną po oględzinach na miejscu.' },
+        { q: 'Jak szybko przyjedziesz?', a: `Termin ustalamy przy zgłoszeniu. Gdy naprawa musi być zrobiona tego samego dnia, do robocizny doliczam ${P.urgentPct}%. Przy stałej opiece reaguję w ciągu ${P.careResponseH}\u00a0godzin.` },
+        { q: 'Czy wystawiasz fakturę VAT?', a: 'Tak. Robocizna i materiały są na niej wpisane osobno.' },
+        { q: 'Czy możesz wykonywać prace elektryczne?', a: 'Tak, mam uprawnienia SEP do 1\u00a0kV. Świadectwo pokażę przed rozpoczęciem pracy.' },
+        { q: 'Czym stała opieka różni się od jednorazowego zlecenia?', a: `Przychodzę w ustalonym rytmie, spisuję usterki i naprawiam je, zanim zauważą je goście. Abonament zaczyna się od ${zl(P.careFrom)} netto miesięcznie: ${P.careHours} ${plHours(P.careHours)} pracy, dojazdy w cenie i reakcja w ciągu ${P.careResponseH}\u00a0godzin.` },
+        { q: 'Czy dogadamy się po niemiecku albo angielsku?', a: 'Tak. Obsługuję klientów po polsku, niemiecku i angielsku.' },
+      ],
+    },
     contact: {
       title: 'Opisz, co się dzieje.',
       lead: 'Wypełnij krótki formularz. Po kliknięciu otworzy się wiadomość do mnie z gotowym opisem, wystarczy ją wysłać.',
@@ -268,6 +286,7 @@ const raw: Record<Lang, Content> = {
         whatsapp: 'Wyślij przez WhatsApp',
         email: 'Wyślij e-mailem',
         hint: 'Zdjęcie dołączysz już w otwartej wiadomości.',
+        privacy: 'Jak chronię Twoje dane',
         where: 'Gdzie',
         wherePlaceholder: 'Np. pokój 4, łazienka',
         errName: 'Wpisz imię i nazwisko.',
@@ -280,7 +299,7 @@ const raw: Record<Lang, Content> = {
       whatsappDirect: 'Napisz na WhatsAppie',
       area: `Pracuję w promieniu ${R}\u00a0km od Jeleniej Góry.`,
     },
-    footer: { area: 'Karkonosze, Dolny Śląsk', rights: 'Wszelkie prawa zastrzeżone.' },
+    footer: { area: 'Karkonosze, Dolny Śląsk', rights: 'Wszelkie prawa zastrzeżone.', privacy: 'Polityka prywatności' },
   },
 
   de: {
@@ -423,6 +442,21 @@ const raw: Record<Lang, Content> = {
       },
     },
     gallery: { title: 'Referenzen' },
+    faq: {
+      title: 'Häufige Fragen',
+      lead: 'Kurze Antworten auf das, was Kunden am häufigsten fragen.',
+      more: 'Ihre Frage ist nicht dabei? Schreiben Sie oder rufen Sie an',
+      items: [
+        { q: 'Kommen Sie auch nach Karpacz, Szklarska Poręba oder Świeradów-Zdrój?', a: `Ja. Ich arbeite im Umkreis von ${R}\u00a0km um Jelenia Góra, die Anfahrt ist in der ersten Arbeitsstunde enthalten.` },
+        { q: 'Was kostet eine kleine Reparatur?', a: `Die erste Stunde inklusive Anfahrt kostet ${zl(P.firstHour)} netto (${money(gross(P.firstHour), 'de')} brutto). Jede weitere angefangene halbe Stunde kostet ${zl(P.halfHour)} netto. Teile berechne ich zum Einkaufspreis.` },
+        { q: 'Wie bekomme ich ein Angebot?', a: 'Schicken Sie ein Foto und eine kurze Beschreibung per WhatsApp oder über das Formular. Sie bekommen eine Richtschätzung, den genauen Preis nach der Besichtigung vor Ort.' },
+        { q: 'Wie schnell kommen Sie?', a: `Den Termin vereinbaren wir bei der Meldung. Muss es am selben Tag sein, berechne ich auf die Arbeitszeit ${P.urgentPct}\u00a0% Zuschlag. Bei fester Betreuung reagiere ich innerhalb von ${P.careResponseH}\u00a0Stunden.` },
+        { q: 'Stellen Sie eine Rechnung mit MwSt. aus?', a: 'Ja. Arbeit und Material stehen darauf getrennt.' },
+        { q: 'Dürfen Sie Elektroarbeiten ausführen?', a: 'Ja, ich habe die polnische SEP-Qualifikation bis 1\u00a0kV. Den Nachweis zeige ich vor Arbeitsbeginn.' },
+        { q: 'Was unterscheidet die feste Betreuung von einem Einzelauftrag?', a: `Ich komme in einem festen Rhythmus, notiere Mängel und behebe sie, bevor Gäste sie bemerken. Die Betreuung beginnt bei ${zl(P.careFrom)} netto im Monat: ${P.careHours} ${P.careHours === 1 ? 'Arbeitsstunde' : 'Arbeitsstunden'}, Anfahrten inklusive, Reaktion innerhalb von ${P.careResponseH}\u00a0Stunden.` },
+        { q: 'Können wir Deutsch sprechen?', a: 'Ja. Ich betreue Kunden auf Polnisch, Deutsch und Englisch.' },
+      ],
+    },
     contact: {
       title: 'Beschreiben Sie, was los ist.',
       lead: 'Füllen Sie das kurze Formular aus. Danach öffnet sich eine Nachricht an mich mit fertiger Beschreibung, Sie müssen sie nur absenden.',
@@ -436,6 +470,7 @@ const raw: Record<Lang, Content> = {
         whatsapp: 'Per WhatsApp senden',
         email: 'Per E-Mail senden',
         hint: 'Ein Foto fügen Sie in der geöffneten Nachricht hinzu.',
+        privacy: 'Wie ich Ihre Daten schütze',
         where: 'Wo',
         wherePlaceholder: 'Z. B. Zimmer 4, Bad',
         errName: 'Bitte geben Sie Ihren Namen ein.',
@@ -448,7 +483,7 @@ const raw: Record<Lang, Content> = {
       whatsappDirect: 'Per WhatsApp schreiben',
       area: `Ich arbeite im Umkreis von ${R}\u00a0km um Jelenia Góra.`,
     },
-    footer: { area: 'Riesengebirge, Niederschlesien', rights: 'Alle Rechte vorbehalten.' },
+    footer: { area: 'Riesengebirge, Niederschlesien', rights: 'Alle Rechte vorbehalten.', privacy: 'Datenschutz' },
   },
 
   en: {
@@ -591,6 +626,21 @@ const raw: Record<Lang, Content> = {
       },
     },
     gallery: { title: 'Selected work' },
+    faq: {
+      title: 'Common questions',
+      lead: 'Short answers to what clients ask most often.',
+      more: 'Question not here? Message or call',
+      items: [
+        { q: 'Do you come out to Karpacz, Szklarska Poręba or Świeradów-Zdrój?', a: `Yes. I work within ${R}\u00a0km of Jelenia Góra, and travel is included in the first hour of work.` },
+        { q: 'What does a small repair cost?', a: `The first hour including travel is ${zl(P.firstHour)} net (${money(gross(P.firstHour), 'en')} incl. VAT). Each further 30\u00a0minutes or part of it is ${zl(P.halfHour)} net. Parts are charged at cost.` },
+        { q: 'How do I get a quote?', a: 'Send a photo and a short description by WhatsApp or the form. You get a rough quote, and an exact one after I have seen it on site.' },
+        { q: 'How quickly can you come?', a: `We agree the time when you report the fault. If it has to be the same day, I add ${P.urgentPct}% to the labour. With regular property care I respond within ${P.careResponseH}\u00a0hours.` },
+        { q: 'Do you issue VAT invoices?', a: 'Yes. Labour and materials are listed separately.' },
+        { q: 'Can you do electrical work?', a: 'Yes, I hold the Polish SEP licence up to 1\u00a0kV. I will show the certificate before work starts.' },
+        { q: 'How is regular care different from a one-off job?', a: `I come on a fixed rhythm, log defects and fix them before guests notice. Care starts from ${zl(P.careFrom)} net a month: ${P.careHours} ${P.careHours === 1 ? 'hour' : 'hours'} of work, travel included and a response within ${P.careResponseH}\u00a0hours.` },
+        { q: 'Can we talk in English or German?', a: 'Yes. I work with clients in Polish, German and English.' },
+      ],
+    },
     contact: {
       title: 'Tell me what is going on.',
       lead: 'Fill in the short form. A message to me will open with the description ready, you only need to send it.',
@@ -604,6 +654,7 @@ const raw: Record<Lang, Content> = {
         whatsapp: 'Send via WhatsApp',
         email: 'Send by email',
         hint: 'You can attach a photo in the message that opens.',
+        privacy: 'How I protect your data',
         where: 'Where',
         wherePlaceholder: 'E.g. room 4, bathroom',
         errName: 'Enter your name.',
@@ -616,7 +667,7 @@ const raw: Record<Lang, Content> = {
       whatsappDirect: 'Message on WhatsApp',
       area: `I work within ${R}\u00a0km of Jelenia Góra.`,
     },
-    footer: { area: 'Karkonosze, Lower Silesia', rights: 'All rights reserved.' },
+    footer: { area: 'Karkonosze, Lower Silesia', rights: 'All rights reserved.', privacy: 'Privacy policy' },
   },
 };
 

@@ -471,6 +471,41 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 .gallery ul { display: grid; gap: .8rem; margin-top: 1rem; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
 .gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius); }
 
+/* Częste pytania: natywne details/summary, plus zmienia się w minus */
+.faq { display: grid; gap: clamp(1.6rem, 4vw, 2.6rem); }
+.faq__head { margin-bottom: 0; align-content: start; justify-items: start; }
+.faq__list { border-top: 2px solid var(--deep); }
+.faq__item { border-bottom: 1px solid var(--rule); }
+.faq__item summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  min-height: 3.4rem; padding-block: .9rem; cursor: pointer; list-style: none;
+  font: 700 1.04rem/1.3 var(--display); font-stretch: 106%; color: var(--ink);
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary:hover span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .25em; }
+.faq__sign { width: 1.25rem; height: 1.25rem; flex: none; fill: none; stroke: var(--pine); stroke-width: 2; stroke-linecap: round; }
+.faq__v { transform-box: fill-box; transform-origin: center; transition: transform .35s var(--ease-out); }
+.faq__item[open] .faq__v { transform: scaleY(0); }
+.faq__item p { padding: 0 2.25rem 1.25rem 0; max-width: 62ch; font-size: .92rem; color: var(--muted); }
+@media (min-width: 64rem) {
+  .faq { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); column-gap: clamp(3rem, 6vw, 5.5rem); }
+  .faq__head { position: sticky; top: calc(var(--top-h-compact) + 2rem); align-self: start; }
+}
+
+/* Podstrony tekstowe (polityka prywatności, 404): wąska kolumna do czytania */
+.doc__in { max-width: 50rem; }
+.doc h1 { font-size: clamp(2rem, 4.6vw, 3.4rem); color: var(--deep); hyphens: auto; overflow-wrap: break-word; }
+.doc__head { display: grid; grid-template-columns: minmax(0, 1fr); gap: .9rem; padding-bottom: 1.4rem; margin-bottom: .4rem; border-bottom: 2px solid var(--deep); }
+.doc__sec { display: grid; gap: .7rem; padding-block: 1.35rem; border-bottom: 1px solid var(--line); }
+.doc .doc__sec h2 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.25; text-transform: none; letter-spacing: 0; }
+.doc__sec p, .doc__sec li { max-width: 68ch; font-size: .95rem; text-wrap: pretty; }
+.doc__sec ul { display: grid; gap: .45rem; padding-left: 1.2rem; list-style: disc; }
+.doc__sec li::marker { color: var(--pine); }
+.doc__back { margin-top: 1.8rem; }
+.lost { display: grid; gap: 1.4rem; justify-items: start; }
+.lost__other { display: grid; gap: .35rem; width: 100%; margin-top: .8rem; padding-top: 1.1rem; border-top: 1px solid var(--line); font-size: .9rem; color: var(--muted); }
+.lost__other a { color: var(--pine-ink); text-underline-offset: .25em; }
+
 /* ---------- Kontakt ---------- */
 .contact { background: var(--forest); color: var(--paper); padding-block: clamp(3.5rem, 8vw, 6rem); --focus: var(--paper); }
 .contact__in { display: grid; gap: clamp(2rem, 5vw, 4rem); }
@@ -504,6 +539,9 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 .foot__in { display: flex; flex-wrap: wrap; gap: .5rem 2rem; justify-content: space-between; align-items: center; }
 .foot__brand { display: inline-flex; align-items: center; gap: .6rem; font-family: var(--display); font-weight: 560; font-stretch: 94%; letter-spacing: -.01em; color: var(--paper); font-size: 1.15rem; }
 .foot__mark { width: 4.4rem; aspect-ratio: 240 / 132; color: var(--paper); --mark-knock: var(--deep); }
+.foot__link { padding-block: .45rem; color: var(--paper); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .25em; }
+.foot__link:hover { text-decoration-thickness: 2px; }
+.form .fine a { color: var(--pine-ink); text-underline-offset: .2em; }
 
 /* ---------- Szybki kontakt na telefonie (w zasięgu kciuka) ---------- */
 .quick { display: none; }
@@ -521,7 +559,8 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
     font: 600 1rem/1 var(--display); font-stretch: 92%;
   }
   .quick__btn--call { background: var(--pine); color: #fff; }
-  .foot { padding-bottom: calc(1.8rem + 4.2rem + env(safe-area-inset-bottom)); }
+  /* Miejsce pod paskiem szybkiego kontaktu tylko tam, gdzie pasek jest (nie na podstronach) */
+  body:has(.quick) .foot { padding-bottom: calc(1.8rem + 4.2rem + env(safe-area-inset-bottom)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -27,8 +27,10 @@ export const site = {
   phone: '+48 000 000 000',
   whatsapp: '48000000000', // sam numer, bez + i spacji
   email: 'kontakt@handyman.example',
-  // TODO: dane firmy do stopki (nazwa, NIP)
-  company: '',
+  // TODO: dane firmy do stopki i polityki prywatności (administrator danych)
+  company: '', // np. 'QuickFix Serwis+ Jan Kowalski'
+  nip: '', // np. '6110000000'
+  address: '', // np. 'Popielówek 1, 59-623 Lubomierz'
   // Czy dane kontaktowe są prawdziwe (gdy false, nie trafiają do danych strukturalnych)
   contactReady: false,
   // Zdjęcia realizacji: wrzuć pliki do public/img/ i dopisz tutaj.

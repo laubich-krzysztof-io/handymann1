@@ -14,11 +14,19 @@ interface Props {
   description: string;
   /** Opis obrazka OG (co na nim jest), nie powtórka tytułu */
   imageAlt: string;
+  /** Ścieżka tej samej strony w każdym języku (canonical, hreflang). Domyślnie strona główna. */
+  paths?: Record<Lang, string>;
+  /** Dane strukturalne; domyślnie graf firmy dla strony głównej, null = bez JSON-LD */
+  ld?: unknown;
+  /** Strona techniczna (np. 404): zawsze poza indeksem */
+  noindex?: boolean;
 }
-const { lang, htmlLang, title, description, imageAlt } = Astro.props;
-const canonical = `${ORIGIN}/${lang}/`;
+const { lang, htmlLang, title, description, imageAlt, noindex = false } = Astro.props;
+const paths = Astro.props.paths ?? (Object.fromEntries(locales.map((l) => [l, `/${l}/`])) as Record<Lang, string>);
+const canonical = `${ORIGIN}${paths[lang]}`;
 const ogImage = `${ORIGIN}/img/og.png`;
-const ld = jsonLd(lang);
+const ld = Astro.props.ld === undefined ? jsonLd(lang) : Astro.props.ld;
+const indexable = site.indexable && !noindex;
 ---
 <!doctype html>
 <html lang={htmlLang}>
@@ -27,13 +35,13 @@ const ld = jsonLd(lang);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content={site.indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow'} />
+    <meta name="robots" content={indexable ? 'index, follow, max-image-preview:large' : noindex ? 'noindex, follow' : 'noindex, nofollow'} />
     <meta name="theme-color" content="#F9F6EB" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonical} />
-    {locales.map((l) => <link rel="alternate" hreflang={l} href={`${ORIGIN}/${l}/`} />)}
-    <link rel="alternate" hreflang="x-default" href={`${ORIGIN}/pl/`} />
+    {!noindex && locales.map((l) => <link rel="alternate" hreflang={l} href={`${ORIGIN}${paths[l]}`} />)}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={`${ORIGIN}${paths.pl}`} />}
     <link rel="sitemap" href="/sitemap.xml" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
@@ -50,7 +58,7 @@ const ld = jsonLd(lang);
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
-    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+    {ld && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
   </head>
   <body>
     <slot />

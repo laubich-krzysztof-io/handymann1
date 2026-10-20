@@ -2,6 +2,9 @@ import { content } from '../i18n/content';
 import { locales, site, type Lang } from '../config';
 
 export const ORIGIN = 'https://handymann.vercel.app';
+/** Tekst do danych strukturalnych: twarde spacje (typografia na stronie) jako zwykłe */
+const plain = (v: string) => v.replace(/\u00a0/g, ' ');
+
 export const ogLocale: Record<Lang, string> = { pl: 'pl_PL', de: 'de_DE', en: 'en_GB' };
 
 /** JSON-LD graph: business, website and the page, linked by @id. No invented facts: contact only when real. */
@@ -14,7 +17,7 @@ export function jsonLd(lang: Lang) {
   // Cennik jako oferty: te same kwoty co w sekcji „Cennik” (config.ts)
   const rate = (name: string, price: Record<string, unknown>, unit: Record<string, unknown>) => ({
     '@type': 'Offer',
-    name: name.replace(/\u00a0/g, ' '),
+    name: plain(name),
     priceCurrency: 'PLN',
     ...price,
     priceSpecification: { '@type': 'UnitPriceSpecification', priceCurrency: 'PLN', valueAddedTaxIncluded: false, ...price, referenceQuantity: { '@type': 'QuantitativeValue', ...unit } },
@@ -81,6 +84,19 @@ export function jsonLd(lang: Lang) {
         isPartOf: { '@id': `${ORIGIN}/#website` },
         about: { '@id': bizId },
         primaryImageOfPage: `${ORIGIN}/img/og.png`,
+      },
+      {
+        // Te same pytania i odpowiedzi co w sekcji „Częste pytania”
+        '@type': 'FAQPage',
+        '@id': `${pageUrl}#faq`,
+        url: `${pageUrl}#pytania`,
+        inLanguage: lang,
+        isPartOf: { '@id': `${pageUrl}#page` },
+        mainEntity: t.faq.items.map((f) => ({
+          '@type': 'Question',
+          name: plain(f.q),
+          acceptedAnswer: { '@type': 'Answer', text: plain(f.a) },
+        })),
       },
     ],
   };

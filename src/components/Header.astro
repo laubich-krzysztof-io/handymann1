@@ -3,8 +3,16 @@ import Mark from './Mark.astro';
 import { content } from '../i18n/content';
 import { locales, site, type Lang } from '../config';
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props {
+  lang: Lang;
+  /** Na podstronach kotwice menu prowadzą do strony głównej */
+  sub?: boolean;
+  /** Adres tej samej strony w innych językach (przełącznik języka) */
+  alternates?: Record<Lang, string>;
+}
+const { lang, sub = false } = Astro.props;
+const home = sub ? `/${lang}/` : '';
+const alt = Astro.props.alternates ?? (Object.fromEntries(locales.map((l) => [l, `/${l}/`])) as Record<Lang, string>);
 const t = content[lang];
 
 const brandSub = t.brand.sub;
@@ -43,26 +51,26 @@ const links = [
     <nav class="nav" id="nav" aria-label={navLabel[lang]}>
       <ul class="nav__list">
         {links.map((l) => (
-          <li class="nav__item"><a class="nav__link" href={`#${l.id}`} data-spy={l.id}>{l.label}</a></li>
+          <li class="nav__item"><a class="nav__link" href={`${home}#${l.id}`} data-spy={l.id}>{l.label}</a></li>
         ))}
       </ul>
       <div class="nav__extra">
         <ul class="lang" aria-label={langLabel[lang]}>
           {locales.map((l) => (
-            <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
+            <li><a href={alt[l]} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
           ))}
         </ul>
-        <a class="cta" href="#kontakt">{t.hero.primary}</a>
+        <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
       </div>
     </nav>
 
     <div class="top__end">
       <ul class="lang" aria-label={langLabel[lang]}>
         {locales.map((l) => (
-          <li><a href={`/${l}/`} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
+          <li><a href={alt[l]} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
         ))}
       </ul>
-      <a class="cta" href="#kontakt">{t.hero.primary}</a>
+      <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
       <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel[lang].open} data-burger>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path class="burger__a" d="M4 7h16" /><path class="burger__b" d="M4 12h16" /><path class="burger__c" d="M4 17h16" /></svg>
       </button>

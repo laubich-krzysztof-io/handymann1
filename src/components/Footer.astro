@@ -1,0 +1,18 @@
+---
+import Mark from './Mark.astro';
+import { content } from '../i18n/content';
+import { privacyPath } from '../i18n/privacy';
+import { site, type Lang } from '../config';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = content[lang];
+---
+<footer class="foot">
+  <div class="wrap foot__in">
+    <span class="foot__brand"><Mark class="foot__mark" />{site.name}</span>
+    <span>{t.footer.area}</span>
+    <a class="foot__link" href={privacyPath(lang)}>{t.footer.privacy}</a>
+    <span>© {new Date().getFullYear()} {site.company || site.name}{site.nip && `, NIP ${site.nip}`}. {t.footer.rights}</span>
+  </div>
+</footer>

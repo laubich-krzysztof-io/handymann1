@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { content } from '../i18n/content';
 import { site } from '../config';
 import { ORIGIN } from '../lib/seo';
+import { privacyPath } from '../i18n/privacy';
 
 // llms.txt: zwięzły opis firmy dla wyszukiwarek AI (GEO). Generowany z tych samych treści co strona.
 export const GET: APIRoute = () => {
@@ -35,12 +36,15 @@ export const GET: APIRoute = () => {
     '## Jak wygląda zlecenie',
     ...pl.process.steps.map((s, i) => `${i + 1}. ${s.title}: ${s.text}`),
     '',
+    `## ${pl.faq.title}`,
+    ...pl.faq.items.flatMap((f) => [`### ${f.q}`, f.a, '']),
     '## Strony',
     `- [Polski](${ORIGIN}/pl/)`,
     `- [Deutsch](${ORIGIN}/de/)`,
     `- [English](${ORIGIN}/en/)`,
+    `- [Polityka prywatności](${ORIGIN}${privacyPath('pl')})`,
     ...(site.contactReady ? ['', '## Kontakt', `- Telefon: ${site.phone}`, `- E-mail: ${site.email}`] : []),
     '',
   ];
-  return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+  return new Response(lines.join('\n').replace(/\u00a0/g, ' '), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };
