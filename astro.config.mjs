@@ -6,6 +6,7 @@ export default defineConfig({
   i18n: {
     locales: ['pl', 'de', 'en'],
     defaultLocale: 'pl',
-    routing: { prefixDefaultLocale: true },
+    // Bez automatycznej strony „Redirecting…” (2 s opóźnienia): przekierowanie z / robi serwer (vercel.json)
+    routing: { prefixDefaultLocale: true, redirectToDefaultLocale: false },
   },
 });
