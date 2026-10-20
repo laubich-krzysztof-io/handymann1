@@ -297,12 +297,14 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 
 /* Znacznik „zrobione” wspólny dla Dziennika, wpisu i etapów pracy */
 .entry__done, .log__done, .track__status { color: var(--ok); }
-.entry__done::before, .log__done::before, .track__status::before {
+.entry__done::before, .log__done::before, .track__status::before, .plan__points li::before, .bill__status::before {
   content: ''; display: inline-block; width: .85em; height: .85em; margin-right: .4em; vertical-align: -.1em;
   background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5'/%3E%3C/svg%3E") center / contain no-repeat;
 }
+
+.plan__points li::before { background: var(--pine); }
 
 /* ---------- Sekcje ---------- */
 .section { padding-block: clamp(3.5rem, 8vw, 6rem); }
@@ -366,6 +368,66 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
   .track { grid-template-columns: repeat(4, 1fr); column-gap: 2rem; }
   .track li { padding: 2.1rem 0 0; }
   .track li:not(:last-child)::after { left: 1.4rem; right: -1.6rem; top: .42rem; bottom: auto; width: auto; height: 2px; }
+}
+
+/* Cennik: stawki jak w cenniku warsztatu, obok rachunek za zgłoszenie z Dziennika (pok. 7) */
+.price { display: grid; gap: clamp(1.8rem, 4vw, 2.4rem); grid-template-columns: minmax(0, 1fr); grid-template-areas: 'head' 'rates' 'bill' 'plan' 'end'; }
+.price__head { grid-area: head; margin-bottom: 0; }
+.price__rates { grid-area: rates; }
+.rates { border-top: 2px solid var(--deep); }
+.rates__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: .3rem 1.5rem; padding-block: 1rem; border-bottom: 1px solid var(--line); }
+.rates dt { font: 700 1.02rem/1.3 var(--display); font-stretch: 106%; }
+.rates__note { display: block; margin-top: .3rem; font: 400 .84rem/1.5 var(--mono); color: var(--muted); }
+.rates__price { margin: 0; font: 800 clamp(1.3rem, 2.1vw, 1.55rem)/1.1 var(--display); font-stretch: 112%; color: var(--deep); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; text-align: right; }
+.rates__price--text { font-size: 1rem; font-weight: 700; font-stretch: 100%; color: var(--pine); white-space: normal; max-width: 9.5rem; }
+.rates__row--extra dt { font-weight: 600; }
+.rates__row--extra .rates__price { font-size: 1.12rem; font-weight: 700; color: var(--pine-soft); }
+.rates__fine { margin-top: .8rem; font-size: .84rem; color: var(--muted); }
+.price__area { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .65rem; margin-top: 1.5rem; max-width: 40rem; font-size: .92rem; }
+.price__area .icon { width: 1.3rem; height: 1.3rem; margin-top: .2rem; color: var(--pine); }
+
+.plan { grid-area: plan; display: grid; gap: 1rem; justify-items: start; padding: clamp(1.15rem, 2.6vw, 1.6rem); background: var(--paper-2); border-radius: 10px; }
+.plan__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .35rem 1.2rem; width: 100%; }
+.plan__price { font: 800 clamp(1.3rem, 2.1vw, 1.55rem)/1.1 var(--display); font-stretch: 112%; color: var(--deep); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.plan__price span { font: 400 .84rem/1 var(--mono); color: var(--muted); letter-spacing: 0; }
+.plan__points { display: grid; gap: .45rem 1.6rem; width: 100%; }
+.plan__points li { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; font-size: .92rem; }
+.plan__link { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.75rem; margin-block: -.4rem; font: 600 .98rem/1.2 var(--display); font-stretch: 92%; color: var(--pine-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .3em; }
+.plan__link:hover { text-decoration-thickness: 2px; }
+.plan__link .icon { transition: transform .35s var(--ease-out); }
+.plan__link:hover .icon { transform: translateX(.2rem); }
+/* Duży telefon poziomo: abonament na całą szerokość, punkty w dwóch kolumnach */
+@media (min-width: 36rem) and (max-width: 47.99rem) { .plan__points { grid-template-columns: 1fr 1fr; } }
+/* Tablet: rachunek i abonament obok siebie pod stawkami */
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  .price { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 2rem; grid-template-areas: 'head head' 'rates rates' 'bill plan' 'end end'; }
+  .plan { align-self: start; }
+}
+
+/* Rachunek: papier z perforacją u dołu (maska), cień pod papierem, nie pod podpisem */
+.bill { grid-area: bill; display: grid; gap: .75rem; width: 100%; max-width: 26rem; }
+.bill__sheet { filter: drop-shadow(0 16px 22px rgb(12 47 32 / .14)) drop-shadow(0 1px 1.5px rgb(12 47 32 / .16)); }
+.bill__paper {
+  --edge: .55rem; --dash: color-mix(in oklab, var(--field-line) 55%, var(--field));
+  padding: 1.25rem 1.3rem calc(1.15rem + var(--edge)); background: var(--field); border-radius: 6px 6px 0 0;
+  -webkit-mask: radial-gradient(circle at 50% 100%, #0000 calc(var(--edge) - .5px), #000 var(--edge)) bottom / calc(var(--edge) * 2.3) var(--edge) repeat-x, linear-gradient(#000 0 0) top / 100% calc(100% - var(--edge) + 1px) no-repeat;
+  mask: radial-gradient(circle at 50% 100%, #0000 calc(var(--edge) - .5px), #000 var(--edge)) bottom / calc(var(--edge) * 2.3) var(--edge) repeat-x, linear-gradient(#000 0 0) top / 100% calc(100% - var(--edge) + 1px) no-repeat;
+}
+.bill__title { font: 700 .8rem/1 var(--display); font-stretch: 112%; text-transform: uppercase; letter-spacing: .08em; color: var(--deep); padding-bottom: .8rem; border-bottom: 1px dashed var(--dash); }
+.bill__meta { display: grid; gap: .1rem; padding-block: .8rem; font-size: .84rem; line-height: 1.5; color: var(--muted); border-bottom: 1px dashed var(--dash); }
+.bill__meta span:first-child { color: var(--ink); font-weight: 700; }
+.bill__lines { width: 100%; border-collapse: collapse; font-size: .86rem; line-height: 1.45; font-variant-numeric: tabular-nums; }
+.bill__lines th { padding: .6rem 1rem 0 0; text-align: left; font-weight: 400; vertical-align: top; }
+.bill__lines td { padding: .6rem 0 0; text-align: right; white-space: nowrap; vertical-align: top; }
+.bill__lines tbody tr:last-child > * { padding-bottom: .9rem; }
+.bill__lines tfoot > tr > * { padding-top: .85rem; border-top: 1px dashed var(--dash); font: 800 1.25rem/1.1 var(--display); font-stretch: 112%; color: var(--deep); }
+.bill__status { margin-top: 1rem; font-size: .82rem; font-weight: 700; color: var(--pine); }
+.bill__note { font-size: .8rem; color: var(--muted); padding-inline: .2rem; }
+
+.price__end { grid-area: end; display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 1.4rem; }
+@media (min-width: 64rem) {
+  .price { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); column-gap: clamp(3rem, 6vw, 5.5rem); grid-template-areas: 'head head' 'rates bill' 'plan bill' 'end bill'; }
+  .bill { align-self: start; justify-self: end; position: sticky; top: calc(var(--top-h-compact) + 2rem); }
 }
 
 /* Realizacja: jedno zlecenie, zdjęcia przewijane w poziomie na telefonie */

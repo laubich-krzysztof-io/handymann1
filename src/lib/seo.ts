@@ -9,6 +9,17 @@ export function jsonLd(lang: Lang) {
   const t = content[lang];
   const pageUrl = `${ORIGIN}/${lang}/`;
   const bizId = `${ORIGIN}/#business`;
+  const p = site.pricing;
+  const pr = t.pricing;
+  // Cennik jako oferty: te same kwoty co w sekcji „Cennik” (config.ts)
+  const rate = (name: string, price: Record<string, unknown>, unit: Record<string, unknown>) => ({
+    '@type': 'Offer',
+    name,
+    priceCurrency: 'PLN',
+    ...price,
+    priceSpecification: { '@type': 'UnitPriceSpecification', priceCurrency: 'PLN', ...price, referenceQuantity: { '@type': 'QuantitativeValue', ...unit } },
+    areaServed: { '@id': `${ORIGIN}/#area` },
+  });
   const business: Record<string, unknown> = {
     '@type': 'HomeAndConstructionBusiness',
     '@id': bizId,
@@ -18,7 +29,15 @@ export function jsonLd(lang: Lang) {
     image: `${ORIGIN}/img/og.png`,
     description: t.meta.description,
     knowsLanguage: ['pl', 'de', 'en'],
+    // Promień od Jeleniej Góry plus miejscowości wymienione na stronie (jedno zdanie w sekcji „Cennik”)
     areaServed: [
+      {
+        '@type': 'GeoCircle',
+        '@id': `${ORIGIN}/#area`,
+        name: `${site.radiusKm} km – ${site.center.name}`,
+        geoMidpoint: { '@type': 'GeoCoordinates', latitude: site.center.lat, longitude: site.center.lng },
+        geoRadius: site.radiusKm * 1000,
+      },
       ...site.areas.map((name) => ({ '@type': 'City', name })),
       { '@type': 'AdministrativeArea', name: site.region },
     ],
@@ -27,9 +46,14 @@ export function jsonLd(lang: Lang) {
       name: t.services.title,
       itemListElement: t.services.items.map((s) => ({
         '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: s.name, description: s.text, areaServed: site.region },
+        itemOffered: { '@type': 'Service', name: s.name, description: s.text, areaServed: { '@id': `${ORIGIN}/#area` } },
       })),
     },
+    makesOffer: [
+      rate(pr.rates[0].label, { price: p.firstHour }, { value: 1, unitCode: 'HUR' }),
+      rate(pr.rates[1].label, { price: p.halfHour }, { value: 30, unitCode: 'MIN' }),
+      rate(pr.care.title, { minPrice: p.careFrom }, { value: 1, unitCode: 'MON' }),
+    ],
   };
   if (site.contactReady) {
     business.telephone = site.phone.replace(/\s/g, '');

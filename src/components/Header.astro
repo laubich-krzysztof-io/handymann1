@@ -7,11 +7,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = content[lang];
 
-const brandSub: Record<Lang, string> = {
-  pl: 'Serwis dla domu i pensjonatu',
-  de: 'Service für Haus und Pension',
-  en: 'Service for home and guesthouse',
-};
+const brandSub = t.brand.sub;
 const navLabel: Record<Lang, string> = { pl: 'Menu główne', de: 'Hauptmenü', en: 'Main menu' };
 const langLabel: Record<Lang, string> = { pl: 'Język', de: 'Sprache', en: 'Language' };
 const menuLabel: Record<Lang, { open: string; close: string }> = {
@@ -25,6 +21,7 @@ const links = [
   { id: 'uslugi', label: t.nav.services },
   { id: 'opieka', label: t.nav.care },
   { id: 'jak', label: t.nav.process },
+  { id: 'cennik', label: t.nav.prices },
   { id: 'realizacja', label: t.nav.work },
 ];
 ---
@@ -35,11 +32,11 @@ const links = [
     <span class="top__forest"></span>
   </div>
   <div class="top__in">
-    <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub[lang]}`}>
+    <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub}`}>
       <Mark class="brand__mark" />
       <span class="brand__text">
         <span class="brand__name">{word1}<span class="brand__dot">.</span>{word2}</span>
-        <span class="brand__sub">{brandSub[lang]}</span>
+        <span class="brand__sub">{brandSub}</span>
       </span>
     </a>
 

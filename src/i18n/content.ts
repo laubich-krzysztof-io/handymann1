@@ -1,9 +1,23 @@
-import type { Lang } from '../config';
+import { site, type Lang } from '../config';
+
+// Kwoty z config.ts, z twardą spacją przed walutą (cena nie rozpada się między wiersze)
+const P = site.pricing;
+const zl = (n: number) => `${n}\u00a0zł`;
+const R = site.radiusKm;
+// Przykładowy rachunek: 1 h 20 min pracy = pierwsza godzina + jedno rozpoczęte pół godziny + część
+const BILL_PART = 189;
+const BILL_TOTAL = P.firstHour + P.halfHour + BILL_PART;
+const h12 = (h: number) => `${h % 12 || 12}\u00a0${h < 12 ? 'am' : 'pm'}`;
+// Polska odmiana liczebnika: 1 godzina, 2–4 godziny, 5+ godzin (12–14 też „godzin”)
+const plHours = (n: number) =>
+  n === 1 ? 'godzina' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'godziny' : 'godzin';
 
 export interface Content {
   htmlLang: string;
   meta: { title: string; description: string };
-  nav: { services: string; care: string; process: string; work: string };
+  /** Podtytuł pod nazwą marki w nagłówku; także opis obrazka OG */
+  brand: { sub: string };
+  nav: { services: string; care: string; process: string; prices: string; work: string };
   call: string;
   /** Pierwsza linijka wiadomości WhatsApp otwieranej z przycisków szybkiego kontaktu */
   waGreeting: string;
@@ -28,6 +42,26 @@ export interface Content {
     cta: string;
   };
   process: { title: string; lead: string; steps: { status: string; title: string; text: string }[] };
+  pricing: {
+    title: string;
+    lead: string;
+    /** text: cena słowna (np. „według paragonu”) zamiast kwoty; extra: dopłata, pokazana ciszej */
+    rates: { label: string; price: string; note?: string; text?: boolean; extra?: boolean }[];
+    surcharges: string;
+    area: string;
+    care: { title: string; price: string; per: string; points: string[]; link: string };
+    bill: {
+      title: string;
+      place: string;
+      job: string;
+      time: string;
+      lines: [string, string][];
+      total: [string, string];
+      status: string;
+      note: string;
+    };
+    fine: string;
+  };
   trust: {
     title: string;
     items: { title: string; text: string }[];
@@ -67,20 +101,20 @@ export interface Content {
   footer: { area: string; rights: string };
 }
 
-export const content: Record<Lang, Content> = {
+const raw: Record<Lang, Content> = {
   pl: {
     htmlLang: 'pl',
     meta: {
-      title: 'handyman.karkonosze – serwis dla pensjonatów, hoteli i domów',
-      description:
-        'Hydraulika, elektryka, montaż i drobne remonty oraz stała opieka nad obiektem. Dla pensjonatów, małych hoteli, firm i osób prywatnych w Karkonoszach.',
+      title: 'Złota rączka Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
+      description: `Hydraulika, elektryka z uprawnieniami SEP i drobne naprawy dla pensjonatów, hoteli i domów. Do ${R}\u00a0km od Jeleniej Góry. Pierwsza godzina z dojazdem ${zl(P.firstHour)}.`,
     },
-    nav: { services: 'Usługi', care: 'Stała opieka', process: 'Jak pracuję', work: 'Realizacja' },
+    brand: { sub: 'Naprawy i opieka nad obiektami' },
+    nav: { services: 'Usługi', care: 'Stała opieka', process: 'Jak pracuję', prices: 'Cennik', work: 'Realizacja' },
     call: 'Zadzwoń',
     waGreeting: 'Dzień dobry, piszę ze strony handyman.karkonosze.',
     hero: {
       title: 'Naprawię, zanim gość zauważy.',
-      lead: 'Hydraulika, elektryka, montaż i drobne remonty. Dla pensjonatów, małych hoteli, firm i domów w Karkonoszach, jednorazowo albo na stałe.',
+      lead: 'Złota rączka dla pensjonatów, małych hoteli, firm i domów: hydraulika, elektryka, montaż i drobne remonty. Jelenia Góra, Karpacz, Szklarska Poręba i okolice, jednorazowo albo na stałe.',
       primary: 'Opisz usterkę',
       entryLabel: 'Dziennik obiektu · przykładowy wpis',
       entryMore: 'Tak wygląda stała opieka',
@@ -143,6 +177,46 @@ export const content: Record<Lang, Content> = {
         { status: 'rozliczone', title: 'Rozliczamy się jasno', text: 'Rachunek lub faktura, z podziałem na robociznę i materiały.' },
       ],
     },
+    pricing: {
+      title: 'Ile to kosztuje',
+      lead: 'Płacisz za czas pracy według stawek poniżej. Orientacyjną wycenę dostajesz ze zdjęcia, zanim przyjadę.',
+      rates: [
+        { label: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour) },
+        { label: 'Każde kolejne rozpoczęte 30\u00a0minut', price: zl(P.halfHour) },
+        { label: 'Części i materiały', price: 'według paragonu', note: 'Paragon dołączam do rachunku.', text: true },
+        { label: 'Pilne zlecenie, tego samego dnia', price: `+${P.urgentPct}%`, extra: true },
+        { label: `W nocy (${P.night.from}:00–${P.night.to}:00) i w święta`, price: `+${P.nightPct}%`, extra: true },
+      ],
+      surcharges: 'Dopłaty liczę tylko od robocizny, nie od części.',
+      area: `Dojazd w cenie w promieniu ${R}\u00a0km od Jeleniej Góry: Jelenia Góra z Cieplicami, Karpacz, Szklarska Poręba, Świeradów-Zdrój, Podgórzyn, Mysłakowice, Kowary, Piechowice i miejscowości po drodze.`,
+      care: {
+        title: 'Stała opieka nad obiektem',
+        price: `od ${zl(P.careFrom)}`,
+        per: 'miesięcznie',
+        points: [
+          `${P.careHours} ${plHours(P.careHours)} pracy w miesiącu`,
+          'Dojazdy w cenie',
+          `Reakcja w ciągu ${P.careResponseH}\u00a0godzin`,
+          'Lista usterek po każdej wizycie',
+        ],
+        link: 'Jak wygląda stała opieka',
+      },
+      bill: {
+        title: 'Przykładowy rachunek',
+        place: 'Pensjonat, Szklarska Poręba',
+        job: 'Pok. 7 · bateria prysznicowa kapie',
+        time: 'Czas pracy: 1\u00a0h 20\u00a0min',
+        lines: [
+          ['Pierwsza godzina z dojazdem', zl(P.firstHour)],
+          ['Kolejne rozpoczęte 30\u00a0min', zl(P.halfHour)],
+          ['Bateria prysznicowa (paragon)', zl(BILL_PART)],
+        ],
+        total: ['Razem', zl(BILL_TOTAL)],
+        status: 'rozliczone',
+        note: 'Przykład wyliczony według cennika.',
+      },
+      fine: 'Podane kwoty to ceny końcowe.',
+    },
     trust: {
       title: 'Dlaczego mi zaufasz',
       items: [
@@ -186,7 +260,7 @@ export const content: Record<Lang, Content> = {
       },
       direct: 'Wolisz zadzwonić albo napisać?',
       whatsappDirect: 'Napisz na WhatsAppie',
-      area: 'Karkonosze i okolice: Jelenia Góra, Lubomierz, Szklarska Poręba i dalej na zapytanie.',
+      area: `Pracuję w promieniu ${R}\u00a0km od Jeleniej Góry.`,
     },
     footer: { area: 'Karkonosze, Dolny Śląsk', rights: 'Wszelkie prawa zastrzeżone.' },
   },
@@ -194,16 +268,16 @@ export const content: Record<Lang, Content> = {
   de: {
     htmlLang: 'de',
     meta: {
-      title: 'handyman.karkonosze – Service für Pensionen, Hotels und Häuser im Riesengebirge',
-      description:
-        'Sanitär, Elektro, Montage und kleine Renovierungen sowie feste Objektbetreuung. Für Pensionen, kleine Hotels, Firmen und Privatkunden im Riesengebirge.',
+      title: 'Handwerker Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
+      description: `Sanitär, Elektro mit SEP-Qualifikation und kleine Reparaturen für Pensionen, Hotels und Häuser. Bis ${R}\u00a0km um Jelenia Góra. Erste Stunde inkl. Anfahrt ${zl(P.firstHour)}.`,
     },
-    nav: { services: 'Leistungen', care: 'Betreuung', process: 'Ablauf', work: 'Referenz' },
+    brand: { sub: 'Reparaturen und Objektbetreuung' },
+    nav: { services: 'Leistungen', care: 'Betreuung', process: 'Ablauf', prices: 'Preise', work: 'Referenz' },
     call: 'Anrufen',
     waGreeting: 'Guten Tag, ich schreibe über handyman.karkonosze.',
     hero: {
       title: 'Repariert, bevor Gäste es merken.',
-      lead: 'Sanitär, Elektro, Montage und kleine Renovierungen. Für Pensionen, kleine Hotels, Firmen und Häuser im Riesengebirge, einmalig oder dauerhaft.',
+      lead: 'Handwerker für Pensionen, kleine Hotels, Firmen und Häuser: Sanitär, Elektro, Montage und kleine Renovierungen. Jelenia Góra, Karpacz, Szklarska Poręba und Umgebung, einmalig oder dauerhaft.',
       primary: 'Schaden melden',
       entryLabel: 'Objektbuch · Beispieleintrag',
       entryMore: 'So sieht die Objektbetreuung aus',
@@ -266,6 +340,46 @@ export const content: Record<Lang, Content> = {
         { status: 'abgerechnet', title: 'Klare Abrechnung', text: 'Rechnung mit getrennten Posten für Arbeit und Material.' },
       ],
     },
+    pricing: {
+      title: 'Was es kostet',
+      lead: 'Sie zahlen die Arbeitszeit nach den Sätzen unten. Eine Richtschätzung bekommen Sie anhand eines Fotos, bevor ich anreise.',
+      rates: [
+        { label: 'Erste Arbeitsstunde inkl. Anfahrt', price: zl(P.firstHour) },
+        { label: 'Jede weitere angefangene halbe Stunde', price: zl(P.halfHour) },
+        { label: 'Ersatzteile und Material', price: 'laut Beleg', note: 'Den Beleg lege ich der Rechnung bei.', text: true },
+        { label: 'Eilauftrag am selben Tag', price: `+${P.urgentPct}\u00a0%`, extra: true },
+        { label: `Nachts (${P.night.from}–${P.night.to}\u00a0Uhr) und an Feiertagen`, price: `+${P.nightPct}\u00a0%`, extra: true },
+      ],
+      surcharges: 'Zuschläge gelten nur für die Arbeitszeit, nicht für Teile.',
+      area: `Anfahrt inklusive im Umkreis von ${R}\u00a0km um Jelenia Góra: Jelenia Góra mit Cieplice, Karpacz, Szklarska Poręba, Świeradów-Zdrój, Podgórzyn, Mysłakowice, Kowary, Piechowice und die Orte dazwischen.`,
+      care: {
+        title: 'Feste Objektbetreuung',
+        price: `ab ${zl(P.careFrom)}`,
+        per: 'monatlich',
+        points: [
+          `${P.careHours} ${P.careHours === 1 ? 'Arbeitsstunde' : 'Arbeitsstunden'} im Monat`,
+          'Anfahrten inklusive',
+          `Reaktion innerhalb von ${P.careResponseH}\u00a0Stunden`,
+          'Mängelliste nach jedem Besuch',
+        ],
+        link: 'So sieht die Objektbetreuung aus',
+      },
+      bill: {
+        title: 'Beispielrechnung',
+        place: 'Pension, Szklarska Poręba',
+        job: 'Zi. 7 · Duscharmatur tropft',
+        time: 'Arbeitszeit: 1\u00a0Std. 20\u00a0Min.',
+        lines: [
+          ['Erste Stunde inkl. Anfahrt', zl(P.firstHour)],
+          ['Weitere angefangene halbe Stunde', zl(P.halfHour)],
+          ['Duscharmatur (laut Beleg)', zl(BILL_PART)],
+        ],
+        total: ['Summe', zl(BILL_TOTAL)],
+        status: 'abgerechnet',
+        note: 'Beispiel, berechnet nach dieser Preisliste.',
+      },
+      fine: 'Preise in polnischen Złoty (PLN), Endpreise.',
+    },
     trust: {
       title: 'Warum Sie mir vertrauen können',
       items: [
@@ -309,7 +423,7 @@ export const content: Record<Lang, Content> = {
       },
       direct: 'Lieber anrufen oder schreiben?',
       whatsappDirect: 'Per WhatsApp schreiben',
-      area: 'Riesengebirge und Umgebung: Jelenia Góra, Lubomierz, Szklarska Poręba und weiter auf Anfrage.',
+      area: `Ich arbeite im Umkreis von ${R}\u00a0km um Jelenia Góra.`,
     },
     footer: { area: 'Riesengebirge, Niederschlesien', rights: 'Alle Rechte vorbehalten.' },
   },
@@ -317,16 +431,16 @@ export const content: Record<Lang, Content> = {
   en: {
     htmlLang: 'en',
     meta: {
-      title: 'handyman.karkonosze – service for guesthouses, small hotels and homes',
-      description:
-        'Plumbing, electrics, installation and small repairs, plus ongoing property care for guesthouses, small hotels, businesses and homes in the Karkonosze mountains.',
+      title: 'Handyman Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
+      description: `Plumbing, SEP-licensed electrics and small repairs for guesthouses, hotels, businesses and homes within ${R}\u00a0km of Jelenia Góra. First hour incl. travel ${zl(P.firstHour)}.`,
     },
-    nav: { services: 'Services', care: 'Property care', process: 'How it works', work: 'Recent job' },
+    brand: { sub: 'Repairs and property care' },
+    nav: { services: 'Services', care: 'Property care', process: 'How it works', prices: 'Prices', work: 'Recent job' },
     call: 'Call',
     waGreeting: 'Hello, I am writing via handyman.karkonosze.',
     hero: {
       title: 'Fixed before your guest notices.',
-      lead: 'Plumbing, electrics, installation and small renovations. For guesthouses, small hotels, businesses and homes in the Karkonosze, one-off or on a regular basis.',
+      lead: 'A handyman for guesthouses, small hotels, businesses and homes: plumbing, electrics, installation and small renovations. Jelenia Góra, Karpacz, Szklarska Poręba and around, one-off or on a regular basis.',
       primary: 'Report a fault',
       entryLabel: 'Property log · sample entry',
       entryMore: 'This is what property care looks like',
@@ -389,6 +503,46 @@ export const content: Record<Lang, Content> = {
         { status: 'invoiced', title: 'Clear billing', text: 'An invoice with labour and materials listed separately.' },
       ],
     },
+    pricing: {
+      title: 'What it costs',
+      lead: 'You pay for the time worked at the rates below. You get a rough quote from a photo before I drive out.',
+      rates: [
+        { label: 'First hour of work, travel included', price: zl(P.firstHour) },
+        { label: 'Each further 30\u00a0minutes or part of it', price: zl(P.halfHour) },
+        { label: 'Parts and materials', price: 'at receipt price', note: 'The receipt comes with the invoice.', text: true },
+        { label: 'Urgent, same-day job', price: `+${P.urgentPct}%`, extra: true },
+        { label: `Nights (${h12(P.night.from)}–${h12(P.night.to)}) and public holidays`, price: `+${P.nightPct}%`, extra: true },
+      ],
+      surcharges: 'Surcharges apply to labour only, never to parts.',
+      area: `Travel included within ${R}\u00a0km of Jelenia Góra: Jelenia Góra and Cieplice, Karpacz, Szklarska Poręba, Świeradów-Zdrój, Podgórzyn, Mysłakowice, Kowary, Piechowice and the places in between.`,
+      care: {
+        title: 'Regular property care',
+        price: `from ${zl(P.careFrom)}`,
+        per: 'a month',
+        points: [
+          `${P.careHours} ${P.careHours === 1 ? 'hour' : 'hours'} of work a month`,
+          'Travel included',
+          `Response within ${P.careResponseH}\u00a0hours`,
+          'A defect list after every visit',
+        ],
+        link: 'What property care looks like',
+      },
+      bill: {
+        title: 'Sample bill',
+        place: 'Guesthouse, Szklarska Poręba',
+        job: 'Room 7 · shower mixer dripping',
+        time: 'Time on site: 1\u00a0h 20\u00a0min',
+        lines: [
+          ['First hour incl. travel', zl(P.firstHour)],
+          ['Further 30\u00a0min (started)', zl(P.halfHour)],
+          ['Shower mixer (receipt)', zl(BILL_PART)],
+        ],
+        total: ['Total', zl(BILL_TOTAL)],
+        status: 'invoiced',
+        note: 'An example priced from this list.',
+      },
+      fine: 'Prices in Polish złoty (PLN), final prices.',
+    },
     trust: {
       title: 'Why you can trust me',
       items: [
@@ -432,8 +586,25 @@ export const content: Record<Lang, Content> = {
       },
       direct: 'Prefer to call or message?',
       whatsappDirect: 'Message on WhatsApp',
-      area: 'Karkonosze and surroundings: Jelenia Góra, Lubomierz, Szklarska Poręba and further on request.',
+      area: `I work within ${R}\u00a0km of Jelenia Góra.`,
     },
     footer: { area: 'Karkonosze, Lower Silesia', rights: 'All rights reserved.' },
   },
+};
+
+// Polska typografia: jednoliterowe spójniki i przyimki (a, i, o, u, w, z) nie zostają na końcu wiersza.
+// Pomijamy meta (tytuł i opis w Google) i powitanie WhatsApp: tam liczy się czysty tekst.
+const glue = (v: unknown): unknown =>
+  typeof v === 'string'
+    ? v.replace(/(?<=^|\s)([aiouwzAIOUWZ]) /g, '$1\u00a0')
+    : Array.isArray(v)
+      ? v.map(glue)
+      : v && typeof v === 'object'
+        ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, glue(x)]))
+        : v;
+const { meta, waGreeting, ...plRest } = raw.pl;
+
+export const content: Record<Lang, Content> = {
+  ...raw,
+  pl: { ...(glue(plRest) as Omit<Content, 'meta' | 'waGreeting'>), meta, waGreeting },
 };

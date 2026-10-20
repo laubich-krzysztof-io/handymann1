@@ -32,6 +32,8 @@ const icons = [
 const iconPhone = '<path d="M6.5 3.5h3l1.8 4.6-2.3 1.5a11.5 11.5 0 0 0 5.4 5.4l1.5-2.3 4.6 1.8v3a2 2 0 0 1-2 2A16.5 16.5 0 0 1 4.5 5.5a2 2 0 0 1 2-2z"/>';
 const iconChat = '<path d="M4.5 5.5h15v10.5H10l-5.5 4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/>';
 const iconArrow = '<path d="M4.5 12h14M13 6.5l5.5 5.5-5.5 5.5"/>';
+const iconPin = '<path d="M12 20.5s-6.5-6-6.5-10.8a6.5 6.5 0 0 1 13 0c0 4.8-6.5 10.8-6.5 10.8z"/><circle cx="12" cy="9.8" r="2.3"/>';
+const pr = t.pricing;
 const photos = [
   { id: 'malowanie', cls: 'w-a', w: 1600, h: 1200 },
   { id: 'gotowe', cls: 'w-b', w: 1200, h: 1600 },
@@ -39,7 +41,7 @@ const photos = [
   { id: 'detal', cls: 'w-d', w: 1200, h: 1600 },
 ];
 ---
-<Base lang={lang} htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description}>
+<Base lang={lang} htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description} imageAlt={`${site.name} – ${t.brand.sub}`}>
   <a class="skip" href="#main">{skip[lang]}</a>
 
   <Header lang={lang} />
@@ -153,6 +155,68 @@ const photos = [
             </li>
           ))}
         </ol>
+      </div>
+    </section>
+
+    <section id="cennik" class="section" aria-labelledby="cennik-h">
+      <div class="wrap price">
+        <div class="section__head price__head">
+          <h2 id="cennik-h">{pr.title}</h2>
+          <p class="lead">{pr.lead}</p>
+        </div>
+
+        <div class="price__rates">
+          <dl class="rates">
+            {pr.rates.map((r) => (
+              <div class:list={['rates__row', { 'rates__row--extra': r.extra }]}>
+                <dt>{r.label}{r.note && <span class="rates__note">{r.note}</span>}</dt>
+                <dd class:list={['rates__price', { 'rates__price--text': r.text }]}>{r.price}</dd>
+              </div>
+            ))}
+          </dl>
+          <p class="rates__fine">{pr.surcharges}</p>
+          <p class="price__area">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconPin} />
+            <span>{pr.area}</span>
+          </p>
+        </div>
+
+        <div class="plan">
+          <div class="plan__head">
+            <h3>{pr.care.title}</h3>
+            <p class="plan__price">{pr.care.price} <span>{pr.care.per}</span></p>
+          </div>
+          <ul class="plan__points">
+            {pr.care.points.map((p) => <li>{p}</li>)}
+          </ul>
+          <a class="plan__link" href="#opieka">{pr.care.link}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconArrow} /></a>
+        </div>
+
+        <aside class="bill" aria-labelledby="bill-h">
+          <div class="bill__sheet"><div class="bill__paper">
+            <p class="bill__title" id="bill-h">{pr.bill.title}</p>
+            <p class="bill__meta">
+              <span>{pr.bill.place}</span>
+              <span>{pr.bill.job}</span>
+              <span>{pr.bill.time}</span>
+            </p>
+            <table class="bill__lines">
+              <tbody>
+                {pr.bill.lines.map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}
+              </tbody>
+              <tfoot>
+                <tr><th scope="row">{pr.bill.total[0]}</th><td>{pr.bill.total[1]}</td></tr>
+              </tfoot>
+            </table>
+            <p class="bill__status">{pr.bill.status}</p>
+          </div></div>
+          <p class="bill__note">{pr.bill.note}</p>
+        </aside>
+
+        <div class="price__end">
+          <a class="btn" href="#kontakt">{t.hero.primary}</a>
+          <p class="fine">{pr.fine}</p>
+        </div>
       </div>
     </section>
 
