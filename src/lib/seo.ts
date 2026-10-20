@@ -14,10 +14,10 @@ export function jsonLd(lang: Lang) {
   // Cennik jako oferty: te same kwoty co w sekcji „Cennik” (config.ts)
   const rate = (name: string, price: Record<string, unknown>, unit: Record<string, unknown>) => ({
     '@type': 'Offer',
-    name,
+    name: name.replace(/\u00a0/g, ' '),
     priceCurrency: 'PLN',
     ...price,
-    priceSpecification: { '@type': 'UnitPriceSpecification', priceCurrency: 'PLN', ...price, referenceQuantity: { '@type': 'QuantitativeValue', ...unit } },
+    priceSpecification: { '@type': 'UnitPriceSpecification', priceCurrency: 'PLN', valueAddedTaxIncluded: false, ...price, referenceQuantity: { '@type': 'QuantitativeValue', ...unit } },
     areaServed: { '@id': `${ORIGIN}/#area` },
   });
   const business: Record<string, unknown> = {

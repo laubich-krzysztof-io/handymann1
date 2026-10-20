@@ -10,17 +10,18 @@ export const site = {
   radiusKm: 30,
   areas: ['Jelenia Góra', 'Karpacz', 'Szklarska Poręba', 'Świeradów-Zdrój', 'Podgórzyn', 'Mysłakowice', 'Kowary', 'Piechowice'],
   region: 'Karkonosze',
-  // Cennik w złotych. Kwoty to ceny końcowe dla klienta.
+  // Cennik w złotych NETTO (bez VAT). Strona pokazuje obok cenę brutto z vatPct.
   // Zmiana tutaj zmienia sekcję „Cennik”, przykładowy rachunek, opis w Google i dane strukturalne.
   pricing: {
     firstHour: 200, // pierwsza godzina pracy z dojazdem w promieniu radiusKm
-    halfHour: 60, // każde kolejne rozpoczęte 30 minut
+    halfHour: 70, // każde kolejne rozpoczęte 30 minut
     urgentPct: 50, // pilne, tego samego dnia (dopłata do robocizny)
-    nightPct: 100, // noc i święta (dopłata do robocizny)
+    nightPct: 150, // noc i święta (dopłata do robocizny)
     night: { from: 22, to: 6 }, // godziny nocne
     careFrom: 450, // stała opieka: od tylu zł miesięcznie
     careHours: 4, // godzin pracy w abonamencie
     careResponseH: 24, // czas reakcji w abonamencie
+    vatPct: 23, // VAT doliczany do kwot netto
   },
   // TODO: wpisz prawdziwy numer (format międzynarodowy) i e-mail
   phone: '+48 000 000 000',

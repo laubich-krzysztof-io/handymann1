@@ -3,10 +3,17 @@ import { site, type Lang } from '../config';
 // Kwoty z config.ts, z twardą spacją przed walutą (cena nie rozpada się między wiersze)
 const P = site.pricing;
 const zl = (n: number) => `${n}\u00a0zł`;
+// Kwota z groszami w zapisie danego języka (86,10 / 86.10), bez groszy, gdy całe złote
+const loc: Record<Lang, string> = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' };
+const money = (n: number, lang: Lang) =>
+  `${new Intl.NumberFormat(loc[lang], { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 }).format(n)}\u00a0zł`;
+const gross = (n: number) => Math.round(n * (100 + P.vatPct)) / 100;
 const R = site.radiusKm;
 // Przykładowy rachunek: 1 h 20 min pracy = pierwsza godzina + jedno rozpoczęte pół godziny + część
 const BILL_PART = 189;
-const BILL_TOTAL = P.firstHour + P.halfHour + BILL_PART;
+const BILL_NET = P.firstHour + P.halfHour + BILL_PART;
+const BILL_VAT = Math.round(BILL_NET * P.vatPct) / 100;
+const BILL_GROSS = Math.round((BILL_NET + BILL_VAT) * 100) / 100;
 const h12 = (h: number) => `${h % 12 || 12}\u00a0${h < 12 ? 'am' : 'pm'}`;
 // Polska odmiana liczebnika: 1 godzina, 2–4 godziny, 5+ godzin (12–14 też „godzin”)
 const plHours = (n: number) =>
@@ -45,21 +52,27 @@ export interface Content {
   pricing: {
     title: string;
     lead: string;
-    /** text: cena słowna (np. „według paragonu”) zamiast kwoty; extra: dopłata, pokazana ciszej */
-    rates: { label: string; price: string; note?: string; text?: boolean; extra?: boolean }[];
+    /** price: kwota netto; gross: brutto z VAT; text: cena słowna zamiast kwoty; extra: dopłata, pokazana ciszej */
+    rates: { label: string; price: string; gross?: string; note?: string; text?: boolean; extra?: boolean }[];
+    /** etykiety przy kwotach: netto i brutto */
+    net: string;
+    grossLabel: string;
     surcharges: string;
     area: string;
-    care: { title: string; price: string; per: string; points: string[]; link: string };
+    care: { title: string; price: string; gross: string; per: string; points: string[]; link: string };
     bill: {
       title: string;
       place: string;
       job: string;
       time: string;
       lines: [string, string][];
+      subtotal: [string, string];
+      vat: [string, string];
       total: [string, string];
       status: string;
       note: string;
     };
+    /** objaśnienie nad stawkami: netto/brutto, waluta */
     fine: string;
   };
   trust: {
@@ -106,7 +119,7 @@ const raw: Record<Lang, Content> = {
     htmlLang: 'pl',
     meta: {
       title: 'Złota rączka Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
-      description: `Hydraulika, elektryka z uprawnieniami SEP i drobne naprawy dla pensjonatów, hoteli i domów. Do ${R}\u00a0km od Jeleniej Góry. Pierwsza godzina z dojazdem ${zl(P.firstHour)}.`,
+      description: `Hydraulika, elektryka (uprawnienia SEP) i drobne naprawy dla pensjonatów, hoteli i domów, do ${R}\u00a0km od Jeleniej Góry. Pierwsza godzina z dojazdem: ${zl(P.firstHour)} netto.`,
     },
     brand: { sub: 'Naprawy i opieka nad obiektami' },
     nav: { services: 'Usługi', care: 'Stała opieka', process: 'Jak pracuję', prices: 'Cennik', work: 'Realizacja' },
@@ -181,9 +194,9 @@ const raw: Record<Lang, Content> = {
       title: 'Ile to kosztuje',
       lead: 'Płacisz za czas pracy według stawek poniżej. Orientacyjną wycenę dostajesz ze zdjęcia, zanim przyjadę.',
       rates: [
-        { label: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour) },
-        { label: 'Każde kolejne rozpoczęte 30\u00a0minut', price: zl(P.halfHour) },
-        { label: 'Części i materiały', price: 'według paragonu', note: 'Paragon dołączam do rachunku.', text: true },
+        { label: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: money(gross(P.firstHour), 'pl') },
+        { label: 'Każde kolejne rozpoczęte 30\u00a0minut', price: zl(P.halfHour), gross: money(gross(P.halfHour), 'pl') },
+        { label: 'Części i materiały', price: 'po cenie zakupu', note: 'Paragon lub fakturę zakupu dołączam do rachunku.', text: true },
         { label: 'Pilne zlecenie, tego samego dnia', price: `+${P.urgentPct}%`, extra: true },
         { label: `W nocy (${P.night.from}:00–${P.night.to}:00) i w święta`, price: `+${P.nightPct}%`, extra: true },
       ],
@@ -192,6 +205,7 @@ const raw: Record<Lang, Content> = {
       care: {
         title: 'Stała opieka nad obiektem',
         price: `od ${zl(P.careFrom)}`,
+        gross: `od ${money(gross(P.careFrom), 'pl')}`,
         per: 'miesięcznie',
         points: [
           `${P.careHours} ${plHours(P.careHours)} pracy w miesiącu`,
@@ -209,13 +223,17 @@ const raw: Record<Lang, Content> = {
         lines: [
           ['Pierwsza godzina z dojazdem', zl(P.firstHour)],
           ['Kolejne rozpoczęte 30\u00a0min', zl(P.halfHour)],
-          ['Bateria prysznicowa (paragon)', zl(BILL_PART)],
+          ['Bateria prysznicowa (cena zakupu)', zl(BILL_PART)],
         ],
-        total: ['Razem', zl(BILL_TOTAL)],
+        subtotal: ['Razem netto', zl(BILL_NET)],
+        vat: [`VAT ${P.vatPct}%`, money(BILL_VAT, 'pl')],
+        total: ['Do zapłaty', money(BILL_GROSS, 'pl')],
         status: 'rozliczone',
         note: 'Przykład wyliczony według cennika.',
       },
-      fine: 'Podane kwoty to ceny końcowe.',
+      fine: `Kwoty netto, pod nimi brutto z VAT ${P.vatPct}%.`,
+      net: 'netto',
+      grossLabel: 'brutto',
     },
     trust: {
       title: 'Dlaczego mi zaufasz',
@@ -269,7 +287,7 @@ const raw: Record<Lang, Content> = {
     htmlLang: 'de',
     meta: {
       title: 'Handwerker Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
-      description: `Sanitär, Elektro mit SEP-Qualifikation und kleine Reparaturen für Pensionen, Hotels und Häuser. Bis ${R}\u00a0km um Jelenia Góra. Erste Stunde inkl. Anfahrt ${zl(P.firstHour)}.`,
+      description: `Sanitär, Elektro (SEP-Qualifikation) und Reparaturen für Pensionen, Hotels und Häuser, bis ${R}\u00a0km um Jelenia Góra. Erste Stunde inkl. Anfahrt: ${zl(P.firstHour)} netto.`,
     },
     brand: { sub: 'Reparaturen und Objektbetreuung' },
     nav: { services: 'Leistungen', care: 'Betreuung', process: 'Ablauf', prices: 'Preise', work: 'Referenz' },
@@ -344,9 +362,9 @@ const raw: Record<Lang, Content> = {
       title: 'Was es kostet',
       lead: 'Sie zahlen die Arbeitszeit nach den Sätzen unten. Eine Richtschätzung bekommen Sie anhand eines Fotos, bevor ich anreise.',
       rates: [
-        { label: 'Erste Arbeitsstunde inkl. Anfahrt', price: zl(P.firstHour) },
-        { label: 'Jede weitere angefangene halbe Stunde', price: zl(P.halfHour) },
-        { label: 'Ersatzteile und Material', price: 'laut Beleg', note: 'Den Beleg lege ich der Rechnung bei.', text: true },
+        { label: 'Erste Arbeitsstunde inkl. Anfahrt', price: zl(P.firstHour), gross: money(gross(P.firstHour), 'de') },
+        { label: 'Jede weitere angefangene halbe Stunde', price: zl(P.halfHour), gross: money(gross(P.halfHour), 'de') },
+        { label: 'Ersatzteile und Material', price: 'zum Einkaufspreis', note: 'Den Kaufbeleg lege ich der Rechnung bei.', text: true },
         { label: 'Eilauftrag am selben Tag', price: `+${P.urgentPct}\u00a0%`, extra: true },
         { label: `Nachts (${P.night.from}–${P.night.to}\u00a0Uhr) und an Feiertagen`, price: `+${P.nightPct}\u00a0%`, extra: true },
       ],
@@ -355,6 +373,7 @@ const raw: Record<Lang, Content> = {
       care: {
         title: 'Feste Objektbetreuung',
         price: `ab ${zl(P.careFrom)}`,
+        gross: `ab ${money(gross(P.careFrom), 'de')}`,
         per: 'monatlich',
         points: [
           `${P.careHours} ${P.careHours === 1 ? 'Arbeitsstunde' : 'Arbeitsstunden'} im Monat`,
@@ -372,13 +391,17 @@ const raw: Record<Lang, Content> = {
         lines: [
           ['Erste Stunde inkl. Anfahrt', zl(P.firstHour)],
           ['Weitere angefangene halbe Stunde', zl(P.halfHour)],
-          ['Duscharmatur (laut Beleg)', zl(BILL_PART)],
+          ['Duscharmatur (Einkaufspreis)', zl(BILL_PART)],
         ],
-        total: ['Summe', zl(BILL_TOTAL)],
+        subtotal: ['Summe netto', zl(BILL_NET)],
+        vat: [`MwSt. ${P.vatPct}\u00a0%`, money(BILL_VAT, 'de')],
+        total: ['Zu zahlen', money(BILL_GROSS, 'de')],
         status: 'abgerechnet',
         note: 'Beispiel, berechnet nach dieser Preisliste.',
       },
-      fine: 'Preise in polnischen Złoty (PLN), Endpreise.',
+      fine: `Nettobeträge in Złoty (PLN), darunter brutto mit ${P.vatPct}\u00a0% MwSt.`,
+      net: 'netto',
+      grossLabel: 'brutto',
     },
     trust: {
       title: 'Warum Sie mir vertrauen können',
@@ -432,7 +455,7 @@ const raw: Record<Lang, Content> = {
     htmlLang: 'en',
     meta: {
       title: 'Handyman Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
-      description: `Plumbing, SEP-licensed electrics and small repairs for guesthouses, hotels, businesses and homes within ${R}\u00a0km of Jelenia Góra. First hour incl. travel ${zl(P.firstHour)}.`,
+      description: `Plumbing, SEP-licensed electrics and repairs for guesthouses, hotels and homes within ${R}\u00a0km of Jelenia Góra. First hour incl. travel: ${zl(P.firstHour)} + VAT.`,
     },
     brand: { sub: 'Repairs and property care' },
     nav: { services: 'Services', care: 'Property care', process: 'How it works', prices: 'Prices', work: 'Recent job' },
@@ -507,9 +530,9 @@ const raw: Record<Lang, Content> = {
       title: 'What it costs',
       lead: 'You pay for the time worked at the rates below. You get a rough quote from a photo before I drive out.',
       rates: [
-        { label: 'First hour of work, travel included', price: zl(P.firstHour) },
-        { label: 'Each further 30\u00a0minutes or part of it', price: zl(P.halfHour) },
-        { label: 'Parts and materials', price: 'at receipt price', note: 'The receipt comes with the invoice.', text: true },
+        { label: 'First hour of work, travel included', price: zl(P.firstHour), gross: money(gross(P.firstHour), 'en') },
+        { label: 'Each further 30\u00a0minutes or part of it', price: zl(P.halfHour), gross: money(gross(P.halfHour), 'en') },
+        { label: 'Parts and materials', price: 'at cost', note: 'The purchase receipt comes with the invoice.', text: true },
         { label: 'Urgent, same-day job', price: `+${P.urgentPct}%`, extra: true },
         { label: `Nights (${h12(P.night.from)}–${h12(P.night.to)}) and public holidays`, price: `+${P.nightPct}%`, extra: true },
       ],
@@ -518,6 +541,7 @@ const raw: Record<Lang, Content> = {
       care: {
         title: 'Regular property care',
         price: `from ${zl(P.careFrom)}`,
+        gross: `from ${money(gross(P.careFrom), 'en')}`,
         per: 'a month',
         points: [
           `${P.careHours} ${P.careHours === 1 ? 'hour' : 'hours'} of work a month`,
@@ -535,13 +559,17 @@ const raw: Record<Lang, Content> = {
         lines: [
           ['First hour incl. travel', zl(P.firstHour)],
           ['Further 30\u00a0min (started)', zl(P.halfHour)],
-          ['Shower mixer (receipt)', zl(BILL_PART)],
+          ['Shower mixer (at cost)', zl(BILL_PART)],
         ],
-        total: ['Total', zl(BILL_TOTAL)],
+        subtotal: ['Net total', zl(BILL_NET)],
+        vat: [`VAT ${P.vatPct}%`, money(BILL_VAT, 'en')],
+        total: ['To pay', money(BILL_GROSS, 'en')],
         status: 'invoiced',
         note: 'An example priced from this list.',
       },
-      fine: 'Prices in Polish złoty (PLN), final prices.',
+      fine: `Net amounts in Polish złoty (PLN), with the price incl. ${P.vatPct}% VAT below.`,
+      net: 'net',
+      grossLabel: 'incl. VAT',
     },
     trust: {
       title: 'Why you can trust me',

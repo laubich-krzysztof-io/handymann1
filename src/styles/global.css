@@ -374,11 +374,13 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 .price { display: grid; gap: clamp(1.8rem, 4vw, 2.4rem); grid-template-columns: minmax(0, 1fr); grid-template-areas: 'head' 'rates' 'bill' 'plan' 'end'; }
 .price__head { grid-area: head; margin-bottom: 0; }
 .price__rates { grid-area: rates; }
+.rates__legend { margin-bottom: .55rem; font-size: .8rem; color: var(--muted); text-align: right; }
 .rates { border-top: 2px solid var(--deep); }
 .rates__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: .3rem 1.5rem; padding-block: 1rem; border-bottom: 1px solid var(--line); }
 .rates dt { font: 700 1.02rem/1.3 var(--display); font-stretch: 106%; }
 .rates__note { display: block; margin-top: .3rem; font: 400 .84rem/1.5 var(--mono); color: var(--muted); }
-.rates__price { margin: 0; font: 800 clamp(1.3rem, 2.1vw, 1.55rem)/1.1 var(--display); font-stretch: 112%; color: var(--deep); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; text-align: right; }
+.rates__price { display: grid; justify-items: end; gap: .3rem; margin: 0; font: 800 clamp(1.3rem, 2.1vw, 1.55rem)/1.1 var(--display); font-stretch: 112%; color: var(--deep); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; text-align: right; }
+.rates__gross, .plan__gross { font: 400 .78rem/1.35 var(--mono); color: var(--muted); letter-spacing: 0; white-space: nowrap; }
 .rates__price--text { font-size: 1rem; font-weight: 700; font-stretch: 100%; color: var(--pine); white-space: normal; max-width: 9.5rem; }
 .rates__row--extra dt { font-weight: 600; }
 .rates__row--extra .rates__price { font-size: 1.12rem; font-weight: 700; color: var(--pine-soft); }
@@ -388,8 +390,8 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 
 .plan { grid-area: plan; display: grid; gap: 1rem; justify-items: start; padding: clamp(1.15rem, 2.6vw, 1.6rem); background: var(--paper-2); border-radius: 10px; }
 .plan__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .35rem 1.2rem; width: 100%; }
-.plan__price { font: 800 clamp(1.3rem, 2.1vw, 1.55rem)/1.1 var(--display); font-stretch: 112%; color: var(--deep); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
-.plan__price span { font: 400 .84rem/1 var(--mono); color: var(--muted); letter-spacing: 0; }
+.plan__price { display: grid; gap: .3rem; font: 800 clamp(1.3rem, 2.1vw, 1.55rem)/1.1 var(--display); font-stretch: 112%; color: var(--deep); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.plan__gross { white-space: normal; }
 .plan__points { display: grid; gap: .45rem 1.6rem; width: 100%; }
 .plan__points li { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; font-size: .92rem; }
 .plan__link { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.75rem; margin-block: -.4rem; font: 600 .98rem/1.2 var(--display); font-stretch: 92%; color: var(--pine-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .3em; }
@@ -420,7 +422,10 @@ h3 { font-size: 1.15rem; font-stretch: 112%; font-weight: 750; line-height: 1.2;
 .bill__lines th { padding: .6rem 1rem 0 0; text-align: left; font-weight: 400; vertical-align: top; }
 .bill__lines td { padding: .6rem 0 0; text-align: right; white-space: nowrap; vertical-align: top; }
 .bill__lines tbody tr:last-child > * { padding-bottom: .9rem; }
-.bill__lines tfoot > tr > * { padding-top: .85rem; border-top: 1px dashed var(--dash); font: 800 1.25rem/1.1 var(--display); font-stretch: 112%; color: var(--deep); }
+/* Netto, VAT, do zapłaty: dwie przerywane linie jak na prawdziwym paragonie */
+.bill__lines .bill__sub > * { padding-top: .85rem; border-top: 1px dashed var(--dash); }
+.bill__lines tfoot td { color: var(--ink); }
+.bill__lines .bill__total > * { padding-top: .85rem; border-top: 1px dashed var(--dash); font: 800 1.25rem/1.1 var(--display); font-stretch: 112%; color: var(--deep); }
 .bill__status { margin-top: 1rem; font-size: .82rem; font-weight: 700; color: var(--pine); }
 .bill__note { font-size: .8rem; color: var(--muted); padding-inline: .2rem; }
 

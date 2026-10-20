@@ -166,11 +166,15 @@ const photos = [
         </div>
 
         <div class="price__rates">
+          <p class="rates__legend">{pr.fine}</p>
           <dl class="rates">
             {pr.rates.map((r) => (
               <div class:list={['rates__row', { 'rates__row--extra': r.extra }]}>
                 <dt>{r.label}{r.note && <span class="rates__note">{r.note}</span>}</dt>
-                <dd class:list={['rates__price', { 'rates__price--text': r.text }]}>{r.price}</dd>
+                <dd class:list={['rates__price', { 'rates__price--text': r.text }]}>
+                  <span class="rates__net">{r.price}</span>
+                  {r.gross && <span class="rates__gross">{r.gross} {pr.grossLabel}</span>}
+                </dd>
               </div>
             ))}
           </dl>
@@ -184,7 +188,10 @@ const photos = [
         <div class="plan">
           <div class="plan__head">
             <h3>{pr.care.title}</h3>
-            <p class="plan__price">{pr.care.price} <span>{pr.care.per}</span></p>
+            <p class="plan__price">
+              <span class="plan__net">{pr.care.price}</span>
+              <span class="plan__gross">{pr.net} {pr.care.per} · {pr.care.gross} {pr.grossLabel}</span>
+            </p>
           </div>
           <ul class="plan__points">
             {pr.care.points.map((p) => <li>{p}</li>)}
@@ -205,7 +212,9 @@ const photos = [
                 {pr.bill.lines.map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}
               </tbody>
               <tfoot>
-                <tr><th scope="row">{pr.bill.total[0]}</th><td>{pr.bill.total[1]}</td></tr>
+                <tr class="bill__sub"><th scope="row">{pr.bill.subtotal[0]}</th><td>{pr.bill.subtotal[1]}</td></tr>
+                <tr><th scope="row">{pr.bill.vat[0]}</th><td>{pr.bill.vat[1]}</td></tr>
+                <tr class="bill__total"><th scope="row">{pr.bill.total[0]}</th><td>{pr.bill.total[1]}</td></tr>
               </tfoot>
             </table>
             <p class="bill__status">{pr.bill.status}</p>
@@ -215,7 +224,6 @@ const photos = [
 
         <div class="price__end">
           <a class="btn" href="#kontakt">{t.hero.primary}</a>
-          <p class="fine">{pr.fine}</p>
         </div>
       </div>
     </section>
