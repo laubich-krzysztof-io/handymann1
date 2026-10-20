@@ -19,22 +19,9 @@ const skip: Record<Lang, string> = { pl: 'Przejdź do treści', de: 'Zum Inhalt 
 const quickLabel: Record<Lang, string> = { pl: 'Szybki kontakt', de: 'Schnellkontakt', en: 'Quick contact' };
 const sample = t.log.entries[0];
 
-// Ikony usług z biblioteki Lucide (ISC), jedna siatka 24 px i jedna grubość linii; kolejność jak w content.services.items
-const icons = [
-  // klucz (hydraulika)
-  '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
-  // wtyczka z iskrą (elektryka)
-  '<path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"/><path d="m2 22 3-3"/><path d="M7.5 13.5 10 11"/><path d="M10.5 16.5 13 14"/><path d="m18 3-4 4h6l-4 4"/>',
-  // wiertarka (montaż)
-  '<path d="M10 18a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H5a3 3 0 0 1-3-3 1 1 0 0 1 1-1z"/><path d="M13 10H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1l-.81 3.242a1 1 0 0 1-.97.758H8"/><path d="M14 4h3a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-3"/><path d="M18 6h4"/><path d="m5 10-2 8"/><path d="m7 18 2-8"/>',
-  // lista z odhaczeniem (stała opieka, jak Dziennik obiektu)
-  '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
-];
-const iconPhone = '<path d="M6.5 3.5h3l1.8 4.6-2.3 1.5a11.5 11.5 0 0 0 5.4 5.4l1.5-2.3 4.6 1.8v3a2 2 0 0 1-2 2A16.5 16.5 0 0 1 4.5 5.5a2 2 0 0 1 2-2z"/>';
-const iconChat = '<path d="M4.5 5.5h15v10.5H10l-5.5 4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/>';
-const iconArrow = '<path d="M4.5 12h14M13 6.5l5.5 5.5-5.5 5.5"/>';
-const iconPin = '<path d="M12 20.5s-6.5-6-6.5-10.8a6.5 6.5 0 0 1 13 0c0 4.8-6.5 10.8-6.5 10.8z"/><circle cx="12" cy="9.8" r="2.3"/>';
+
 const pr = t.pricing;
+const logBtn: Record<Lang, [string, string]> = { pl: ['Pauza', 'Wznów'], de: ['Pause', 'Weiter'], en: ['Pause', 'Resume'] };
 const photos = [
   { id: 'malowanie', cls: 'w-a', w: 1600, h: 1200 },
   { id: 'gotowe', cls: 'w-b', w: 1200, h: 1600 },
@@ -56,7 +43,6 @@ const photos = [
           <div class="actions">
             <a class="btn" href="#kontakt">{t.hero.primary}</a>
             <a class="call-link" href={`tel:${tel}`}>
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconPhone} />
               <span>{t.call}: {site.phone}</span>
             </a>
           </div>
@@ -70,7 +56,7 @@ const photos = [
                 <span class="entry__done">{sample.done}</span>
               </span>
             </span>
-            <span class="entry__more">{t.hero.entryMore}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconArrow} /></span>
+            <span class="entry__more">{t.hero.entryMore}</span>
           </a>
         </div>
       </div>
@@ -85,9 +71,8 @@ const photos = [
         <ul class="svc">
           {t.services.items.map((s, i) => (
             <li class="svc__item" id={`usluga-${i + 1}`}>
-              <svg class="svc__icon" viewBox="0 0 24 24" aria-hidden="true" set:html={icons[i]} />
               <div>
-                <h3>{i === 3 ? <a href="#opieka">{s.name}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconArrow} /></a> : s.name}</h3>
+                <h3>{i === 3 ? <a href="#opieka">{s.name}</a> : s.name}</h3>
                 <p>{s.text}</p>
               </div>
             </li>
@@ -117,8 +102,7 @@ const photos = [
           <div class="log__head">
             <span class="log__title">{t.log.title}</span>
             <button class="log__toggle" type="button" aria-pressed="false" aria-label={t.log.pause} data-log-toggle>
-              <svg class="log__pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5v11M15 6.5v11" /></svg>
-              <svg class="log__play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 6.5v11l9-5.5z" /></svg>
+              <span class="log__pause">{logBtn[lang][0]}</span><span class="log__play">{logBtn[lang][1]}</span>
             </button>
           </div>
           <div class="log__window" aria-hidden="true">
@@ -181,7 +165,6 @@ const photos = [
           </dl>
           <p class="rates__fine">{pr.surcharges}</p>
           <p class="price__area">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconPin} />
             <span>{pr.area}</span>
           </p>
         </div>
@@ -197,7 +180,7 @@ const photos = [
           <ul class="plan__points">
             {pr.care.points.map((p) => <li>{p}</li>)}
           </ul>
-          <a class="plan__link" href="#opieka">{pr.care.link}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconArrow} /></a>
+          <a class="plan__link" href="#opieka">{pr.care.link}</a>
         </div>
 
         <aside class="bill" aria-labelledby="bill-h">
@@ -286,14 +269,13 @@ const photos = [
         <div class="section__head faq__head">
           <h2 id="pytania-h">{t.faq.title}</h2>
           <p class="lead">{t.faq.lead}</p>
-          <a class="plan__link" href="#kontakt">{t.faq.more}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconArrow} /></a>
+          <a class="plan__link" href="#kontakt">{t.faq.more}</a>
         </div>
         <div class="faq__list">
           {t.faq.items.map((f) => (
             <details class="faq__item">
               <summary>
-                <span>{f.q}</span>
-                <svg class="faq__sign" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /><path class="faq__v" d="M12 5v14" /></svg>
+                <span>{f.q}</span><i class="faq__sign" aria-hidden="true"></i>
               </summary>
               <p>{f.a}</p>
             </details>
@@ -309,11 +291,9 @@ const photos = [
           <p>{t.contact.lead}</p>
           <div class="direct">
             <p class="direct__label">{t.contact.direct}</p>
-            <a href={`tel:${tel}`}>
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconPhone} />{site.phone}
+            <a href={`tel:${tel}`}>{site.phone}
             </a>
-            <a href={wa} target="_blank" rel="noopener">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconChat} />{t.contact.whatsappDirect}
+            <a href={wa} target="_blank" rel="noopener">{t.contact.whatsappDirect}
             </a>
           </div>
           <p class="fine fine--light">{t.contact.area}</p>
@@ -361,11 +341,9 @@ const photos = [
   <Footer lang={lang} />
 
   <nav class="quick" aria-label={quickLabel[lang]} data-quick>
-    <a class="quick__btn quick__btn--call" href={`tel:${tel}`}>
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconPhone} />{t.call}
+    <a class="quick__btn quick__btn--call" href={`tel:${tel}`}>{t.call}
     </a>
-    <a class="quick__btn" href={wa} target="_blank" rel="noopener">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" set:html={iconChat} />WhatsApp
+    <a class="quick__btn" href={wa} target="_blank" rel="noopener">WhatsApp
     </a>
   </nav>
 
