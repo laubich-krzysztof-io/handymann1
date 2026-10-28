@@ -15,6 +15,7 @@ const t = content[lang];
 const brandSub = t.brand.sub;
 const navLabel = 'Menu główne';
 const menuLabel = { open: 'Otwórz menu', close: 'Zamknij menu' };
+const tel = site.phone.replace(/\s/g, '');
 const [word1, word2] = site.name.split('.');
 // WhatsApp na komputerze: sama ikona obok przycisku (na telefonie jest dolny pasek szybkiego kontaktu)
 const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreeting)}`;
@@ -22,7 +23,6 @@ const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreetin
 const links = [
   { id: 'uslugi', label: t.nav.services },
   { id: 'opieka', label: t.nav.care },
-  { id: 'jak', label: t.nav.process },
   { id: 'cennik', label: t.nav.prices },
   { id: 'realizacja', label: t.nav.work },
 ];
@@ -49,6 +49,8 @@ const links = [
         ))}
       </ul>
       <div class="nav__extra">
+        <a class="nav__tel" href={`tel:${tel}`}>{site.phone}</a>
+        <a class="nav__wa" href={wa} target="_blank" rel="noopener">WhatsApp</a>
         <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
       </div>
     </nav>
@@ -56,7 +58,7 @@ const links = [
     <div class="top__end">
       <a class="wa-link" href={wa} target="_blank" rel="noopener" aria-label={t.contact.whatsappDirect}>WhatsApp</a>
       <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
-      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel.open} data-burger><span class="burger__label">Menu</span></button>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel.open} data-burger><span class="burger__label" data-burger-label>Menu</span></button>
     </div>
   </div>
 </header>
@@ -87,12 +89,23 @@ const links = [
 
     // Mobile panel
     const burger = top.querySelector<HTMLButtonElement>('[data-burger]');
+    const label = top.querySelector<HTMLElement>('[data-burger-label]');
     const setPanel = (open: boolean) => {
       top.classList.toggle('is-open', open);
       burger?.setAttribute('aria-expanded', String(open));
       burger?.setAttribute('aria-label', (open ? top.dataset.labelClose : top.dataset.labelOpen) || '');
+      if (label) label.textContent = open ? 'Zamknij' : 'Menu';
     };
-    burger?.addEventListener('click', () => setPanel(!top.classList.contains('is-open')));
+    burger?.addEventListener('click', () => {
+      const open = !top.classList.contains('is-open');
+      setPanel(open);
+      // Po otwarciu kursor przechodzi do pierwszej pozycji menu (inaczej Tab ucieka pod panel)
+      if (open) top.querySelector<HTMLAnchorElement>('.nav a')?.focus();
+    });
+    // Menu zamyka się, gdy kursor klawiatury opuści nagłówek
+    top.addEventListener('focusout', (e) => {
+      if (top.classList.contains('is-open') && !top.contains(e.relatedTarget as Node | null)) setPanel(false);
+    });
 
     document.addEventListener('click', (e) => {
       if (!top.contains(e.target as Node)) setPanel(false);

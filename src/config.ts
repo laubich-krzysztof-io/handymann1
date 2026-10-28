@@ -33,9 +33,6 @@ export const site = {
   address: '', // np. 'Popielówek 1, 59-623 Lubomierz'
   // Czy dane kontaktowe są prawdziwe (gdy false, nie trafiają do danych strukturalnych)
   contactReady: true,
-  // Zdjęcia realizacji: wrzuć pliki do public/img/ i dopisz tutaj.
-  // Dopóki lista jest pusta, sekcja „Realizacje” jest ukryta.
-  gallery: [] as { src: string; alt: string }[],
 };
 
 export const locales = ['pl'] as const;

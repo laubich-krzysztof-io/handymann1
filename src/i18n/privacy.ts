@@ -25,22 +25,22 @@ const reach = site.contactReady ? `${site.email}, ${site.phone}` : site.email;
 export const privacy: Record<Lang, Privacy> = {
   pl: {
     title: 'Polityka prywatności',
-    description: `Jakie dane trafiają do ${site.name}, po co i jakie masz prawa. Formularz niczego nie zapisuje na stronie, a strona nie używa cookies.`,
-    lead: 'Krótko i konkretnie: jakie dane do mnie trafiają, po co i jakie masz prawa.',
-    updated: 'Aktualizacja: 20 października 2026',
+    description: `Jakie dane trafiają do ${site.name}, po co i jakie prawa Państwu przysługują. Formularz niczego nie zapisuje na stronie, a strona nie używa cookies.`,
+    lead: 'Krótko i konkretnie: jakie dane do mnie trafiają, po co i jakie prawa Państwu przysługują.',
+    updated: 'Aktualizacja: 28 października 2026',
     back: 'Wróć na stronę główną',
     sections: [
-      { h: 'Kto jest administratorem', p: [`Administratorem Twoich danych jest ${admin}. W sprawach danych osobowych napisz na ${reach}.`] },
+      { h: 'Kto jest administratorem', p: [`Administratorem Państwa danych jest ${admin}. W sprawach danych osobowych proszę pisać na ${reach}.`] },
       {
         h: 'Jakie dane do mnie trafiają',
         p: [
-          'Tylko te, które sam podasz: imię i nazwisko, telefon, kim jesteś (pensjonat, firma, osoba prywatna), miejsce i opis usterki oraz zdjęcia, jeśli je dołączysz. Przy zleceniu także dane potrzebne do rachunku lub faktury.',
+          'Tylko te, które Państwo sami podadzą: imię i nazwisko, telefon, czego dotyczy sprawa, rodzaj obiektu, miejsce i opis usterki oraz zdjęcia, jeśli zostaną dołączone. Przy zleceniu także dane potrzebne do rachunku lub faktury.',
         ],
       },
       {
         h: 'Jak działa formularz',
         p: [
-          'Formularz nie zapisuje niczego na tej stronie. Po kliknięciu otwiera WhatsAppa albo Twój program pocztowy z gotową wiadomością, a wysyłasz ją sam.',
+          'Formularz nie zapisuje niczego na tej stronie. Po kliknięciu otwiera WhatsAppa albo program pocztowy z gotową wiadomością, którą wysyłają Państwo sami.',
           'Wiadomość wysłana przez WhatsAppa przechodzi przez serwis WhatsApp Ireland Limited (Meta), na zasadach jego polityki prywatności.',
         ],
       },
@@ -67,16 +67,16 @@ export const privacy: Record<Lang, Privacy> = {
       },
       { h: 'Cookies i statystyki', p: ['Ta strona nie używa plików cookies ani narzędzi śledzących i nie zbiera statystyk odwiedzin.'] },
       {
-        h: 'Twoje prawa',
+        h: 'Państwa prawa',
         p: [
-          `Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przeniesienia, a także prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie. Wystarczy napisać na ${site.email}.`,
-          'Możesz też złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych, ul. Stawki 2, 00-193 Warszawa.',
+          `Mają Państwo prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przeniesienia, a także prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie. Wystarczy napisać na ${site.email}.`,
+          'Mogą Państwo też złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych, ul. Stawki 2, 00-193 Warszawa.',
         ],
       },
       {
-        h: 'Czy musisz podać dane',
+        h: 'Czy podanie danych jest obowiązkowe',
         p: [
-          'Nie musisz, ale bez telefonu albo adresu do odpowiedzi nie mogę się z Tobą skontaktować ani przyjąć zlecenia. Nie podejmuję decyzji w sposób zautomatyzowany i nie profiluję.',
+          'Nie, ale bez telefonu albo adresu do odpowiedzi nie mogę się z Państwem skontaktować ani przyjąć zlecenia. Nie podejmuję decyzji w sposób zautomatyzowany i nie profiluję.',
         ],
       },
     ],
