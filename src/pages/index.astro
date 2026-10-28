@@ -295,8 +295,6 @@ const work = [
               <path class="zmap__border" d={zm.poland} />
               <g class="zmap__shapes" aria-hidden="true">{zm.towns.filter((tw) => tw.zone > 0).map((tw) => <path class:list={['zmap__shape', `zmap__shape--z${tw.zone}`]} data-shape={tw.name} d={tw.c} />)}</g>
               <g class="zmap__gmname" aria-hidden="true">{zm.gmLabels.map((g) => <text x={g.x} y={g.y} text-anchor="middle">{g.name}</text>)}</g>
-              <circle class="zmap__ring" cx={zm.circle.cx} cy={zm.circle.cy} r={zm.circle.r} />
-              <text class="zmap__note" x={zm.note.x} y={zm.note.y}>{zm.radiusKm} km</text>
               <text class="zmap__cz" x={zm.czechy.x} y={zm.czechy.y} text-anchor="middle">CZECHY</text>
               <g class="zmap__peak">
                 <path d={`M${zm.sniezka.x},${zm.sniezka.y - 9} l8,13 h-16z`} />
