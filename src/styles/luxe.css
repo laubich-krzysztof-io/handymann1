@@ -7,6 +7,7 @@
    ========================================================================= */
 :root {
   --linen: #f7f4ee;
+  --page: #f7f4ee; /* odcień kartki; skrypt ruchu przenika go między rozdziałami */
   --stone: #ece7dc;
   --frost: #dfe7df;
   --paper: #fbfaf7;
@@ -36,7 +37,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 5.2rem; -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--linen); color: var(--ink); font: 400 var(--text)/1.6 var(--serif); font-variant-numeric: lining-nums; -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 400 var(--text)/1.6 var(--serif); font-variant-numeric: lining-nums; -webkit-font-smoothing: antialiased; }
 img { max-width: 100%; display: block; }
 a { color: inherit; text-underline-offset: .22em; text-decoration-thickness: 1px; }
 h1, h2, h3 { margin: 0; font-family: var(--serif); color: inherit; text-wrap: balance; font-weight: 400; }
@@ -87,13 +88,13 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 }
 
 /* ---------- Nagłówek: jasny, z cienką linią ---------- */
-.top { position: fixed; inset: 0 0 auto; z-index: 50; height: var(--top-h); background: var(--linen); color: var(--ink); border-bottom: 1px solid var(--line); transition: height .4s var(--ease-out); }
+.top { position: fixed; inset: 0 0 auto; z-index: 50; height: var(--top-h); background: var(--page); color: var(--ink); border-bottom: 1px solid var(--line); transition: height .4s var(--ease-out); }
 .top.is-compact { height: var(--top-h-compact); }
 .top__scene { display: none; }
 .top-space { height: var(--top-h); }
 .top__in { height: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); display: flex; align-items: center; gap: 1.5rem; }
 .brand { display: flex; align-items: center; gap: .7rem; flex: none; color: var(--ink); text-decoration: none; min-height: 2.75rem; }
-.brand__mark { width: 4.6rem; aspect-ratio: 240 / 132; flex: none; color: var(--spruce); --mark-knock: var(--linen); transition: width .4s var(--ease-out); }
+.brand__mark { width: 4.6rem; aspect-ratio: 240 / 132; flex: none; color: var(--spruce); --mark-knock: var(--page); transition: width .4s var(--ease-out); }
 .top.is-compact .brand__mark { width: 4rem; }
 .brand__text { display: grid; gap: .15rem; }
 .brand__name { font-size: 1.3rem; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
@@ -119,7 +120,7 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 @media (max-width: 75.99rem) {
   .burger { display: inline-grid; place-items: center end; }
   .top__end { margin-left: auto; gap: 1.2rem; }
-  .nav { position: absolute; inset: 100% 0 auto; margin: 0; padding: .4rem var(--gutter) 1.8rem; background: var(--linen); border-bottom: 1px solid var(--line); max-height: calc(100dvh - var(--top-h-compact)); overflow-y: auto; overscroll-behavior: contain; visibility: hidden; opacity: 0; transform: translateY(-.4rem); transition: opacity .25s var(--ease-out), transform .35s var(--ease-out), visibility 0s .35s; }
+  .nav { position: absolute; inset: 100% 0 auto; margin: 0; padding: .4rem var(--gutter) 1.8rem; background: var(--page); border-bottom: 1px solid var(--line); max-height: calc(100dvh - var(--top-h-compact)); overflow-y: auto; overscroll-behavior: contain; visibility: hidden; opacity: 0; transform: translateY(-.4rem); transition: opacity .25s var(--ease-out), transform .35s var(--ease-out), visibility 0s .35s; }
   .top.is-open .nav { visibility: visible; opacity: 1; transform: none; transition: opacity .25s var(--ease-out), transform .35s var(--ease-out); }
   .nav__list { flex-direction: column; align-items: stretch; gap: 0; }
   .nav__item { border-bottom: 1px solid var(--line); }
@@ -148,7 +149,7 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 /* Konkret zamiast przykładu: pierwsza stawka z cennika, zapisana jak pozycja w karcie */
 .proof { display: grid; gap: .7rem; max-width: 27rem; }
 .proof__line { display: flex; align-items: baseline; justify-content: space-between; gap: 1.2rem; padding-block: .9rem; border-block: 1px solid var(--line); font-size: 1.15rem; }
-.proof__price { font-size: 2.1rem; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; }
+.proof__price { font-size: 2.1rem; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; font-variant-numeric: lining-nums tabular-nums; }
 .proof__sub { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .9rem; font-size: 1rem; font-style: italic; color: var(--muted); }
 .proof__sub a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--spruce); text-decoration: underline; }
 @media (min-width: 64rem) {
@@ -271,7 +272,7 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 @media (min-width: 40rem) { .steps { grid-template-columns: 1fr 1fr; column-gap: var(--gap); } }
 .direct { display: grid; gap: .3rem; justify-items: start; }
 .direct .label { color: var(--muted); }
-.direct__tel { display: inline-flex; align-items: baseline; gap: .12em; font-size: clamp(3.1rem, 7.4vw, 6rem); line-height: 1.05; letter-spacing: -0.035em; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.direct__tel { font-variant-numeric: lining-nums tabular-nums; display: inline-flex; align-items: baseline; gap: .12em; font-size: clamp(2.6rem, 12.4vw, 6rem); line-height: 1.05; letter-spacing: -0.035em; color: var(--ink); text-decoration: none; white-space: nowrap; }
 .direct__cc { font-size: .38em; letter-spacing: 0; color: var(--muted); }
 .direct__links { display: flex; flex-wrap: wrap; gap: 0 1.8rem; }
 .direct__links a { display: inline-flex; align-items: center; min-height: 2.9rem; text-decoration: underline; text-decoration-color: var(--spruce); overflow-wrap: anywhere; }
@@ -308,7 +309,7 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 /* ---------- Szybki kontakt na telefonie: dopiero po otwarciu strony ---------- */
 .quick { display: none; }
 @media (max-width: 59.99rem) {
-  .quick { position: fixed; inset: auto 0 0; z-index: 40; display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; padding: .55rem var(--gutter) max(.55rem, env(safe-area-inset-bottom)); background: var(--linen); border-top: 1px solid var(--line); transition: transform .45s var(--ease-out), visibility 0s; }
+  .quick { position: fixed; inset: auto 0 0; z-index: 40; display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; padding: .55rem var(--gutter) max(.55rem, env(safe-area-inset-bottom)); background: var(--page); border-top: 1px solid var(--line); transition: transform .45s var(--ease-out), visibility 0s; }
   .quick.is-hidden, body:has(.top.is-open) .quick { transform: translateY(110%); visibility: hidden; transition: transform .45s var(--ease-out), visibility 0s .45s; }
   .quick__btn { display: inline-flex; align-items: center; justify-content: center; min-height: 3rem; border: 1px solid var(--spruce); color: var(--spruce); text-decoration: none; font-size: .82rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
   .quick__btn--call { background: var(--spruce); color: var(--on-spruce); }
@@ -343,6 +344,18 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 .motion [data-hero-actions],
 .motion .proof__line,
 .motion .proof__sub { visibility: hidden; }
+
+/* Jedna kartka: rozdziały nie mają własnego tła, kolor kartki przenika się pod nimi */
+.motion-ready main > .section--stone, .motion-ready main > .section--frost { background: transparent; }
+.motion-ready .hero { border-bottom-color: transparent; }
+
+/* Licznik: każda cyfra to kolumna 0–9 w okienku wysokości jednej linii */
+.odo { display: inline-flex; flex-direction: column; height: 1lh; overflow: clip; font-variant-numeric: lining-nums tabular-nums; }
+.odo__track { display: flex; flex-direction: column; will-change: transform; }
+.odo__track > span { display: block; height: 1lh; }
+
+/* Zdjęcie na cały ekran i rozjeżdżające się linie otwarcia nie mogą rozpychać strony w poziomie */
+#realizacja, .hero { overflow-x: clip; }
 
 /* Linia atramentu nad listą rysuje się od lewej; bez skryptu zostaje zwykła ramka */
 .motion-ready [data-rule] { position: relative; border-top-color: transparent; }
