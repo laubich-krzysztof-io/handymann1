@@ -5,6 +5,12 @@
    Brygada 1918 (polski krój z 1918 r.) do nagłówków, cen i tekstu do czytania;
    Albert Sans tylko w krótkich etykietach, menu i na przyciskach.
    ========================================================================= */
+
+/* Czcionka zastępcza o wymiarach Brygady: zanim Brygada dojdzie (wolne łącze), tekst łamie się tak samo
+   i strona nie przeskakuje. Wyliczone z metryk (Capsize): szerokość średnia i wysokość linii. */
+@font-face { font-family: 'Brygada Fallback'; src: local('Georgia'); size-adjust: 104.76%; ascent-override: 87.82%; descent-override: 23.87%; line-gap-override: 0%; }
+@font-face { font-family: 'Brygada Fallback Android'; src: local('Noto Serif'), local('NotoSerif-Regular'); size-adjust: 97.09%; ascent-override: 94.76%; descent-override: 25.75%; line-gap-override: 0%; }
+
 :root {
   --linen: #f7f4ee;
   --page: #f7f4ee; /* odcień kartki; skrypt ruchu przenika go między rozdziałami */
@@ -23,7 +29,7 @@
   --line-spruce: #ffffff2e;
   --error: #a4361f;
 
-  --serif: 'Brygada 1918 Variable', 'Brygada 1918', Georgia, serif;
+  --serif: 'Brygada 1918 Variable', 'Brygada 1918', 'Brygada Fallback', 'Brygada Fallback Android', Georgia, serif;
   --sans: 'Albert Sans Variable', 'Albert Sans', system-ui, sans-serif;
   --text: 1.125rem;
   --measure: 62ch;
@@ -37,6 +43,10 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 5.2rem; -webkit-text-size-adjust: 100%; }
+/* Gdy działa skrypt ruchu, płynne skoki do sekcji robi on (Lenis albo scrollIntoView),
+   a przewijanie do pola z fokusem (Tab) jest natychmiastowe. Bez skryptu zostaje płynne przewijanie z CSS. */
+html.motion, html.motion-ready { scroll-behavior: auto; }
+main:focus { outline: none; }
 body { margin: 0; background: var(--page); color: var(--ink); font: 400 var(--text)/1.6 var(--serif); font-variant-numeric: lining-nums; -webkit-font-smoothing: antialiased; }
 img { max-width: 100%; display: block; }
 a { color: inherit; text-underline-offset: .22em; text-decoration-thickness: 1px; }

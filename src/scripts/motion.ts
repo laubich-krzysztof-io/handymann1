@@ -12,9 +12,10 @@
    a zapasowy licznik w <head> zdejmuje ją, gdyby ten plik się nie wczytał.
    ========================================================================= */
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+// ScrollTrigger dochodzi w osobnym pliku zaraz po otwarciu (mniej skryptu do przeliczenia na starcie)
+import type { ScrollTrigger as ScrollTriggerType } from 'gsap/ScrollTrigger';
+let ScrollTrigger: typeof ScrollTriggerType;
 import { SplitText } from 'gsap/SplitText';
-import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
 declare global {
@@ -33,18 +34,23 @@ if (reduce) {
   root.classList.remove('motion');
 } else {
   try {
-    gsap.registerPlugin(ScrollTrigger, SplitText);
-    smoothScroll();
+    gsap.registerPlugin(SplitText);
     // Podział na linie dopiero po wczytaniu fontów (inaczej linie łamią się inaczej), najwyżej 600 ms czekania
     const fonts = Promise.race([document.fonts?.ready, new Promise((r) => setTimeout(r, 600))]);
-    fonts.then(() => {
+    fonts.then(async () => {
       // Jeśli strona wczytała się tak wolno, że zapasowy licznik już odsłonił treść, nie animujemy otwarcia
       const entrance = root.classList.contains('motion');
-      root.classList.add('motion-ready');
-      paper();
       if (entrance) hero();
-      reveals();
-      magnetic();
+      // Reszta w małych porcjach, z oddaniem wątku przeglądarce między nimi:
+      // na słabszym telefonie strona od pierwszej chwili reaguje na dotyk (bez jednego długiego zadania)
+      await pause();
+      ({ ScrollTrigger } = await import('gsap/ScrollTrigger'));
+      gsap.registerPlugin(ScrollTrigger);
+      root.classList.add('motion-ready');
+      for (const step of [heroScroll, paper, ...reveals(), photos, magnetic, smoothScroll]) {
+        await pause();
+        step();
+      }
       ScrollTrigger.refresh();
     }).catch(fail);
   } catch (e) {
@@ -52,20 +58,34 @@ if (reduce) {
   }
 }
 
+/** Oddaje wątek przeglądarce (scheduler.yield, gdzie jest; inaczej następne zadanie) */
+function pause(): Promise<void> {
+  const s = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  return s?.yield ? s.yield() : new Promise((r) => setTimeout(r, 0));
+}
+
 function fail(e?: unknown) {
   root.classList.remove('motion', 'motion-ready');
   if (e) console.error(e);
 }
 
-/* ---------- Płynne przewijanie (tylko kółko myszy i gładzik; dotyk zostaje natywny) ---------- */
+/* ---------- Płynne przewijanie (tylko kółko myszy i gładzik; na dotyku Lenis nie jest nawet wczytywany) ---------- */
 function smoothScroll() {
-  const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((t) => lenis.raf(t * 1000));
-  gsap.ticker.lagSmoothing(0);
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  // Dotyk: bez Lenisa, skoki do sekcji natywnie płynne
+  if (!fine) { anchors((target) => { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); return Promise.resolve(); }); return; }
+  import('lenis').then(({ default: Lenis }) => {
+    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((t) => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+    // Odstęp pod nagłówkiem Lenis bierze sam ze scroll-padding-top w CSS
+    anchors((target) => new Promise((done) => lenis.scrollTo(target, { duration: 1.2, easing: (x) => 1 - Math.pow(1 - x, 4), onComplete: () => done() })));
+  }).catch(() => {});
+}
 
-  // Odnośniki do sekcji: płynnie, adres i fokus jak przy zwykłym skoku.
-  // Odstęp pod nagłówkiem Lenis bierze sam ze scroll-padding-top w CSS.
+/** Odnośniki do sekcji: płynny skok, adres w pasku i fokus jak przy zwykłym skoku */
+function anchors(go: (target: HTMLElement) => Promise<void>) {
   document.addEventListener('click', (e) => {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     const a = (e.target as Element).closest?.('a[href^="#"]') as HTMLAnchorElement | null;
@@ -74,15 +94,11 @@ function smoothScroll() {
     const target = id ? document.getElementById(id) : null;
     if (!target) return;
     e.preventDefault();
-    lenis.scrollTo(target, {
-      duration: 1.2,
-      easing: (x) => 1 - Math.pow(1 - x, 4),
-      onComplete: () => {
-        if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-        target.focus({ preventScroll: true });
-      },
-    });
     history.pushState(null, '', `#${id}`);
+    go(target).then(() => {
+      if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
+    });
   });
 }
 
@@ -168,7 +184,7 @@ function hero() {
   });
 
   let placed = false;
-  let drift: gsap.core.Tween | null = null;
+  heroEl = hero;
   SplitText.create(h1, {
     type: 'lines,words,chars',
     mask: 'lines',
@@ -182,13 +198,8 @@ function hero() {
         yPercent: 118, rotate: 9, transformOrigin: '0% 100%', duration: 1.25, stagger: 0.024, ease: EASE,
       });
       if (!placed) { tl.add(tw, 0.05); placed = true; }
-      // Przy przewijaniu linie rozjeżdżają się w przeciwne strony
-      drift?.scrollTrigger?.kill(); drift?.kill();
-      drift = gsap.to(self.masks, {
-        x: (i: number) => (i % 2 ? '7vw' : '-7vw'),
-        ease: 'none',
-        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
-      });
+      heroMasks = self.masks;
+      drift(); // po ponownym podziale (zmiana szerokości) linie dostają nowe przesunięcie
       return tw;
     },
   });
@@ -199,20 +210,34 @@ function hero() {
   if (proofLine) tl.fromTo(proofLine, { clipPath: 'inset(0 100% 0 0)', autoAlpha: 1 }, { clipPath: 'inset(0 0% 0 0)', duration: 1.1, ease: 'power3.inOut' }, 0.6);
   if (price.tracks.length) tl.add(roll(price, { duration: 1.9 }), 0.85);
   if (proofSub) tl.fromTo(proofSub, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.7 }, 1.5);
+}
 
-  // Głębia przy wyjściu z otwarcia: opis i cena odpływają wolniej niż tytuł
-  const depth = (el: HTMLElement | null, y: number) =>
-    el && gsap.to(el, { y, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
-  depth(hero.querySelector('.hero__main'), -40);
-  depth(proof, -90);
+/* Otwarcie przy przewijaniu (gdy ScrollTrigger już jest): linie nagłówka rozjeżdżają się, opis i cena odpływają wolniej */
+let heroEl: HTMLElement | null = null;
+let heroMasks: Element[] = [];
+let driftTween: gsap.core.Tween | null = null;
+const exit = () => ({ trigger: heroEl!, start: 'top top', end: 'bottom top', scrub: true });
+function drift() {
+  if (!ScrollTrigger || !heroEl || !heroMasks.length) return;
+  driftTween?.scrollTrigger?.kill(); driftTween?.kill();
+  driftTween = gsap.to(heroMasks, { x: (i: number) => (i % 2 ? '7vw' : '-7vw'), ease: 'none', scrollTrigger: exit() });
+}
+function heroScroll() {
+  if (!heroEl) return;
+  drift();
+  const depth = (el: Element | null, y: number) => el && gsap.to(el, { y, ease: 'none', scrollTrigger: exit() });
+  depth(heroEl.querySelector('.hero__main'), -40);
+  depth(heroEl.querySelector('.proof'), -90);
 }
 
 /* ---------- Przy przewijaniu ---------- */
 const at = (trigger: Element, start = 'top 86%') => ({ trigger, start, once: true });
 
-function reveals() {
-  // Tytuły sekcji i zdanie w kontakcie: linia po linii spod maski
-  document.querySelectorAll<HTMLElement>('main h2').forEach((el) => {
+/** Animacje przy przewijaniu jako osobne kroki (każdy uruchamiany w osobnym zadaniu) */
+function reveals(): (() => void)[] {
+  const steps: (() => void)[] = [];
+  // Tytuły sekcji i zdanie w kontakcie: linia po linii spod maski, każdy tytuł osobno
+  document.querySelectorAll<HTMLElement>('main h2').forEach((el) => steps.push(() => {
     SplitText.create(el, {
       type: 'lines',
       mask: 'lines',
@@ -222,8 +247,20 @@ function reveals() {
       onSplit: (self) =>
         gsap.from(self.lines, { yPercent: 110, duration: 1.15, stagger: 0.09, ease: EASE, scrollTrigger: at(el) }),
     });
-  });
+  }));
+  steps.push(
+    quoteStep,
+    rulesStep,
+    visitStep,
+    ...[...document.querySelectorAll('.rates .rates__row')].map((row, i) => () => rateStep(row, i)),
+    billStep,
+    telStep,
+  );
+  return steps;
+}
 
+let inked = false;
+function quoteStep() {
   // Zdanie o stałej opiece: atrament wypełnia słowa w tempie czytania (przewijania)
   const quote = document.querySelector<HTMLElement>('.care__quote');
   if (quote) {
@@ -232,19 +269,30 @@ function reveals() {
       wordsClass: 'wd',
       aria: 'none',
       autoSplit: true,
-      onSplit: (self) =>
-        gsap.fromTo(self.words, { opacity: 0.3 }, {
+      // Start od 52% atramentu: już wtedy kontrast ≥ 3:1 (norma WCAG AA dla dużego tekstu).
+      // Po pierwszym przeczytaniu zdanie zostaje pełne, także przy przewijaniu w górę.
+      onSplit: (self) => {
+        if (inked) return gsap.set(self.words, { opacity: 1 });
+        return gsap.fromTo(self.words, { opacity: 0.52 }, {
           opacity: 1, stagger: 0.1, ease: 'none',
-          scrollTrigger: { trigger: quote, start: 'top 85%', end: 'bottom 50%', scrub: 0.4 },
-        }),
+          scrollTrigger: {
+            trigger: quote, start: 'top 85%', end: 'bottom 50%', scrub: 0.4,
+            onLeave: (st) => { inked = true; st.kill(false); gsap.set(self.words, { opacity: 1 }); },
+          },
+        });
+      },
     });
   }
+}
 
+function rulesStep() {
   // Linie atramentu nad listami rysują się od lewej (jak linie w drukowanej karcie)
   document.querySelectorAll<HTMLElement>('[data-rule]').forEach((el) => {
     gsap.fromTo(el, { '--rule': 0 }, { '--rule': 1, duration: 1.4, ease: 'power3.inOut', scrollTrigger: at(el, 'top 90%') });
   });
+}
 
+function visitStep() {
   // Dziennik wizyty: wpisy pojawiają się po kolei, jak zapisywane
   const visit = document.querySelector('.visit');
   if (visit) {
@@ -252,18 +300,17 @@ function reveals() {
       autoAlpha: 0, y: 12, duration: 0.7, stagger: 0.14, ease: EASE, scrollTrigger: at(visit, 'top 80%'),
     });
   }
+}
 
+function rateStep(row: Element, i: number) {
   // Cennik: pozycje jedna pod drugą, a każda kwota dokręca się jak licznik
-  const rates = document.querySelector('.rates');
-  if (rates) {
-    rates.querySelectorAll('.rates__row').forEach((row, i) => {
-      const odo = odometer(row.querySelector('.rates__price > span:first-child'));
-      const tl = gsap.timeline({ scrollTrigger: at(row, 'top 88%'), delay: i === 0 ? 0 : 0.05 });
-      tl.from(row, { autoAlpha: 0, y: 20, duration: 0.9, ease: EASE });
-      if (odo.tracks.length) tl.add(roll(odo), 0.1);
-    });
-  }
+  const odo = odometer(row.querySelector('.rates__price > span:first-child'));
+  const tl = gsap.timeline({ scrollTrigger: at(row, 'top 88%'), delay: i === 0 ? 0 : 0.05 });
+  tl.from(row, { autoAlpha: 0, y: 20, duration: 0.9, ease: EASE });
+  if (odo.tracks.length) tl.add(roll(odo), 0.1);
+}
 
+function billStep() {
   // Przykładowy rachunek „drukuje się”: kartka, wiersze, na końcu suma (licznik) i status
   const sheet = document.querySelector<HTMLElement>('.bill__sheet');
   if (sheet) {
@@ -278,9 +325,9 @@ function reveals() {
     if (totalOdo.tracks.length) tl.add(roll(totalOdo, { duration: 1.5 }), '<');
     tl.from(status, { autoAlpha: 0, duration: 0.5, onComplete: () => status?.classList.add('is-live') }, '>-0.5');
   }
+}
 
-  photos();
-
+function telStep() {
   // Kulminacja: numer telefonu dokręca się cyfra po cyfrze
   const tel = document.querySelector<HTMLElement>('.direct__tel');
   const telOdo = odometer(tel);

@@ -120,8 +120,9 @@ const raw: Record<Lang, Content> = {
     htmlLang: 'pl',
     meta: {
       // „Złota rączka” tylko w tytule dla wyszukiwarki; na stronie mówimy „serwis”
-      title: 'Złota rączka Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
-      description: `Serwis techniczny i stała opieka nad obiektami: hydraulika, elektryka (uprawnienia SEP) i drobne naprawy dla pensjonatów, hoteli, apartamentów i domów, do ${R} km od Jeleniej Góry. Pierwsza godzina z dojazdem: ${zl(P.firstHour)} netto.`,
+      title: 'Złota rączka Jelenia Góra i Karkonosze | handyman.karkonosze',
+      // Do ~160 znaków, żeby Google pokazał całość; kwota z cennika (config.ts)
+      description: `Hydraulika, elektryka (SEP) i drobne naprawy dla pensjonatów, hoteli i domów w Karkonoszach. Stała opieka nad obiektem. Pierwsza godzina z dojazdem ${zl(P.firstHour)} netto.`,
     },
     brand: { sub: 'Serwis i opieka nad obiektami' },
     nav: { services: 'Zakres', care: 'Stała opieka', prices: 'Cennik', work: 'Realizacja' },

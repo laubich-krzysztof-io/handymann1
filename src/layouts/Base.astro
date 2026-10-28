@@ -3,6 +3,9 @@ import '@fontsource-variable/brygada-1918/wght.css';
 import '@fontsource-variable/brygada-1918/wght-italic.css';
 import '@fontsource-variable/albert-sans/wght.css';
 import '../styles/luxe.css';
+// Te dwa pliki niosą tekst otwarcia (łacina + polskie znaki): przeglądarka pobiera je od razu, nie po CSS
+import brygadaLatin from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-wght-normal.woff2?url';
+import brygadaLatinExt from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-ext-wght-normal.woff2?url';
 import { site, type Lang } from '../config';
 import { ORIGIN, jsonLd, ogLocale } from '../lib/seo';
 
@@ -35,6 +38,8 @@ const indexable = site.indexable && !noindex;
     <meta name="description" content={description} />
     <meta name="robots" content={indexable ? 'index, follow, max-image-preview:large' : noindex ? 'noindex, follow' : 'noindex, nofollow'} />
     <meta name="theme-color" content="#F7F4EE" />
+    <link rel="preload" href={brygadaLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={brygadaLatinExt} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonical} />
