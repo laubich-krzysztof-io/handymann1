@@ -448,22 +448,28 @@ main:focus, [role="tabpanel"]:focus { outline: none; }
 .zmap__peak text { font: italic 400 15px var(--serif); fill: var(--ink); }
 .zmap text { paint-order: stroke; stroke: rgba(255, 255, 255, .92); stroke-width: 4px; stroke-linejoin: round; }
 .zmap__cz, .zmap__note { stroke: none; }
-.zmap__town circle { stroke: var(--ink); stroke-width: 1.3; transition: r .25s var(--ease); }
-.zmap__town--z1 circle { fill: var(--ink); }
-.zmap__town--z2 circle, .zmap__town--z0 circle { fill: var(--card); }
-/* Na mapie tylko główne miejscowości; pozostałe pojawiają się po wybraniu w wyszukiwarce */
-.zmap__town:not(.is-major):not(.is-picked) { display: none; }
-.zmap__town text { font-size: 13px; fill: var(--ink); dominant-baseline: central; }
+/* Miejscowości: każdą można wskazać (kursor) albo dotknąć; wtedy pojawia się jej kontur */
+.zmap__town, .zmap__jg { pointer-events: none; }
+.zmap__dot { stroke: var(--ink); stroke-width: 1.3; transition: r .2s var(--ease), fill .2s var(--ease); }
+.zmap__town--z1 .zmap__dot { r: 2.6; fill: var(--ink); }
+.zmap__town--z2 .zmap__dot, .zmap__town--z0 .zmap__dot { r: 4; fill: var(--card); }
+.zmap__town text { font-size: 13px; fill: var(--ink); dominant-baseline: central; transition: opacity .15s var(--ease); }
 .zmap__town text.zmap__below { dominant-baseline: hanging; }
-.zmap__town text, .zmap__gmname { transition: opacity .2s var(--ease); }
-/* Po wybraniu miejscowości: tylko jej podpis i Jelenia Góra, reszta punktów bez nazw */
-.zmap.has-pick .zmap__town:not(.is-picked) text { opacity: 0; }
-.zmap.has-pick .zmap__gmname { opacity: .35; }
-.zmap__town.is-picked text { font-weight: 600; }
-.zmap__town.is-picked circle { r: 7; fill: var(--yellow); stroke-width: 2; }
-.zmap__jg circle { fill: var(--ink); }
+.zmap__town:not(.is-major) text { opacity: 0; }
+.zmap__town.is-on text { opacity: 1; font-weight: 600; }
+.zmap__town.is-on .zmap__dot { r: 5.5; }
+.zmap__town.is-picked .zmap__dot, .zmap__jg.is-picked .zmap__dot { r: 7; fill: #e9b400; stroke-width: 2; }
+.zmap .is-masked { opacity: 0 !important; }
+.zmap__gmname text { transition: opacity .15s var(--ease); }
+/* Kontur wskazanej miejscowości */
+.zmap__shape { fill: rgba(91, 98, 214, .42); stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; opacity: 0; transition: opacity .18s var(--ease); pointer-events: none; }
+.zmap__shape--z2, .zmap__shape--z0 { fill: rgba(255, 214, 0, .38); }
+.zmap__shape.is-on { opacity: 1; }
+.zmap__jg .zmap__dot { r: 6; fill: var(--ink); }
 .zmap__jg text { font: 700 17px var(--serif); fill: var(--ink); }
-.zmap__jg.is-picked circle { fill: var(--yellow); stroke: var(--ink); stroke-width: 2; }
+/* Podpowiedź nad mapą: nazwa wskazanej miejscowości i strefa */
+.zmap__hint { position: absolute; top: 1rem; left: 1rem; z-index: 1; max-width: calc(100% - 2rem); padding: .45rem .75rem; border-radius: var(--r); background: rgba(255, 255, 255, .94); box-shadow: 0 2px 10px rgba(0, 0, 0, .08); font-size: .84rem; line-height: 1.35; pointer-events: none; }
+.zmap__hint strong { font-weight: 600; }
 .zmap__legend { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1.4rem; padding: .7rem .6rem 0; font-size: .86rem; }
 .zmap__key { display: inline-block; width: .95rem; height: .95rem; margin-right: .45rem; vertical-align: -.12em; border: 1px solid var(--ink); border-radius: 2px; }
 .zmap__key--z1 { background: var(--lav); }
@@ -472,7 +478,7 @@ main:focus, [role="tabpanel"]:focus { outline: none; }
 /* Węższy ekran: wyszukiwarka, mapa, potem listy miejscowości */
 @media (max-width: 63.99rem) {
   .zones__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'check' 'map' 'lists'; grid-template-rows: none; }
-  .zones__map { position: static; }
+  .zones__map { position: relative; top: auto; }
 }
 /* Telefon: większe podpisy na mapie (widać tylko główne miejscowości i wybraną) */
 @media (max-width: 47.99rem) {
@@ -484,4 +490,5 @@ main:focus, [role="tabpanel"]:focus { outline: none; }
   .zmap text { stroke-width: 5px; }
   .zmap__src { margin-left: 0; }
   .zmap__gmname { display: none; }
+  .zmap__hint { top: .7rem; left: .7rem; font-size: .8rem; }
 }

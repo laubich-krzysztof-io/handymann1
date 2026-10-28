@@ -140,33 +140,72 @@ if (hero && contact && 'IntersectionObserver' in window) {
   new IntersectionObserver(([en]) => { inContact = en.isIntersecting; update(); }, { threshold: 0.1 }).observe(contact);
 }
 
-/* ---------- Strefy dojazdu: wyszukiwarka miejscowości, podświetlenie na mapie ---------- */
+/* ---------- Strefy dojazdu: wyszukiwarka miejscowości i mapa z konturami miejscowości ---------- */
 const check = document.querySelector<HTMLElement>('[data-check]');
 if (check) {
   const towns: [string, number][] = JSON.parse(check.dataset.towns || '[]');
   const input = check.querySelector<HTMLInputElement>('input')!;
   const out = check.querySelector<HTMLElement>('.check__result')!;
-  const map = document.querySelector<SVGElement>('[data-zmap]');
+  const map = document.querySelector<SVGSVGElement>('[data-zmap]');
+  const hint = document.querySelector<HTMLElement>('[data-zmap-hint]');
   const chips = [...document.querySelectorAll<HTMLButtonElement>('.chip[data-town]')];
+  const z1 = check.dataset.z1 || '';
+  const z2 = check.dataset.z2 || '';
   // Jak w Dyspozytorze: bez polskich znaków, małe litery, myślnik = spacja
-  const norm = (v: string) => v.toLowerCase().replace(/ł/g, 'l').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[-\s]+/g, ' ').trim();
+  const norm = (v: string) => v.toLowerCase().replace(/ł/g, 'l').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[-\s]+/g, ' ').trim();
   const index = towns.map(([name, zone]) => ({ name, zone, key: norm(name) }));
+  const zoneOf = (name: string) => index.find((t) => t.name === name)?.zone ?? 0;
+  const zoneText = (zone: number) => (zone === 1 ? `strefa 1, ${z1}` : zone === 2 ? `strefa 2, ${z2}` : 'dalej niż 30 km, dojazd do ustalenia');
+
+  /* --- mapa: wybrana (z pola lub kliknięcia) i wskazana kursorem miejscowość --- */
+  let picked: string | null = null;
+  let hovered: string | null = null;
+  const groups = map ? [...map.querySelectorAll<SVGGElement>('[data-town]')] : [];
+  const shapes = map ? [...map.querySelectorAll<SVGPathElement>('[data-shape]')] : [];
+  const labels = map ? [...map.querySelectorAll<SVGTextElement>('text')] : [];
   const jg = map?.querySelector('.zmap__jg');
-  const pick = (name: string | null) => {
-    map?.classList.toggle('has-pick', name !== null);
-    map?.querySelectorAll('[data-town]').forEach((g) => {
-      const on = g.getAttribute('data-town') === name;
-      g.classList.toggle('is-picked', on);
-      // Wybrana miejscowość rysowana nad pozostałymi podpisami
-      if (on && jg && g !== jg) jg.before(g);
+  const touch = !window.matchMedia('(hover: hover)').matches;
+  const hintIdle = touch ? 'Proszę dotknąć miejscowości na mapie, pokażę jej granice.' : (hint?.textContent || '');
+  if (hint) hint.textContent = hintIdle;
+  const overlap = (a: DOMRect, b: DOMRect) => a.x < b.x + b.width + 2 && b.x < a.x + a.width + 2 && a.y < b.y + b.height + 1 && b.y < a.y + a.height + 1;
+  const render = () => {
+    if (!map) return;
+    const on = hovered ?? picked;
+    groups.forEach((g) => {
+      const name = g.getAttribute('data-town');
+      g.classList.toggle('is-on', name === on);
+      g.classList.toggle('is-picked', name === picked);
+      // Wskazana miejscowość rysowana nad pozostałymi
+      if (name === on && jg && g !== jg) jg.before(g);
     });
-    chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.town === name)));
+    shapes.forEach((p) => p.classList.toggle('is-on', p.dataset.shape === on));
+    // Nazwy, które zasłaniałyby podpis wskazanej miejscowości, chowają się tylko na ten czas
+    const g = on ? groups.find((x) => x.getAttribute('data-town') === on) : null;
+    const active = g?.querySelector('text');
+    const boxes = g ? [active?.getBBox(), g.querySelector<SVGCircleElement>('.zmap__dot')?.getBBox()].filter(Boolean) as DOMRect[] : [];
+    labels.forEach((t) => {
+      const tb = t.getBBox() as DOMRect;
+      t.classList.toggle('is-masked', t !== active && boxes.some((bx) => overlap(bx, tb)));
+    });
+    if (hint) {
+      if (on) {
+        const b = document.createElement('strong');
+        b.textContent = on;
+        hint.replaceChildren(b, `: ${zoneText(zoneOf(on))}`);
+      } else hint.textContent = hintIdle;
+    }
   };
+
   const say = (zone: number | null, parts: (string | HTMLElement)[]) => {
     out.replaceChildren(...parts);
     if (zone === null) out.removeAttribute('data-zone'); else out.dataset.zone = String(zone);
   };
   const strong = (t: string) => { const b = document.createElement('strong'); b.textContent = t; return b; };
+  const pick = (name: string | null) => {
+    picked = name;
+    chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.town === name)));
+    render();
+  };
   const update = () => {
     const v = norm(input.value);
     if (!v) { say(null, []); pick(null); return; }
@@ -176,9 +215,9 @@ if (check) {
     if (hit) {
       pick(hit.name);
       say(hit.zone, hit.zone === 1
-        ? [strong(hit.name), `: strefa 1, ${check.dataset.z1}. Płacą Państwo tylko za czas pracy.`]
+        ? [strong(hit.name), `: strefa 1, ${z1}. Płacą Państwo tylko za czas pracy.`]
         : hit.zone === 2
-          ? [strong(hit.name), `: strefa 2, ${check.dataset.z2}.`]
+          ? [strong(hit.name), `: strefa 2, ${z2}.`]
           : [strong(hit.name), ': dalej niż 30 km, dojazd ustalam osobno. Proszę zapytać.']);
       return;
     }
@@ -187,6 +226,47 @@ if (check) {
     if (v.length >= 3) say(0, ['Tej miejscowości nie mam na liście. Do 30 km od Jeleniej Góry to strefa 2, dalej dojazd ustalam osobno. Proszę zapytać, sprawdzę.']);
     else say(null, []);
   };
+  const choose = (name: string) => { input.value = name; update(); };
   input.addEventListener('input', update);
-  chips.forEach((c) => c.addEventListener('click', () => { input.value = c.dataset.town || ''; update(); }));
+
+  // Przyciski z nazwami: kliknięcie wybiera, najechanie lub fokus pokazuje kontur na mapie
+  chips.forEach((c) => {
+    const name = c.dataset.town || '';
+    c.addEventListener('click', () => choose(name));
+    c.addEventListener('mouseenter', () => { hovered = name; render(); });
+    c.addEventListener('mouseleave', () => { hovered = null; render(); });
+    c.addEventListener('focus', () => { hovered = name; render(); });
+    c.addEventListener('blur', () => { hovered = null; render(); });
+  });
+  // Mapa: najbliższa miejscowość pod kursorem (do ok. 22 px) pokazuje kontur, kliknięcie lub dotknięcie ją wybiera
+  if (map) {
+    const pts = groups.map((g) => {
+      const c = g.querySelector<SVGCircleElement>('.zmap__dot')!;
+      return { name: g.getAttribute('data-town') || '', x: c.cx.baseVal.value, y: c.cy.baseVal.value };
+    });
+    const nearest = (e: PointerEvent | MouseEvent) => {
+      const m = map.getScreenCTM();
+      if (!m) return null;
+      const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
+      const limit = 22 / m.a;
+      let best: string | null = null;
+      let d = Infinity;
+      pts.forEach((t) => {
+        const dt = Math.hypot(t.x - p.x, t.y - p.y);
+        if (dt < d && dt <= limit) { d = dt; best = t.name; }
+      });
+      return best;
+    };
+    map.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const n = nearest(e);
+      map.style.cursor = n ? 'pointer' : '';
+      if (n !== hovered) { hovered = n; render(); }
+    });
+    map.addEventListener('pointerleave', () => { if (hovered) { hovered = null; render(); } });
+    map.addEventListener('click', (e) => {
+      const n = nearest(e);
+      if (n) { hovered = null; choose(n); }
+    });
+  }
 }

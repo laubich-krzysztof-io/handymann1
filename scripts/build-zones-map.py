@@ -96,6 +96,30 @@ EXPECT1 = {'Jelenia Góra', 'Cieplice', 'Sobieszów', 'Jagniątków', 'Podgórzy
            'Zachełmie', 'Borowice', 'Staniszów', 'Mysłakowice', 'Łomnica', 'Piechowice', 'Jeżów Sudecki', 'Stara Kamienica', 'Wojcieszyce'}
 for t in towns:
     if (t['zone'] == 1) != (t['name'] in EXPECT1): print('UWAGA, strefa z mapy inna niż w tabeli:', t['name'], t['zone'])
+# Kontury miejscowości (granice administracyjne z OpenStreetMap, przez Nominatim; już w pikselach tej mapy,
+# ten sam rzut co wyżej). Plik: scripts/data/kontury-miejscowosci.tsv (nazwa, relacja OSM, punkty x y …, wielokąty po „|”)
+import os
+KONTURY = os.path.join(os.path.dirname(__file__), 'data', 'kontury-miejscowosci.tsv')
+shapes = {}
+for line in open(KONTURY, encoding='utf-8'):
+    if not line.strip(): continue
+    name, osm, pts = line.rstrip('\n').split('\t')
+    d = ''
+    for part in pts.split('|'):
+        n = part.split()
+        d += 'M' + 'L'.join(f'{n[i]},{n[i + 1]}' for i in range(0, len(n), 2)) + 'Z'
+    shapes[name] = d
+    # kontrola: punkt miejscowości leży w jej konturze
+    polys = [Polygon([(float(n[i]), float(n[i + 1])) for i in range(0, len(n), 2)]) for n in (q.split() for q in pts.split('|'))]
+    t = next(t for t in towns if t['name'] == name)
+    if not any(pl.buffer(3).contains(Point(t['x'], t['y'])) for pl in polys):
+        # współrzędne z tabeli wypadają poza granicą wsi: punkt na mapie w środku konturu
+        from shapely.ops import polylabel
+        c = polylabel(max(polys, key=lambda q: q.area), 0.5)
+        print('punkt przesunięty do środka konturu:', name, (t['x'], t['y']), '->', (round(c.x, 1), round(c.y, 1)))
+        t['x'], t['y'] = round(c.x, 1), round(c.y, 1)
+for t in towns:
+    t['c'] = shapes[t['name']]
 jg = proj(LNG0, LAT0)
 sn = proj(15.7399, 50.7360)   # Śnieżka
 cz = proj(15.60, 50.705)      # podpis „Czechy”
@@ -118,7 +142,7 @@ data = {
     'czechy': {'x': round(cz[0], 1), 'y': round(cz[1], 1)},
     'towns': towns,
     'gmLabels': gm_labels,
-    'source': 'Granice gmin: Geoportal (PRG), 2025',
+    'source': 'Granice: Geoportal (PRG) 2025, © OpenStreetMap',
 }
 json.dump(data, open(OUT, 'w'), ensure_ascii=False, separators=(',', ':'))
 print(OUT, len(gminas), 'gmin', round(len(json.dumps(data)) / 1024), 'KB')

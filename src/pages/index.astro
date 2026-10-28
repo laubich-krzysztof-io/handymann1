@@ -282,6 +282,7 @@ const work = [
           </div>
 
           <figure class="zones__map card" data-reveal>
+            <p class="zmap__hint" data-zmap-hint aria-hidden="true">Proszę wskazać miejscowość na mapie, pokażę jej granice.</p>
             <svg class="zmap" viewBox={`${vx} ${vy} ${vw} ${vh}`} role="img" aria-labelledby="zmap-t zmap-d" data-zmap>
               <title id="zmap-t">Mapa stref dojazdu wokół Jeleniej Góry</title>
               <desc id="zmap-d">Strefa 1, dojazd w cenie: {site.zones.one}. Strefa 2, {pr.zones.items[1].price}: pozostała część Polski w promieniu 30 km od Jeleniej Góry. Na południu granica z Czechami i Śnieżka.</desc>
@@ -292,6 +293,7 @@ const work = [
               <g class="zmap__gm" clip-path="url(#zmap-c)">{zm.gminas.map((g) => <path d={g.d} />)}</g>
               <path class="zmap__z1" d={zm.zone1} />
               <path class="zmap__border" d={zm.poland} />
+              <g class="zmap__shapes" aria-hidden="true">{zm.towns.map((tw) => <path class:list={['zmap__shape', `zmap__shape--z${tw.zone}`]} data-shape={tw.name} d={tw.c} />)}</g>
               <g class="zmap__gmname" aria-hidden="true">{zm.gmLabels.map((g) => <text x={g.x} y={g.y} text-anchor="middle">{g.name}</text>)}</g>
               <circle class="zmap__ring" cx={zm.circle.cx} cy={zm.circle.cy} r={zm.circle.r} />
               <text class="zmap__note" x={zm.note.x} y={zm.note.y}>30 km</text>
@@ -302,14 +304,14 @@ const work = [
               </g>
               {zm.towns.map((tw) => tw.name === 'Jelenia Góra' ? null : (
                 <g class:list={['zmap__town', `zmap__town--z${tw.zone}`, { 'is-major': tw.major }]} data-town={tw.name}>
-                  <circle cx={tw.x} cy={tw.y} r="4" />
+                  <circle class="zmap__dot" cx={tw.x} cy={tw.y} r="4" />
                   {tw.side === 'below'
                     ? <text class="zmap__below" x={tw.x} y={tw.y + 8} text-anchor="middle">{tw.name}</text>
                     : <text x={tw.x + (tw.side === 'start' ? 9 : -9)} y={tw.y} text-anchor={tw.side}>{tw.name}</text>}
                 </g>
               ))}
               <g class="zmap__jg" data-town="Jelenia Góra">
-                <circle cx={zm.jg.x} cy={zm.jg.y} r="7" />
+                <circle class="zmap__dot" cx={zm.jg.x} cy={zm.jg.y} r="6" />
                 <text x={zm.jg.x + 12} y={zm.jg.y - 10}>Jelenia Góra</text>
               </g>
             </svg>
