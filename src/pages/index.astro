@@ -57,7 +57,7 @@ const photos = [
           <h2 id="uslugi-h">{t.services.title}</h2>
           <p class="lead">{t.services.lead}</p>
         </div>
-        <ul class="svc">
+        <ul class="svc" data-rule>
           {t.services.items.map((s) => (
             <li class="svc__item">
               <h3>{s.name}</h3>
@@ -78,7 +78,7 @@ const photos = [
         </div>
         <div class="care__body">
           <div class="care__main">
-            <ul class="care__points">
+            <ul class="care__points" data-rule>
               {t.care.points.map((p) => (
                 <li>
                   <h3>{p.title}</h3>
@@ -88,7 +88,7 @@ const photos = [
             </ul>
             <a class="btn" href="#kontakt" data-topic="1">{t.care.cta}</a>
           </div>
-          <aside class="visit" aria-labelledby="visit-h">
+          <aside class="visit" aria-labelledby="visit-h" data-rule>
             <p class="visit__head">
               <span class="visit__title" id="visit-h">{t.care.visit.title}</span>
               <span class="label">{t.care.visit.label}</span>
@@ -116,7 +116,7 @@ const photos = [
 
         <div class="price__rates">
           <p class="rates__legend">{pr.fine}</p>
-          <dl class="rates">
+          <dl class="rates" data-rule>
             {pr.rates.map((r) => (
               <div class="rates__row">
                 <dt>{r.label}{r.note && <span class="rates__note">{r.note}</span>}</dt>
@@ -178,14 +178,14 @@ const photos = [
         <div class="work__row">
           {photos.map((p, i) => (
             <figure class:list={['work__photo', { 'work__photo--wide': i === 0 }]} style={`--ar: ${(p.w / p.h).toFixed(3)}`}>
-              <img
+              <div class="work__frame"><img
                 src={`/img/mural-${p.id}-1600.webp`}
                 srcset={`/img/mural-${p.id}-900.webp 900w, /img/mural-${p.id}-1600.webp 1600w`}
                 sizes={i === 0 ? '(min-width: 64rem) 50vw, 92vw' : '(min-width: 64rem) 25vw, 46vw'}
                 width={p.w} height={p.h}
                 alt={t.work.photos[p.id].alt}
                 loading="lazy" decoding="async"
-              />
+              /></div>
               <figcaption>{t.work.photos[p.id].caption}</figcaption>
             </figure>
           ))}
@@ -199,7 +199,7 @@ const photos = [
           <h2 id="pytania-h">{t.faq.title}</h2>
           <a class="text-link" href="#kontakt">{t.faq.more}</a>
         </div>
-        <div class="faq__list">
+        <div class="faq__list" data-rule>
           {t.faq.items.map((f) => (
             <details class="faq__item">
               <summary>
@@ -216,7 +216,7 @@ const photos = [
       <div class="wrap contact__in">
         <div class="contact__lead">
           <h2 id="kontakt-h" class="h-statement">{t.contact.title}</h2>
-          <ol class="steps">
+          <ol class="steps" data-rule>
             {t.contact.steps.map((s) => (
               <li>
                 <h3>{s.title}</h3>
@@ -226,7 +226,7 @@ const photos = [
           </ol>
           <div class="direct">
             <p class="label">{t.contact.direct}</p>
-            <a class="direct__tel" href={`tel:${tel}`}><span class="direct__cc">{cc}</span>{local}</a>
+            <a class="direct__tel" href={`tel:${tel}`} aria-label={site.phone}><span class="direct__cc">{cc}</span>{local}</a>
             <p class="direct__links">
               <a href={wa} target="_blank" rel="noopener">{t.contact.whatsappDirect}</a>
               <a href={`mailto:${site.email}`}>{site.email}</a>

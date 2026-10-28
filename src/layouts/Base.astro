@@ -54,8 +54,18 @@ const indexable = site.indexable && !noindex;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     {ld && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
+    <!-- Ruch: otwarcie ukryte tylko do startu animacji; gdyby skrypt się nie wczytał, treść pokaże się po 2,5 s -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        d.classList.add('motion');
+        window.__motionFallback = setTimeout(function () { d.classList.remove('motion'); }, 2500);
+      })();
+    </script>
   </head>
   <body>
     <slot />
+    <script>import '../scripts/motion';</script>
   </body>
 </html>

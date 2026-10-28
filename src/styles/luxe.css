@@ -70,16 +70,19 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 /* Przyciski: płaskie, bez zaokrągleń, litery jak na szyldzie */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; max-width: 100%; min-height: 3.25rem;
-  padding: .85rem 1.8rem; border: 1px solid var(--spruce); background: var(--spruce); color: var(--on-spruce);
+  padding: .85rem 1.8rem; border: 1px solid var(--spruce); color: var(--on-spruce);
+  background: linear-gradient(var(--spruce), var(--spruce)) 0 100% / 100% 100% no-repeat transparent;
   font-weight: 500; font-size: .9rem; line-height: 1.15; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; text-align: center; cursor: pointer;
-  transition: background .35s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out);
+  transition: background-size .55s var(--ease-out), color .35s var(--ease-out), border-color .35s var(--ease-out);
 }
-.btn--ghost { background: transparent; color: var(--spruce); }
+.btn:active { transform: translateY(1px); }
+.btn--ghost { background-size: 100% 0; color: var(--spruce); }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .9rem 1.8rem; }
 .call-link { display: inline-flex; align-items: center; min-height: 3rem; font-size: 1.25rem; text-decoration: underline; text-decoration-color: var(--spruce); text-underline-offset: .3em; }
 @media (hover: hover) {
-  .btn:hover { background: transparent; color: var(--spruce); }
-  .btn--ghost:hover { background: var(--spruce); color: var(--on-spruce); }
+  /* Kolor spływa w dół i odsłania len; w odwrotnym przycisku narasta od dołu */
+  .btn:hover { background-size: 100% 0; color: var(--spruce); }
+  .btn--ghost:hover { background-size: 100% 100%; color: var(--on-spruce); }
   .call-link:hover, .text-link:hover { text-decoration-thickness: 2px; }
 }
 
@@ -105,13 +108,13 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 .nav__extra { display: none; }
 .top__end { display: flex; align-items: center; gap: 1.5rem; flex: none; }
 .wa-link { display: inline-flex; align-items: center; min-height: 2.75rem; font-size: .82rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); text-decoration: underline; text-decoration-color: var(--spruce); text-underline-offset: .5em; }
-.cta { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.2rem; border: 1px solid var(--spruce); background: var(--spruce); color: var(--on-spruce); font-size: .82rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; white-space: nowrap; transition: background .35s var(--ease-out), color .35s var(--ease-out); }
+.cta { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.2rem; border: 1px solid var(--spruce); background: linear-gradient(var(--spruce), var(--spruce)) 0 100% / 100% 100% no-repeat transparent; color: var(--on-spruce); font-size: .82rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; white-space: nowrap; transition: background-size .55s var(--ease-out), color .35s var(--ease-out); }
 .burger { display: none; min-width: 5.4rem; min-height: 2.75rem; padding: 0 .2rem; border: 0; background: none; color: var(--ink); cursor: pointer; font-weight: 500; font-size: .82rem; line-height: 1; letter-spacing: .12em; text-transform: uppercase; text-align: right; }
 .top.is-open .burger__label { text-decoration: underline; text-underline-offset: .5em; text-decoration-color: var(--spruce); }
 @media (hover: hover) {
   .nav__link:hover::after { transform: scaleX(1); }
   .wa-link:hover { color: var(--spruce); }
-  .cta:hover { background: transparent; color: var(--spruce); }
+  .cta:hover { background-size: 100% 0; color: var(--spruce); }
 }
 @media (max-width: 75.99rem) {
   .burger { display: inline-grid; place-items: center end; }
@@ -216,6 +219,8 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 .bill__lines .bill__total > * { padding-top: 1rem; border-top: 1px solid var(--ink); font-family: var(--serif); font-size: 1.8rem; font-weight: 400; letter-spacing: -0.02em; }
 .bill__status { margin-top: 1rem; color: var(--spruce); }
 .bill__status::before { content: ''; display: inline-block; width: .45em; height: .45em; margin-right: .55em; vertical-align: .12em; border-radius: 50%; background: currentColor; }
+.bill__status.is-live::before { animation: settle 1.6s var(--ease-out) 1; }
+@keyframes settle { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent); } 100% { box-shadow: 0 0 0 .9em transparent; } }
 .bill__note { font-family: var(--serif); font-style: italic; font-size: 1rem; color: var(--muted); }
 @media (min-width: 64rem) {
   .price { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--gap); }
@@ -230,7 +235,8 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 .work__row { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(.8rem, 2vw, 1.6rem); }
 .work__photo { display: grid; gap: .6rem; align-content: start; margin: 0; }
 .work__photo--wide { grid-column: 1 / -1; }
-.work__photo img { width: 100%; height: auto; background: var(--stone); }
+.work__frame { overflow: clip; background: var(--stone); }
+.work__photo img { width: 100%; height: auto; background: var(--stone); transform-origin: 50% 100%; }
 .work__photo figcaption { font-style: italic; font-size: 1rem; line-height: 1.4; color: var(--muted); }
 @media (min-width: 48rem) {
   .work__row { display: flex; align-items: flex-start; }
@@ -324,8 +330,52 @@ input, select, textarea { caret-color: var(--spruce); accent-color: var(--spruce
 .lost { display: grid; gap: 1.5rem; justify-items: start; }
 .lost .actions { margin-top: .5rem; }
 
+/* =========================================================================
+   Ruch (scripts/motion.ts + natywne CSS). Wszystko poniżej działa tylko bez „ograniczonego ruchu”.
+   ========================================================================= */
+/* Maska linii z zapasem na polskie znaki (Ś, Ż nad linią, ogonki ą, ę pod nią) */
+.ln-mask { padding-block: .08em .16em; margin-block: -.08em -.16em; }
+.ch-mask { padding-block: .06em .12em; margin-block: -.06em -.12em; }
+
+/* Do startu animacji otwarcie jest niewidoczne (zapasowy licznik w <head> odsłania je po 2,5 s) */
+.motion [data-hero] h1,
+.motion [data-hero] .lead,
+.motion [data-hero-actions],
+.motion .proof__line,
+.motion .proof__sub { visibility: hidden; }
+
+/* Linia atramentu nad listą rysuje się od lewej; bez skryptu zostaje zwykła ramka */
+.motion-ready [data-rule] { position: relative; border-top-color: transparent; }
+.motion-ready [data-rule]::before { content: ''; position: absolute; inset: -1px 0 auto; height: 1px; background: var(--ink); transform: scaleX(var(--rule, 0)); transform-origin: left; pointer-events: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Pasek postępu czytania pod nagłówkiem: natywna animacja sterowana przewijaniem */
+  @supports (animation-timeline: scroll()) {
+    .top::after { content: ''; position: absolute; inset: auto 0 -1px; height: 1px; background: var(--spruce); transform: scaleX(0); transform-origin: left; animation: read-progress linear both; animation-timeline: scroll(root block); }
+    @keyframes read-progress { to { transform: scaleX(1); } }
+  }
+
+  /* Pytania otwierają się płynnie (natywnie: interpolate-size + ::details-content) */
+  @supports (interpolate-size: allow-keywords) and selector(::details-content) {
+    :root { interpolate-size: allow-keywords; }
+    .faq__item::details-content { block-size: 0; overflow: clip; opacity: 0; transition: block-size .5s var(--ease-out), opacity .35s var(--ease-out), content-visibility .5s allow-discrete; }
+    .faq__item[open]::details-content { block-size: auto; opacity: 1; }
+  }
+
+  /* Przejście między stroną główną a polityką prywatności (View Transitions między dokumentami) */
+  @view-transition { navigation: auto; }
+  .top { view-transition-name: top; }
+  ::view-transition-old(root) { animation: vt-out .28s cubic-bezier(.4, 0, 1, 1) both; }
+  ::view-transition-new(root) { animation: vt-in .6s var(--ease-out) both; }
+  @keyframes vt-out { to { opacity: 0; transform: translateY(-.6rem); } }
+  @keyframes vt-in { from { opacity: 0; transform: translateY(1.2rem); } }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .top, .brand__mark, .nav, .nav__link::after, .quick, .btn, .cta, .faq__sign::before, .faq__sign::after { transition: none !important; }
+  .top, .brand__mark, .nav, .nav__link::after, .quick, .faq__sign::before, .faq__sign::after { transition: none !important; }
+  /* Przyciski zmieniają kolor bez ruchu tła */
+  .btn, .cta { transition: color .2s, background-size 0s !important; }
+  .btn:active { transform: none; }
 }
 .care > *, .care__body > *, .contact__in > *, .hero__in > *, .hero__side > *, .price > * { min-width: 0; }
