@@ -13,7 +13,7 @@ Primary: owners and managers of better guesthouses, small hotels (incl. 4-star),
 handyman.karkonosze is one craftsman's repair and property-care service: plumbing, electrics (SEP licence up to 1 kV), installation and small renovations, plus regular property care (walk-rounds on a set rhythm, a defect list after each visit, one phone number in season). Success: an owner reports a fault or asks about regular care by phone, WhatsApp or the form.
 
 ## Positioning
-The same person every time, who knows the property; faults are logged and fixed before guests notice; transparent published rates (net, gross with 23% VAT) and a worked sample bill. Within 30 km of Jelenia Góra.
+The same person every time, who knows the property; faults are logged and fixed before guests notice; transparent published rates (net, gross with 23% VAT) and a worked sample bill. Within 15 km of Jelenia Góra (straight line), plus all of Szklarska Poręba; no travel beyond that.
 
 ## Operating Context
 Season-driven hospitality; reports arrive by phone, WhatsApp (often with a photo) or the site form, which hands the message to WhatsApp or e-mail. Quote from a photo, exact quote on site, invoice with labour and materials listed separately. Polish-only site and service (German and English versions removed on the user's request, 2026-10-28).

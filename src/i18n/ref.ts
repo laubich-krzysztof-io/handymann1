@@ -60,14 +60,14 @@ export const pillars = [
 export const priceCards = [
   { badge: 'Strefa 1', title: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: `${money(gross(P.firstHour))} brutto`, note: 'Dojazd w cenie: Jelenia Góra i najbliższa okolica.', topic: 0 },
   { badge: 'Robocizna', title: 'Każde kolejne rozpoczęte 30 minut', price: zl(P.halfHour), gross: `${money(gross(P.halfHour))} brutto`, note: 'Liczone od pierwszej minuty po pierwszej godzinie.', topic: 0 },
-  { badge: 'Strefa 2', title: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))} brutto`, note: 'Np. Karpacz, Kowary, Szklarska Poręba, Świeradów-Zdrój. Raz za wizytę.', topic: 0, href: '#strefy' },
+  { badge: 'Strefa 2', title: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))} brutto`, note: 'Np. Karpacz, Kowary, Szklarska Poręba, Wleń. Raz za wizytę.', topic: 0, href: '#strefy' },
   { badge: 'Miesięcznie', title: t.pricing.care.title, price: `od ${zl(P.careFrom)}`, gross: `od ${money(gross(P.careFrom))} brutto`, note: `${P.careHours} godziny pracy, dojazdy w cenie, reakcja w ciągu ${P.careResponseH} godzin.`, topic: 1 },
 ];
 
 /** Liczby (w referencji: pas z sześcioma kartami) — tylko fakty z cennika i opisu usług */
 export const stats = [
   { value: String(P.firstHour), unit: 'zł', label: 'pierwsza godzina z dojazdem, netto', icon: 'coin' },
-  { value: '30', unit: 'km', label: 'od Jeleniej Góry, dwie strefy dojazdu', icon: 'pin' },
+  { value: String(site.radiusKm), unit: 'km', label: 'od Jeleniej Góry, dwie strefy dojazdu', icon: 'pin' },
   { value: String(P.careResponseH), unit: 'h', label: 'reakcja przy stałej opiece, także w weekendy', icon: 'clock' },
   { value: '1', unit: 'kV', label: 'uprawnienia SEP do prac elektrycznych', icon: 'bolt' },
   { value: String(P.careHours), unit: 'h', label: 'pracy w miesięcznym pakiecie opieki', icon: 'house' },

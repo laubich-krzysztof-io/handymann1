@@ -490,5 +490,5 @@ main:focus, [role="tabpanel"]:focus { outline: none; }
   .zmap text { stroke-width: 5px; }
   .zmap__src { margin-left: 0; }
   .zmap__gmname { display: none; }
-  .zmap__hint { top: .7rem; left: .7rem; font-size: .8rem; }
+  .zmap__hint { position: static; max-width: none; margin: .2rem .2rem .6rem; box-shadow: none; background: var(--bg); font-size: .85rem; }
 }

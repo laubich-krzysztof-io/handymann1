@@ -151,11 +151,12 @@ if (check) {
   const chips = [...document.querySelectorAll<HTMLButtonElement>('.chip[data-town]')];
   const z1 = check.dataset.z1 || '';
   const z2 = check.dataset.z2 || '';
+  const km = check.dataset.km || '15';
   // Jak w Dyspozytorze: bez polskich znaków, małe litery, myślnik = spacja
   const norm = (v: string) => v.toLowerCase().replace(/ł/g, 'l').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[-\s]+/g, ' ').trim();
   const index = towns.map(([name, zone]) => ({ name, zone, key: norm(name) }));
   const zoneOf = (name: string) => index.find((t) => t.name === name)?.zone ?? 0;
-  const zoneText = (zone: number) => (zone === 1 ? `strefa 1, ${z1}` : zone === 2 ? `strefa 2, ${z2}` : 'dalej niż 30 km, dojazd do ustalenia');
+  const zoneText = (zone: number) => (zone === 1 ? `strefa 1, ${z1}` : zone === 2 ? `strefa 2, ${z2}` : 'tu nie dojeżdżam');
 
   /* --- mapa: wybrana (z pola lub kliknięcia) i wskazana kursorem miejscowość --- */
   let picked: string | null = null;
@@ -218,12 +219,12 @@ if (check) {
         ? [strong(hit.name), `: strefa 1, ${z1}. Płacą Państwo tylko za czas pracy.`]
         : hit.zone === 2
           ? [strong(hit.name), `: strefa 2, ${z2}.`]
-          : [strong(hit.name), ': dalej niż 30 km, dojazd ustalam osobno. Proszę zapytać.']);
+          : [strong(hit.name), `: tu nie dojeżdżam. Obsługuję Jelenią Górę i okolice do ${km} km.`]);
       return;
     }
     pick(null);
     if (starts.length > 1 && v.length >= 2) { say(null, [`Pasuje kilka miejscowości: ${starts.slice(0, 4).map((t) => t.name).join(', ')}…`]); return; }
-    if (v.length >= 3) say(0, ['Tej miejscowości nie mam na liście. Do 30 km od Jeleniej Góry to strefa 2, dalej dojazd ustalam osobno. Proszę zapytać, sprawdzę.']);
+    if (v.length >= 3) say(0, [`Tej miejscowości nie mam na liście. Dojeżdżam do ${km} km od Jeleniej Góry (w linii prostej). Jeśli to bliżej, proszę zapytać, sprawdzę.`]);
     else say(null, []);
   };
   const choose = (name: string) => { input.value = name; update(); };

@@ -7,8 +7,8 @@ export const site = {
   // Obszar działania: promień od Jeleniej Góry (do danych strukturalnych i llms.txt).
   // Na stronie te same miejscowości są wpisane w jednym zdaniu w src/i18n/content.ts (pricing.area).
   center: { name: 'Jelenia Góra', lat: 50.9044, lng: 15.7194 },
-  radiusKm: 30,
-  areas: ['Jelenia Góra', 'Karpacz', 'Szklarska Poręba', 'Świeradów-Zdrój', 'Podgórzyn', 'Mysłakowice', 'Kowary', 'Piechowice'],
+  radiusKm: 15, // w linii prostej od centrum; dalej nie dojeżdżam (Karpacz, Kowary i Szklarska Poręba w całości są w strefie 2)
+  areas: ['Jelenia Góra', 'Karpacz', 'Szklarska Poręba', 'Kowary', 'Podgórzyn', 'Mysłakowice', 'Piechowice', 'Janowice Wielkie'],
   region: 'Karkonosze',
   // Cennik w złotych NETTO (bez VAT). Strona pokazuje obok cenę brutto z vatPct.
   // Zmiana tutaj zmienia sekcję „Cennik”, przykładowy rachunek, pytania, opis w Google i dane strukturalne.
@@ -29,7 +29,9 @@ export const site = {
   // Dyspozytor ma te same strefy w lib/area.ts.
   zones: {
     one: 'Jelenia Góra z Cieplicami i Sobieszowem oraz gminy Podgórzyn, Mysłakowice, Piechowice, Jeżów Sudecki i Stara Kamienica',
-    two: 'Karpacz, Kowary, Szklarska Poręba, Świeradów-Zdrój, Janowice Wielkie, Lwówek Śląski, Kamienna Góra i inne miejscowości do 30 km od Jeleniej Góry',
+    two: 'Karpacz, Kowary, Szklarska Poręba, Janowice Wielkie, Wleń i inne miejscowości do 15 km od Jeleniej Góry',
+    // Poza strefami nie dojeżdżam (np. Świeradów-Zdrój, Lwówek Śląski, Kamienna Góra)
+    outside: 'Dalej nie dojeżdżam, np. do Świeradowa-Zdroju, Lwówka Śląskiego czy Kamiennej Góry.',
   },
   // Kontakt (format międzynarodowy)
   phone: '+48 537 419 388',
