@@ -35,8 +35,8 @@ export const site = {
   contactReady: true,
   // Zdjęcia realizacji: wrzuć pliki do public/img/ i dopisz tutaj.
   // Dopóki lista jest pusta, sekcja „Realizacje” jest ukryta.
-  gallery: [] as { src: string; alt: { pl: string; de: string; en: string } }[],
+  gallery: [] as { src: string; alt: string }[],
 };
 
-export const locales = ['pl', 'de', 'en'] as const;
+export const locales = ['pl'] as const;
 export type Lang = (typeof locales)[number];

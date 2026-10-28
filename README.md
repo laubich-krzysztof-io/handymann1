@@ -1,6 +1,6 @@
 # Handyman
 
-Strona wizytówkowa (PL / DE / EN) dla marki Handyman: usługi dla pensjonatów, małych hoteli, firm i domów w Karkonoszach.
+Strona wizytówkowa (tylko po polsku) dla marki Handyman: usługi dla pensjonatów, małych hoteli, firm i domów w Karkonoszach.
 
 Astro, statyczny build, wdrożenie na Vercel.
 
@@ -17,4 +17,4 @@ npm run build
 - `src/config.ts`: telefon, WhatsApp, e-mail, dane firmy do stopki.
 - `src/config.ts` → `gallery`: zdjęcia realizacji (pliki do `public/img/`). Dopóki lista jest pusta, sekcja „Realizacje” jest ukryta.
 - `astro.config.mjs` → `site`: docelowa domena.
-- `src/i18n/content.ts`: teksty we wszystkich trzech językach.
+- `src/i18n/content.ts`: teksty strony.

@@ -3,7 +3,7 @@ import '@fontsource-variable/brygada-1918/wght.css';
 import '@fontsource-variable/brygada-1918/wght-italic.css';
 import '@fontsource-variable/albert-sans/wght.css';
 import '../styles/luxe.css';
-import { locales, site, type Lang } from '../config';
+import { site, type Lang } from '../config';
 import { ORIGIN, jsonLd, ogLocale } from '../lib/seo';
 
 interface Props {
@@ -13,16 +13,15 @@ interface Props {
   description: string;
   /** Opis obrazka OG (co na nim jest), nie powtórka tytułu */
   imageAlt: string;
-  /** Ścieżka tej samej strony w każdym języku (canonical, hreflang). Domyślnie strona główna. */
-  paths?: Record<Lang, string>;
+  /** Ścieżka strony (canonical). Domyślnie strona główna. */
+  path?: string;
   /** Dane strukturalne; domyślnie graf firmy dla strony głównej, null = bez JSON-LD */
   ld?: unknown;
   /** Strona techniczna (np. 404): zawsze poza indeksem */
   noindex?: boolean;
 }
-const { lang, htmlLang, title, description, imageAlt, noindex = false } = Astro.props;
-const paths = Astro.props.paths ?? (Object.fromEntries(locales.map((l) => [l, `/${l}/`])) as Record<Lang, string>);
-const canonical = `${ORIGIN}${paths[lang]}`;
+const { lang, htmlLang, title, description, imageAlt, noindex = false, path = '/' } = Astro.props;
+const canonical = `${ORIGIN}${path}`;
 const ogImage = `${ORIGIN}/img/og.png`;
 const ld = Astro.props.ld === undefined ? jsonLd(lang) : Astro.props.ld;
 const indexable = site.indexable && !noindex;
@@ -39,8 +38,6 @@ const indexable = site.indexable && !noindex;
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonical} />
-    {!noindex && locales.map((l) => <link rel="alternate" hreflang={l} href={`${ORIGIN}${paths[l]}`} />)}
-    {!noindex && <link rel="alternate" hreflang="x-default" href={`${ORIGIN}${paths.pl}`} />}
     <link rel="sitemap" href="/sitemap.xml" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
@@ -48,7 +45,6 @@ const indexable = site.indexable && !noindex;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={ogLocale[lang]} />
-    {locales.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={ogLocale[l]} />)}
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />

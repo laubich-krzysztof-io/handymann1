@@ -3,10 +3,9 @@ import { site, type Lang } from '../config';
 // Kwoty z config.ts, z twardą spacją przed walutą (cena nie rozpada się między wiersze)
 const P = site.pricing;
 const zl = (n: number) => `${n}\u00a0zł`;
-// Kwota z groszami w zapisie danego języka (86,10 / 86.10), bez groszy, gdy całe złote
-const loc: Record<Lang, string> = { pl: 'pl-PL', de: 'de-DE', en: 'en-GB' };
-const money = (n: number, lang: Lang) =>
-  `${new Intl.NumberFormat(loc[lang], { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 }).format(n)}\u00a0zł`;
+// Kwota z groszami (86,10), bez groszy, gdy całe złote
+const money = (n: number) =>
+  `${new Intl.NumberFormat('pl-PL', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 }).format(n)}\u00a0zł`;
 const gross = (n: number) => Math.round(n * (100 + P.vatPct)) / 100;
 const R = site.radiusKm;
 // Przykładowy rachunek: 1 h 20 min pracy = pierwsza godzina + jedno rozpoczęte pół godziny + część
@@ -14,7 +13,6 @@ const BILL_PART = 189;
 const BILL_NET = P.firstHour + P.halfHour + BILL_PART;
 const BILL_VAT = Math.round(BILL_NET * P.vatPct) / 100;
 const BILL_GROSS = Math.round((BILL_NET + BILL_VAT) * 100) / 100;
-const h12 = (h: number) => `${h % 12 || 12}\u00a0${h < 12 ? 'am' : 'pm'}`;
 // Polska odmiana liczebnika: 1 godzina, 2–4 godziny, 5+ godzin (12–14 też „godzin”)
 const plHours = (n: number) =>
   n === 1 ? 'godzina' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'godziny' : 'godzin';
@@ -197,8 +195,8 @@ const raw: Record<Lang, Content> = {
       title: 'Ile to kosztuje',
       lead: 'Płacisz za czas pracy według stawek poniżej. Orientacyjną wycenę dostajesz ze zdjęcia, zanim przyjadę.',
       rates: [
-        { label: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: money(gross(P.firstHour), 'pl') },
-        { label: 'Każde kolejne rozpoczęte 30\u00a0minut', price: zl(P.halfHour), gross: money(gross(P.halfHour), 'pl') },
+        { label: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: money(gross(P.firstHour)) },
+        { label: 'Każde kolejne rozpoczęte 30\u00a0minut', price: zl(P.halfHour), gross: money(gross(P.halfHour)) },
         { label: 'Części i materiały', price: 'po cenie zakupu', note: 'Paragon lub fakturę zakupu dołączam do rachunku.', text: true },
         { label: 'Pilne zlecenie, tego samego dnia', price: `+${P.urgentPct}%`, extra: true },
         { label: `W nocy (${P.night.from}:00–${P.night.to}:00) i w święta`, price: `+${P.nightPct}%`, extra: true },
@@ -208,7 +206,7 @@ const raw: Record<Lang, Content> = {
       care: {
         title: 'Stała opieka nad obiektem',
         price: `od ${zl(P.careFrom)}`,
-        gross: `od ${money(gross(P.careFrom), 'pl')}`,
+        gross: `od ${money(gross(P.careFrom))}`,
         per: 'miesięcznie',
         points: [
           `${P.careHours} ${plHours(P.careHours)} pracy w miesiącu`,
@@ -229,8 +227,8 @@ const raw: Record<Lang, Content> = {
           ['Bateria prysznicowa (cena zakupu)', zl(BILL_PART)],
         ],
         subtotal: ['Razem netto', zl(BILL_NET)],
-        vat: [`VAT ${P.vatPct}%`, money(BILL_VAT, 'pl')],
-        total: ['Do zapłaty', money(BILL_GROSS, 'pl')],
+        vat: [`VAT ${P.vatPct}%`, money(BILL_VAT)],
+        total: ['Do zapłaty', money(BILL_GROSS)],
         status: 'rozliczone',
         note: 'Przykład wyliczony według cennika.',
       },
@@ -264,13 +262,12 @@ const raw: Record<Lang, Content> = {
       more: 'Nie ma tu Twojego pytania? Napisz albo zadzwoń',
       items: [
         { q: 'Czy dojedziesz do Karpacza, Szklarskiej Poręby albo Świeradowa?', a: `Tak. Pracuję w promieniu ${R}\u00a0km od Jeleniej Góry, a dojazd jest wliczony w pierwszą godzinę pracy.` },
-        { q: 'Ile kosztuje drobna naprawa?', a: `Pierwsza godzina z dojazdem to ${zl(P.firstHour)} netto (${money(gross(P.firstHour), 'pl')} brutto). Każde kolejne rozpoczęte 30\u00a0minut to ${zl(P.halfHour)} netto. Części liczę po cenie zakupu.` },
+        { q: 'Ile kosztuje drobna naprawa?', a: `Pierwsza godzina z dojazdem to ${zl(P.firstHour)} netto (${money(gross(P.firstHour))} brutto). Każde kolejne rozpoczęte 30\u00a0minut to ${zl(P.halfHour)} netto. Części liczę po cenie zakupu.` },
         { q: 'Jak dostanę wycenę?', a: 'Wyślij zdjęcie i krótki opis usterki przez WhatsAppa albo formularz. Dostaniesz wycenę orientacyjną, a dokładną po oględzinach na miejscu.' },
         { q: 'Jak szybko przyjedziesz?', a: `Termin ustalamy przy zgłoszeniu. Gdy naprawa musi być zrobiona tego samego dnia, do robocizny doliczam ${P.urgentPct}%. Przy stałej opiece reaguję w ciągu ${P.careResponseH}\u00a0godzin.` },
         { q: 'Czy wystawiasz fakturę VAT?', a: 'Tak. Robocizna i materiały są na niej wpisane osobno.' },
         { q: 'Czy możesz wykonywać prace elektryczne?', a: 'Tak, mam uprawnienia SEP do 1\u00a0kV. Świadectwo pokażę przed rozpoczęciem pracy.' },
         { q: 'Czym stała opieka różni się od jednorazowego zlecenia?', a: `Przychodzę w ustalonym rytmie, spisuję usterki i naprawiam je, zanim zauważą je goście. Abonament zaczyna się od ${zl(P.careFrom)} netto miesięcznie: ${P.careHours} ${plHours(P.careHours)} pracy, dojazdy w cenie i reakcja w ciągu ${P.careResponseH}\u00a0godzin.` },
-        { q: 'Czy dogadamy się po niemiecku albo angielsku?', a: 'Tak. Obsługuję klientów po polsku, niemiecku i angielsku.' },
       ],
     },
     contact: {
@@ -302,373 +299,6 @@ const raw: Record<Lang, Content> = {
     footer: { area: 'Karkonosze, Dolny Śląsk', rights: 'Wszelkie prawa zastrzeżone.', privacy: 'Polityka prywatności' },
   },
 
-  de: {
-    htmlLang: 'de',
-    meta: {
-      title: 'Handwerker Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
-      description: `Sanitär, Elektro (SEP-Qualifikation) und Reparaturen für Pensionen, Hotels und Häuser, bis ${R}\u00a0km um Jelenia Góra. Erste Stunde inkl. Anfahrt: ${zl(P.firstHour)} netto.`,
-    },
-    brand: { sub: 'Reparaturen und Objektbetreuung' },
-    nav: { services: 'Leistungen', care: 'Betreuung', process: 'Ablauf', prices: 'Preise', work: 'Referenz' },
-    call: 'Anrufen',
-    waGreeting: 'Guten Tag, ich schreibe über handyman.karkonosze.',
-    hero: {
-      title: 'Repariert, bevor Gäste es merken.',
-      lead: 'Handwerker für Pensionen, kleine Hotels, Firmen und Häuser: Sanitär, Elektro, Montage und kleine Renovierungen. Jelenia Góra, Karpacz, Szklarska Poręba und Umgebung, einmalig oder dauerhaft.',
-      primary: 'Schaden melden',
-      entryLabel: 'Objektbuch · Beispieleintrag',
-      entryMore: 'So sieht die Objektbetreuung aus',
-    },
-    log: {
-      title: 'Objektbuch',
-      note: 'Beispieleinträge – so sieht die Liste nach einem Besuch aus.',
-      pause: 'Laufendes Objektbuch anhalten',
-      entries: [
-        { when: 'Mo 08:10', where: 'Zi. 7', what: 'Duscharmatur tropft', done: 'ersetzt' },
-        { when: 'Mo 09:40', where: 'Rezeption', what: 'Beleuchtung über dem Tresen defekt', done: 'repariert' },
-        { when: 'Mo 11:15', where: 'Zi. 3', what: 'Balkontürgriff wackelt', done: 'festgezogen' },
-        { when: 'Mo 12:30', where: 'Bad EG', what: 'Waschbecken-Siphon riecht', done: 'gereinigt' },
-        { when: 'Di 08:00', where: 'Speisesaal', what: 'Steckdose am Kaffeeautomaten funkt', done: 'ersetzt' },
-        { when: 'Di 10:20', where: 'Zi. 5', what: 'Regal über dem Bett löst sich', done: 'montiert' },
-        { when: 'Di 13:05', where: 'Heizraum', what: 'Anlagendruck zu niedrig', done: 'aufgefüllt' },
-        { when: 'Di 15:00', where: 'Terrasse', what: 'Gartenleuchte ohne Licht', done: 'repariert' },
-      ],
-    },
-    services: {
-      title: 'Was ich repariere',
-      lead: 'Kleine und mittlere Arbeiten, für die man kein ganzes Team braucht, die aber nicht lange warten können.',
-      items: [
-        {
-          name: 'Sanitär',
-          text: 'Tropfende Hähne, verstopfte Abflüsse, Austausch von Armaturen, WC und Siphons, Geräteanschlüsse.',
-        },
-        {
-          name: 'Elektro',
-          text: 'Steckdosen, Schalter, Beleuchtung, Zubehör in Verteilern, Fehlersuche.',
-        },
-        {
-          name: 'Montage und kleine Renovierungen',
-          text: 'Möbel, Regale, Türen und Schlösser, Malerarbeiten, kleine Reparaturen an Fliesen, Fenstern und Beschlägen.',
-        },
-        {
-          name: 'Feste Objektbetreuung',
-          text: 'Regelmäßige Rundgänge, Mängelliste und schnelle Reparaturen in der Saison. Eine Telefonnummer.',
-        },
-      ],
-      note: 'Elektroarbeiten führe ich auf Grundlage meiner SEP-Qualifikation bis 1 kV aus.',
-    },
-    care: {
-      title: 'Feste Objektbetreuung',
-      lead: 'Ein Gast vergisst, dass ein Hahn getropft hat. Er erinnert sich, dass er drei Tage getropft hat. Bei fester Betreuung landen Mängel auf einer Liste und werden behoben, bevor sie zum Problem werden.',
-      points: [
-        { title: 'Rundgang im festen Rhythmus', text: 'Ich gehe durch Zimmer, Bäder, Heizraum und Gemeinschaftsflächen. Den Takt legen wir passend zu Ihrem Haus und der Saison fest.' },
-        { title: 'Liste nach jedem Besuch', text: 'Sie erhalten Einträge: was war, was erledigt ist, was Ihre Entscheidung braucht. Ohne Nachfragen, wer was repariert hat.' },
-        { title: 'Eine Nummer in der Saison', text: 'Geht während des Aufenthalts etwas kaputt, rufen Sie dieselbe Person an, die Ihr Haus kennt.' },
-      ],
-      cta: 'Objektbetreuung anfragen',
-    },
-    process: {
-      title: 'Ablauf',
-      lead: 'Ein Auftrag, von der Nachricht bis zur Rechnung.',
-      steps: [
-        { status: 'gemeldet', title: 'Sie beschreiben den Schaden', text: 'Per Telefon, WhatsApp oder Formular. Am besten mit Foto.' },
-        { status: 'angeboten', title: 'Sie erhalten ein Angebot', text: 'Eine Richtschätzung anhand des Fotos, den genauen Preis nach Besichtigung vor Ort.' },
-        { status: 'repariert', title: 'Ich repariere zum vereinbarten Termin', text: 'Ich komme mit Werkzeug und Grundteilen. Nach der Arbeit räume ich auf.' },
-        { status: 'abgerechnet', title: 'Klare Abrechnung', text: 'Rechnung mit getrennten Posten für Arbeit und Material.' },
-      ],
-    },
-    pricing: {
-      title: 'Was es kostet',
-      lead: 'Sie zahlen die Arbeitszeit nach den Sätzen unten. Eine Richtschätzung bekommen Sie anhand eines Fotos, bevor ich anreise.',
-      rates: [
-        { label: 'Erste Arbeitsstunde inkl. Anfahrt', price: zl(P.firstHour), gross: money(gross(P.firstHour), 'de') },
-        { label: 'Jede weitere angefangene halbe Stunde', price: zl(P.halfHour), gross: money(gross(P.halfHour), 'de') },
-        { label: 'Ersatzteile und Material', price: 'zum Einkaufspreis', note: 'Den Kaufbeleg lege ich der Rechnung bei.', text: true },
-        { label: 'Eilauftrag am selben Tag', price: `+${P.urgentPct}\u00a0%`, extra: true },
-        { label: `Nachts (${P.night.from}–${P.night.to}\u00a0Uhr) und an Feiertagen`, price: `+${P.nightPct}\u00a0%`, extra: true },
-      ],
-      surcharges: 'Zuschläge gelten nur für die Arbeitszeit, nicht für Teile.',
-      area: `Anfahrt inklusive im Umkreis von ${R}\u00a0km um Jelenia Góra: Jelenia Góra mit Cieplice, Karpacz, Szklarska Poręba, Świeradów-Zdrój, Podgórzyn, Mysłakowice, Kowary, Piechowice und die Orte dazwischen.`,
-      care: {
-        title: 'Feste Objektbetreuung',
-        price: `ab ${zl(P.careFrom)}`,
-        gross: `ab ${money(gross(P.careFrom), 'de')}`,
-        per: 'monatlich',
-        points: [
-          `${P.careHours} ${P.careHours === 1 ? 'Arbeitsstunde' : 'Arbeitsstunden'} im Monat`,
-          'Anfahrten inklusive',
-          `Reaktion innerhalb von ${P.careResponseH}\u00a0Stunden`,
-          'Mängelliste nach jedem Besuch',
-        ],
-        link: 'So sieht die Objektbetreuung aus',
-      },
-      bill: {
-        title: 'Beispielrechnung',
-        place: 'Pension, Szklarska Poręba',
-        job: 'Zi. 7 · Duscharmatur tropft',
-        time: 'Arbeitszeit: 1\u00a0Std. 20\u00a0Min.',
-        lines: [
-          ['Erste Stunde inkl. Anfahrt', zl(P.firstHour)],
-          ['Weitere angefangene halbe Stunde', zl(P.halfHour)],
-          ['Duscharmatur (Einkaufspreis)', zl(BILL_PART)],
-        ],
-        subtotal: ['Summe netto', zl(BILL_NET)],
-        vat: [`MwSt. ${P.vatPct}\u00a0%`, money(BILL_VAT, 'de')],
-        total: ['Zu zahlen', money(BILL_GROSS, 'de')],
-        status: 'abgerechnet',
-        note: 'Beispiel, berechnet nach dieser Preisliste.',
-      },
-      fine: `Nettobeträge in Złoty (PLN), darunter brutto mit ${P.vatPct}\u00a0% MwSt.`,
-      net: 'netto',
-      grossLabel: 'brutto',
-    },
-    trust: {
-      title: 'Warum Sie mir vertrauen können',
-      items: [
-        { title: 'SEP-Qualifikation bis 1 kV', text: 'Polnischer Elektro-Befähigungsnachweis für Installation, Montage und Wartung. Den Nachweis zeige ich vor Arbeitsbeginn.' },
-        { title: 'Angebot per Foto', text: 'Sie wissen, was auf Sie zukommt, bevor jemand anreist.' },
-        { title: 'Jedes Mal dieselbe Person', text: 'Kein Vermittler und kein wechselndes Team. Ich kenne Ihr Haus.' },
-      ],
-    },
-    work: {
-      title: 'Aus dem letzten Auftrag',
-      lead: 'Eine Wand mit Bergen im Zimmer. Zwei Arbeitstage, vom ersten Streifen Klebeband bis zum letzten Gipfel.',
-      facts: [['Umfang', 'Abkleben und Streichen'], ['Dauer', '2 Tage'], ['Termin', '19.–20. September 2026']],
-      photos: {
-        tasma: 'Berggipfel werden mit Malerkrepp auf der weißen Wand angezeichnet',
-        malowanie: 'Ein orangefarbener Gipfel wird mit dem Pinsel bis an die Klebekante gestrichen',
-        detal: 'Klebeband wird von einem blauen Gipfel abgezogen, die Farbkante ist scharf',
-        gotowe: 'Fertige Wand mit grünen, blauen und orangefarbenen Bergen, daneben der Handwerker',
-      },
-    },
-    gallery: { title: 'Referenzen' },
-    faq: {
-      title: 'Häufige Fragen',
-      lead: 'Kurze Antworten auf das, was Kunden am häufigsten fragen.',
-      more: 'Ihre Frage ist nicht dabei? Schreiben Sie oder rufen Sie an',
-      items: [
-        { q: 'Kommen Sie auch nach Karpacz, Szklarska Poręba oder Świeradów-Zdrój?', a: `Ja. Ich arbeite im Umkreis von ${R}\u00a0km um Jelenia Góra, die Anfahrt ist in der ersten Arbeitsstunde enthalten.` },
-        { q: 'Was kostet eine kleine Reparatur?', a: `Die erste Stunde inklusive Anfahrt kostet ${zl(P.firstHour)} netto (${money(gross(P.firstHour), 'de')} brutto). Jede weitere angefangene halbe Stunde kostet ${zl(P.halfHour)} netto. Teile berechne ich zum Einkaufspreis.` },
-        { q: 'Wie bekomme ich ein Angebot?', a: 'Schicken Sie ein Foto und eine kurze Beschreibung per WhatsApp oder über das Formular. Sie bekommen eine Richtschätzung, den genauen Preis nach der Besichtigung vor Ort.' },
-        { q: 'Wie schnell kommen Sie?', a: `Den Termin vereinbaren wir bei der Meldung. Muss es am selben Tag sein, berechne ich auf die Arbeitszeit ${P.urgentPct}\u00a0% Zuschlag. Bei fester Betreuung reagiere ich innerhalb von ${P.careResponseH}\u00a0Stunden.` },
-        { q: 'Stellen Sie eine Rechnung mit MwSt. aus?', a: 'Ja. Arbeit und Material stehen darauf getrennt.' },
-        { q: 'Dürfen Sie Elektroarbeiten ausführen?', a: 'Ja, ich habe die polnische SEP-Qualifikation bis 1\u00a0kV. Den Nachweis zeige ich vor Arbeitsbeginn.' },
-        { q: 'Was unterscheidet die feste Betreuung von einem Einzelauftrag?', a: `Ich komme in einem festen Rhythmus, notiere Mängel und behebe sie, bevor Gäste sie bemerken. Die Betreuung beginnt bei ${zl(P.careFrom)} netto im Monat: ${P.careHours} ${P.careHours === 1 ? 'Arbeitsstunde' : 'Arbeitsstunden'}, Anfahrten inklusive, Reaktion innerhalb von ${P.careResponseH}\u00a0Stunden.` },
-        { q: 'Können wir Deutsch sprechen?', a: 'Ja. Ich betreue Kunden auf Polnisch, Deutsch und Englisch.' },
-      ],
-    },
-    contact: {
-      title: 'Beschreiben Sie, was los ist.',
-      lead: 'Füllen Sie das kurze Formular aus. Danach öffnet sich eine Nachricht an mich mit fertiger Beschreibung, Sie müssen sie nur absenden.',
-      form: {
-        name: 'Name',
-        phone: 'Telefon',
-        who: 'Wer sind Sie',
-        whoOptions: ['Pension / Hotel', 'Firma', 'Privatperson'],
-        what: 'Was ist zu tun',
-        whatPlaceholder: 'Z. B. Duscharmatur tropft seit gestern.',
-        whatsapp: 'Per WhatsApp senden',
-        email: 'Per E-Mail senden',
-        hint: 'Ein Foto fügen Sie in der geöffneten Nachricht hinzu.',
-        privacy: 'Wie ich Ihre Daten schütze',
-        where: 'Wo',
-        wherePlaceholder: 'Z. B. Zimmer 4, Bad',
-        errName: 'Bitte geben Sie Ihren Namen ein.',
-        errWhat: 'Beschreiben Sie kurz, was zu tun ist.',
-        sentWa: 'Die Nachricht wartet in WhatsApp. Senden Sie sie dort ab, ich melde mich.',
-        sentMail: 'Die Nachricht wartet in Ihrem E-Mail-Programm. Senden Sie sie ab, ich melde mich.',
-        required: 'Pflichtfeld',
-      },
-      direct: 'Lieber anrufen oder schreiben?',
-      whatsappDirect: 'Per WhatsApp schreiben',
-      area: `Ich arbeite im Umkreis von ${R}\u00a0km um Jelenia Góra.`,
-    },
-    footer: { area: 'Riesengebirge, Niederschlesien', rights: 'Alle Rechte vorbehalten.', privacy: 'Datenschutz' },
-  },
-
-  en: {
-    htmlLang: 'en',
-    meta: {
-      title: 'Handyman Jelenia Góra, Karpacz, Szklarska Poręba | handyman.karkonosze',
-      description: `Plumbing, SEP-licensed electrics and repairs for guesthouses, hotels and homes within ${R}\u00a0km of Jelenia Góra. First hour incl. travel: ${zl(P.firstHour)} + VAT.`,
-    },
-    brand: { sub: 'Repairs and property care' },
-    nav: { services: 'Services', care: 'Property care', process: 'How it works', prices: 'Prices', work: 'Recent job' },
-    call: 'Call',
-    waGreeting: 'Hello, I am writing via handyman.karkonosze.',
-    hero: {
-      title: 'Fixed before your guest notices.',
-      lead: 'A handyman for guesthouses, small hotels, businesses and homes: plumbing, electrics, installation and small renovations. Jelenia Góra, Karpacz, Szklarska Poręba and around, one-off or on a regular basis.',
-      primary: 'Report a fault',
-      entryLabel: 'Property log · sample entry',
-      entryMore: 'This is what property care looks like',
-    },
-    log: {
-      title: 'Property log',
-      note: 'Sample entries – this is what the list looks like after a visit.',
-      pause: 'Pause the scrolling log',
-      entries: [
-        { when: 'Mon 08:10', where: 'Room 7', what: 'Shower mixer dripping', done: 'replaced' },
-        { when: 'Mon 09:40', where: 'Reception', what: 'Light over the desk dead', done: 'repaired' },
-        { when: 'Mon 11:15', where: 'Room 3', what: 'Balcony door handle loose', done: 'tightened' },
-        { when: 'Mon 12:30', where: 'Ground-floor bath', what: 'Basin trap smells', done: 'cleaned' },
-        { when: 'Tue 08:00', where: 'Dining room', what: 'Socket by the coffee machine sparks', done: 'replaced' },
-        { when: 'Tue 10:20', where: 'Room 5', what: 'Shelf over the bed coming off', done: 'fitted' },
-        { when: 'Tue 13:05', where: 'Boiler room', what: 'System pressure too low', done: 'topped up' },
-        { when: 'Tue 15:00', where: 'Terrace', what: 'Garden light not working', done: 'repaired' },
-      ],
-    },
-    services: {
-      title: 'What I repair',
-      lead: 'Small and mid-size jobs that do not need a whole crew but cannot wait long.',
-      items: [
-        {
-          name: 'Plumbing',
-          text: 'Dripping taps, blocked drains, replacing mixers, toilets and traps, appliance connections.',
-        },
-        {
-          name: 'Electrics',
-          text: 'Sockets, switches, lighting, consumer-unit fittings, tracing faults.',
-        },
-        {
-          name: 'Installation and small renovations',
-          text: 'Furniture, shelves, doors and locks, painting, minor repairs to tiles, windows and fittings.',
-        },
-        {
-          name: 'Ongoing property care',
-          text: 'Regular walk-rounds, a defect list and quick repairs in season. One phone number.',
-        },
-      ],
-      note: 'Electrical work is carried out under my SEP licence up to 1 kV.',
-    },
-    care: {
-      title: 'Regular property care',
-      lead: 'A guest will not remember that a tap dripped. They will remember it dripped for three days. With regular care, defects go on a list and get fixed before they become a problem.',
-      points: [
-        { title: 'Walk-rounds on a fixed rhythm', text: 'I go through rooms, bathrooms, the boiler room and shared areas. We set the frequency to suit your property and season.' },
-        { title: 'A list after every visit', text: 'You get entries: what was wrong, what is done, what needs your decision. No chasing who fixed what.' },
-        { title: 'One number in season', text: 'When something breaks during a stay, you call the same person who already knows your property.' },
-      ],
-      cta: 'Ask about property care',
-    },
-    process: {
-      title: 'How it works',
-      lead: 'One job, from your message to the invoice.',
-      steps: [
-        { status: 'reported', title: 'You describe the problem', text: 'By phone, WhatsApp or the form. A photo helps.' },
-        { status: 'quoted', title: 'You get a quote', text: 'A rough one from the photo, an exact one after seeing it on site.' },
-        { status: 'fixed', title: 'I fix it at the agreed time', text: 'I arrive with tools and basic parts, and clean up afterwards.' },
-        { status: 'invoiced', title: 'Clear billing', text: 'An invoice with labour and materials listed separately.' },
-      ],
-    },
-    pricing: {
-      title: 'What it costs',
-      lead: 'You pay for the time worked at the rates below. You get a rough quote from a photo before I drive out.',
-      rates: [
-        { label: 'First hour of work, travel included', price: zl(P.firstHour), gross: money(gross(P.firstHour), 'en') },
-        { label: 'Each further 30\u00a0minutes or part of it', price: zl(P.halfHour), gross: money(gross(P.halfHour), 'en') },
-        { label: 'Parts and materials', price: 'at cost', note: 'The purchase receipt comes with the invoice.', text: true },
-        { label: 'Urgent, same-day job', price: `+${P.urgentPct}%`, extra: true },
-        { label: `Nights (${h12(P.night.from)}–${h12(P.night.to)}) and public holidays`, price: `+${P.nightPct}%`, extra: true },
-      ],
-      surcharges: 'Surcharges apply to labour only, never to parts.',
-      area: `Travel included within ${R}\u00a0km of Jelenia Góra: Jelenia Góra and Cieplice, Karpacz, Szklarska Poręba, Świeradów-Zdrój, Podgórzyn, Mysłakowice, Kowary, Piechowice and the places in between.`,
-      care: {
-        title: 'Regular property care',
-        price: `from ${zl(P.careFrom)}`,
-        gross: `from ${money(gross(P.careFrom), 'en')}`,
-        per: 'a month',
-        points: [
-          `${P.careHours} ${P.careHours === 1 ? 'hour' : 'hours'} of work a month`,
-          'Travel included',
-          `Response within ${P.careResponseH}\u00a0hours`,
-          'A defect list after every visit',
-        ],
-        link: 'What property care looks like',
-      },
-      bill: {
-        title: 'Sample bill',
-        place: 'Guesthouse, Szklarska Poręba',
-        job: 'Room 7 · shower mixer dripping',
-        time: 'Time on site: 1\u00a0h 20\u00a0min',
-        lines: [
-          ['First hour incl. travel', zl(P.firstHour)],
-          ['Further 30\u00a0min (started)', zl(P.halfHour)],
-          ['Shower mixer (at cost)', zl(BILL_PART)],
-        ],
-        subtotal: ['Net total', zl(BILL_NET)],
-        vat: [`VAT ${P.vatPct}%`, money(BILL_VAT, 'en')],
-        total: ['To pay', money(BILL_GROSS, 'en')],
-        status: 'invoiced',
-        note: 'An example priced from this list.',
-      },
-      fine: `Net amounts in Polish złoty (PLN), with the price incl. ${P.vatPct}% VAT below.`,
-      net: 'net',
-      grossLabel: 'incl. VAT',
-    },
-    trust: {
-      title: 'Why you can trust me',
-      items: [
-        { title: 'SEP electrical licence up to 1 kV', text: 'Polish certification for electrical installation, fitting and maintenance. I will show the certificate before work starts.' },
-        { title: 'Quote from a photo', text: 'You know what to expect before anyone drives out.' },
-        { title: 'The same person every time', text: 'Not a middleman and not a rotating crew. I know your property.' },
-      ],
-    },
-    work: {
-      title: 'From the last job',
-      lead: 'A mountain wall in a room. Two days of work, from the first strip of tape to the last peak.',
-      facts: [['Scope', 'Taping and painting'], ['Time', '2 days'], ['Dates', '19–20 September 2026']],
-      photos: {
-        tasma: 'Marking mountain peaks on a white wall with masking tape',
-        malowanie: 'Painting an orange peak with a brush right up to the tape edge',
-        detal: 'Pulling tape off a blue peak, leaving a crisp paint edge',
-        gotowe: 'The finished wall with green, blue and orange mountains, the painter beside it',
-      },
-    },
-    gallery: { title: 'Selected work' },
-    faq: {
-      title: 'Common questions',
-      lead: 'Short answers to what clients ask most often.',
-      more: 'Question not here? Message or call',
-      items: [
-        { q: 'Do you come out to Karpacz, Szklarska Poręba or Świeradów-Zdrój?', a: `Yes. I work within ${R}\u00a0km of Jelenia Góra, and travel is included in the first hour of work.` },
-        { q: 'What does a small repair cost?', a: `The first hour including travel is ${zl(P.firstHour)} net (${money(gross(P.firstHour), 'en')} incl. VAT). Each further 30\u00a0minutes or part of it is ${zl(P.halfHour)} net. Parts are charged at cost.` },
-        { q: 'How do I get a quote?', a: 'Send a photo and a short description by WhatsApp or the form. You get a rough quote, and an exact one after I have seen it on site.' },
-        { q: 'How quickly can you come?', a: `We agree the time when you report the fault. If it has to be the same day, I add ${P.urgentPct}% to the labour. With regular property care I respond within ${P.careResponseH}\u00a0hours.` },
-        { q: 'Do you issue VAT invoices?', a: 'Yes. Labour and materials are listed separately.' },
-        { q: 'Can you do electrical work?', a: 'Yes, I hold the Polish SEP licence up to 1\u00a0kV. I will show the certificate before work starts.' },
-        { q: 'How is regular care different from a one-off job?', a: `I come on a fixed rhythm, log defects and fix them before guests notice. Care starts from ${zl(P.careFrom)} net a month: ${P.careHours} ${P.careHours === 1 ? 'hour' : 'hours'} of work, travel included and a response within ${P.careResponseH}\u00a0hours.` },
-        { q: 'Can we talk in English or German?', a: 'Yes. I work with clients in Polish, German and English.' },
-      ],
-    },
-    contact: {
-      title: 'Tell me what is going on.',
-      lead: 'Fill in the short form. A message to me will open with the description ready, you only need to send it.',
-      form: {
-        name: 'Name',
-        phone: 'Phone',
-        who: 'Who you are',
-        whoOptions: ['Guesthouse / hotel', 'Business', 'Private owner'],
-        what: 'What needs doing',
-        whatPlaceholder: 'E.g. shower mixer dripping since yesterday.',
-        whatsapp: 'Send via WhatsApp',
-        email: 'Send by email',
-        hint: 'You can attach a photo in the message that opens.',
-        privacy: 'How I protect your data',
-        where: 'Where',
-        wherePlaceholder: 'E.g. room 4, bathroom',
-        errName: 'Enter your name.',
-        errWhat: 'Describe briefly what needs doing.',
-        sentWa: 'Your message is ready in WhatsApp. Send it there and I will get back to you.',
-        sentMail: 'Your message is ready in your email app. Send it and I will get back to you.',
-        required: 'required',
-      },
-      direct: 'Prefer to call or message?',
-      whatsappDirect: 'Message on WhatsApp',
-      area: `I work within ${R}\u00a0km of Jelenia Góra.`,
-    },
-    footer: { area: 'Karkonosze, Lower Silesia', rights: 'All rights reserved.', privacy: 'Privacy policy' },
-  },
 };
 
 // Polska typografia: jednoliterowe spójniki i przyimki (a, i, o, u, w, z) nie zostają na końcu wiersza.
@@ -684,6 +314,5 @@ const glue = (v: unknown): unknown =>
 const { meta, waGreeting, ...plRest } = raw.pl;
 
 export const content: Record<Lang, Content> = {
-  ...raw,
   pl: { ...(glue(plRest) as Omit<Content, 'meta' | 'waGreeting'>), meta, waGreeting },
 };

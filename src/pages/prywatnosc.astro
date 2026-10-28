@@ -1,0 +1,51 @@
+---
+// Polityka prywatności: /prywatnosc/
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { content } from '../i18n/content';
+import { privacy, privacyPath } from '../i18n/privacy';
+import { site } from '../config';
+import { ORIGIN } from '../lib/seo';
+
+const t = content.pl;
+const pv = privacy.pl;
+const url = `${ORIGIN}${privacyPath}`;
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': `${url}#page`,
+  url,
+  name: pv.title,
+  description: pv.description,
+  inLanguage: 'pl',
+  isPartOf: { '@id': `${ORIGIN}/#website` },
+  about: { '@id': `${ORIGIN}/#business` },
+};
+---
+<Base lang="pl" htmlLang={t.htmlLang} title={`${pv.title} | ${site.name}`} description={pv.description} imageAlt={`${site.name} – ${t.brand.sub}`} path={privacyPath} ld={ld}>
+  <a class="skip" href="#main">Przejdź do treści</a>
+  <Header lang="pl" sub />
+
+  <main id="main">
+    <article class="section doc">
+      <div class="wrap doc__in">
+        <header class="doc__head">
+          <h1>{pv.heading ?? pv.title}</h1>
+          <p class="lead">{pv.lead}</p>
+          <p class="fine">{pv.updated}</p>
+        </header>
+        {pv.sections.map((sec) => (
+          <section class="doc__sec">
+            <h2>{sec.h}</h2>
+            {sec.p?.map((para) => <p>{para}</p>)}
+            {sec.list && <ul>{sec.list.map((li) => <li>{li}</li>)}</ul>}
+          </section>
+        ))}
+        <a class="plan__link doc__back" href="/">{pv.back}</a>
+      </div>
+    </article>
+  </main>
+
+  <Footer lang="pl" />
+</Base>

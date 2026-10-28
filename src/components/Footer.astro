@@ -12,7 +12,7 @@ const t = content[lang];
   <div class="wrap foot__in">
     <span class="foot__brand"><Mark class="foot__mark" />{site.name}</span>
     <span>{t.footer.area}</span>
-    <a class="foot__link" href={privacyPath(lang)}>{t.footer.privacy}</a>
+    <a class="foot__link" href={privacyPath}>{t.footer.privacy}</a>
     <span>© {new Date().getFullYear()} {site.company || site.name}{site.nip && `, NIP ${site.nip}`}. {t.footer.rights}</span>
   </div>
 </footer>

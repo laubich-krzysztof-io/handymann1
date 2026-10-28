@@ -1,28 +1,417 @@
 ---
-// Strona główna: wybór języka. Przekierowuje według języka przeglądarki, bez JS przez meta refresh.
-import { locales, site } from '../config';
-import { ORIGIN } from '../lib/seo';
-const names = { pl: 'Polski', de: 'Deutsch', en: 'English' } as const;
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { privacyPath } from '../i18n/privacy';
+import { content } from '../i18n/content';
+import { site, type Lang } from '../config';
+
+const lang: Lang = 'pl';
+const t = content[lang];
+const tel = site.phone.replace(/\s/g, '');
+const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreeting)}`;
+const gallery = site.gallery;
+const skip = 'Przejdź do treści';
+const quickLabel = 'Szybki kontakt';
+const sample = t.log.entries[0];
+
+const pr = t.pricing;
+const logBtn = ['Pauza', 'Wznów'];
+const photos = [
+  { id: 'malowanie', cls: 'w-a', w: 1600, h: 1200 },
+  { id: 'gotowe', cls: 'w-b', w: 1200, h: 1600 },
+  { id: 'tasma', cls: 'w-c', w: 1600, h: 1200 },
+  { id: 'detal', cls: 'w-d', w: 1200, h: 1600 },
+];
 ---
-<!doctype html>
-<html lang="pl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{site.name}</title>
-    <meta name="robots" content="noindex, follow" />
-    <link rel="canonical" href={`${ORIGIN}/pl/`} />
-    {locales.map((l) => <link rel="alternate" hreflang={l} href={`${ORIGIN}/${l}/`} />)}
-    <link rel="alternate" hreflang="x-default" href={`${ORIGIN}/pl/`} />
-    <meta http-equiv="refresh" content="0; url=/pl/" />
-    <script is:inline>
-      try {
-        var l = (navigator.language || 'pl').slice(0, 2).toLowerCase();
-        location.replace('/' + (l === 'de' || l === 'en' ? l : 'pl') + '/');
-      } catch (e) {}
-    </script>
-  </head>
-  <body>
-    <ul>{locales.map((l) => <li><a href={`/${l}/`} hreflang={l} lang={l}>{names[l]}</a></li>)}</ul>
-  </body>
-</html>
+<Base lang={lang} htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description} imageAlt={`${site.name} – ${t.brand.sub}`}>
+  <a class="skip" href="#main">{skip}</a>
+
+  <Header lang={lang} />
+
+  <main id="main">
+    <section class="hero">
+      <div class="wrap hero__in">
+        <h1>{t.hero.title}</h1>
+        <div class="hero__side">
+          <p class="lead">{t.hero.lead}</p>
+          <div class="actions">
+            <a class="btn" href="#kontakt">{t.hero.primary}</a>
+            <a class="call-link" href={`tel:${tel}`}>
+              <span>{t.call}: {site.phone}</span>
+            </a>
+          </div>
+          <a class="entry" href="#opieka">
+            <span class="entry__label">{t.hero.entryLabel}</span>
+            <span class="entry__row">
+              <span class="entry__when">{sample.when}</span>
+              <span class="entry__body">
+                <span class="entry__where">{sample.where}</span>
+                <span class="entry__what">{sample.what}</span>
+                <span class="entry__done">{sample.done}</span>
+              </span>
+            </span>
+            <span class="entry__more">{t.hero.entryMore}</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="uslugi" class="services-wrap" aria-labelledby="uslugi-h">
+      <div class="wrap">
+        <div class="section__head section__head--light">
+          <h2 id="uslugi-h">{t.services.title}</h2>
+          <p>{t.services.lead}</p>
+        </div>
+        <ul class="svc">
+          {t.services.items.map((s, i) => (
+            <li class="svc__item" id={`usluga-${i + 1}`}>
+              <div>
+                <h3>{i === 3 ? <a href="#opieka">{s.name}</a> : s.name}</h3>
+                <p>{s.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <p class="fine fine--light svc__note">{t.services.note}</p>
+      </div>
+    </section>
+
+    <section id="opieka" class="section" aria-labelledby="opieka-h">
+      <div class="wrap care">
+        <div class="care__lead">
+          <h2 id="opieka-h">{t.care.title}</h2>
+          <p class="lead">{t.care.lead}</p>
+          <ul class="care__points">
+            {t.care.points.map((p) => (
+              <li>
+                <h3>{p.title}</h3>
+                <p>{p.text}</p>
+              </li>
+            ))}
+          </ul>
+          <a class="btn" href="#kontakt">{t.care.cta}</a>
+        </div>
+
+        <aside class="log" aria-label={t.log.title} data-log>
+          <div class="log__head">
+            <span class="log__title">{t.log.title}</span>
+            <button class="log__toggle" type="button" aria-pressed="false" aria-label={t.log.pause} data-log-toggle>
+              <span class="log__pause">{logBtn[0]}</span><span class="log__play">{logBtn[1]}</span>
+            </button>
+          </div>
+          <div class="log__window" aria-hidden="true">
+            <ol class="log__list">
+              {[...t.log.entries, ...t.log.entries].map((e) => (
+                <li>
+                  <span class="log__when">{e.when}</span>
+                  <span class="log__where">{e.where}</span>
+                  <span class="log__what">{e.what}</span>
+                  <span class="log__done">{e.done}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <p class="log__note">{t.log.note}</p>
+          <ul class="sr-only">
+            {t.log.entries.map((e) => <li>{e.where}: {e.what}, {e.done}</li>)}
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="jak" class="section section--tint" aria-labelledby="jak-h">
+      <div class="wrap">
+        <div class="section__head">
+          <h2 id="jak-h">{t.process.title}</h2>
+          <p class="lead">{t.process.lead}</p>
+        </div>
+        <ol class="track">
+          {t.process.steps.map((s) => (
+            <li>
+              <span class="track__status">{s.status}</span>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section id="cennik" class="section" aria-labelledby="cennik-h">
+      <div class="wrap price">
+        <div class="section__head price__head">
+          <h2 id="cennik-h">{pr.title}</h2>
+          <p class="lead">{pr.lead}</p>
+        </div>
+
+        <div class="price__rates">
+          <p class="rates__legend">{pr.fine}</p>
+          <dl class="rates">
+            {pr.rates.map((r) => (
+              <div class:list={['rates__row', { 'rates__row--extra': r.extra }]}>
+                <dt>{r.label}{r.note && <span class="rates__note">{r.note}</span>}</dt>
+                <dd class:list={['rates__price', { 'rates__price--text': r.text }]}>
+                  <span class="rates__net">{r.price}</span>
+                  {r.gross && <span class="rates__gross">{r.gross} {pr.grossLabel}</span>}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p class="rates__fine">{pr.surcharges}</p>
+          <p class="price__area">
+            <span>{pr.area}</span>
+          </p>
+        </div>
+
+        <div class="plan">
+          <div class="plan__head">
+            <h3>{pr.care.title}</h3>
+            <p class="plan__price">
+              <span class="plan__net">{pr.care.price}</span>
+              <span class="plan__gross">{pr.net} {pr.care.per} · {pr.care.gross} {pr.grossLabel}</span>
+            </p>
+          </div>
+          <ul class="plan__points">
+            {pr.care.points.map((p) => <li>{p}</li>)}
+          </ul>
+          <a class="plan__link" href="#opieka">{pr.care.link}</a>
+        </div>
+
+        <aside class="bill" aria-labelledby="bill-h">
+          <div class="bill__sheet"><div class="bill__paper">
+            <p class="bill__title" id="bill-h">{pr.bill.title}</p>
+            <p class="bill__meta">
+              <span>{pr.bill.place}</span>
+              <span>{pr.bill.job}</span>
+              <span>{pr.bill.time}</span>
+            </p>
+            <table class="bill__lines">
+              <tbody>
+                {pr.bill.lines.map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}
+              </tbody>
+              <tfoot>
+                <tr class="bill__sub"><th scope="row">{pr.bill.subtotal[0]}</th><td>{pr.bill.subtotal[1]}</td></tr>
+                <tr><th scope="row">{pr.bill.vat[0]}</th><td>{pr.bill.vat[1]}</td></tr>
+                <tr class="bill__total"><th scope="row">{pr.bill.total[0]}</th><td>{pr.bill.total[1]}</td></tr>
+              </tfoot>
+            </table>
+            <p class="bill__status">{pr.bill.status}</p>
+          </div></div>
+          <p class="bill__note">{pr.bill.note}</p>
+        </aside>
+
+        <div class="price__end">
+          <a class="btn" href="#kontakt">{t.hero.primary}</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="realizacja" class="section work" aria-labelledby="realizacja-h">
+      <div class="wrap">
+        <div class="work__head">
+          <div class="section__head">
+            <h2 id="realizacja-h">{t.work.title}</h2>
+            <p class="lead">{t.work.lead}</p>
+          </div>
+          <dl class="work__facts">
+            {t.work.facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+          </dl>
+        </div>
+      </div>
+      <div class="work__grid">
+        {photos.map((p) => (
+          <figure class={`work__photo ${p.cls}`}>
+            <img
+              src={`/img/mural-${p.id}-1600.webp`}
+              srcset={`/img/mural-${p.id}-900.webp 900w, /img/mural-${p.id}-1600.webp 1600w`}
+              sizes="(min-width: 64rem) 50vw, 80vw"
+              width={p.w} height={p.h}
+              alt={t.work.photos[p.id as keyof typeof t.work.photos]}
+              loading="lazy" decoding="async"
+            />
+          </figure>
+        ))}
+      </div>
+    </section>
+
+    <section id="zaufanie" class="section" aria-labelledby="zaufanie-h">
+      <div class="wrap">
+        <h2 id="zaufanie-h">{t.trust.title}</h2>
+        <ul class="trust">
+          {t.trust.items.map((i) => (
+            <li>
+              <h3>{i.title}</h3>
+              <p>{i.text}</p>
+            </li>
+          ))}
+        </ul>
+        {gallery.length > 0 && (
+          <div class="gallery">
+            <h3>{t.gallery.title}</h3>
+            <ul>
+              {gallery.map((g) => (
+                <li><img src={g.src} alt={g.alt} loading="lazy" /></li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <section id="pytania" class="section section--tint" aria-labelledby="pytania-h">
+      <div class="wrap faq">
+        <div class="section__head faq__head">
+          <h2 id="pytania-h">{t.faq.title}</h2>
+          <p class="lead">{t.faq.lead}</p>
+          <a class="plan__link" href="#kontakt">{t.faq.more}</a>
+        </div>
+        <div class="faq__list">
+          {t.faq.items.map((f) => (
+            <details class="faq__item">
+              <summary>
+                <span>{f.q}</span><i class="faq__sign" aria-hidden="true"></i>
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="kontakt" class="contact" aria-labelledby="kontakt-h">
+      <div class="wrap contact__in">
+        <div class="contact__lead">
+          <h2 id="kontakt-h">{t.contact.title}</h2>
+          <p>{t.contact.lead}</p>
+          <div class="direct">
+            <p class="direct__label">{t.contact.direct}</p>
+            <a href={`tel:${tel}`}>{site.phone}
+            </a>
+            <a href={wa} target="_blank" rel="noopener">{t.contact.whatsappDirect}
+            </a>
+          </div>
+          <p class="fine fine--light">{t.contact.area}</p>
+        </div>
+
+        <form id="lead" class="form" novalidate data-wa={site.whatsapp} data-mail={site.email}
+          data-l-name={t.contact.form.name} data-l-phone={t.contact.form.phone} data-l-who={t.contact.form.who}
+          data-l-where={t.contact.form.where} data-l-what={t.contact.form.what}
+          data-sent-wa={t.contact.form.sentWa} data-sent-mail={t.contact.form.sentMail}>
+          <div class="field">
+            <label for="f-name">{t.contact.form.name} <small>({t.contact.form.required})</small></label>
+            <input id="f-name" name="name" autocomplete="name" required aria-describedby="e-name" />
+            <p id="e-name" class="field__error" hidden>{t.contact.form.errName}</p>
+          </div>
+          <div class="field">
+            <label for="f-phone">{t.contact.form.phone}</label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+          </div>
+          <div class="field">
+            <label for="f-who">{t.contact.form.who}</label>
+            <select id="f-who" name="who">
+              {t.contact.form.whoOptions.map((o) => <option value={o}>{o}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-where">{t.contact.form.where}</label>
+            <input id="f-where" name="where" placeholder={t.contact.form.wherePlaceholder} />
+          </div>
+          <div class="field">
+            <label for="f-what">{t.contact.form.what} <small>({t.contact.form.required})</small></label>
+            <textarea id="f-what" name="what" rows="4" required aria-describedby="e-what" placeholder={t.contact.form.whatPlaceholder}></textarea>
+            <p id="e-what" class="field__error" hidden>{t.contact.form.errWhat}</p>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button" data-send="wa">{t.contact.form.whatsapp}</button>
+            <button class="btn btn--ghost" type="button" data-send="mail">{t.contact.form.email}</button>
+          </div>
+          <p class="form__status" role="status" aria-live="polite"></p>
+          <p class="fine">{t.contact.form.hint} <a href={privacyPath}>{t.contact.form.privacy}</a>.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <Footer lang={lang} />
+
+  <nav class="quick" aria-label={quickLabel} data-quick>
+    <a class="quick__btn quick__btn--call" href={`tel:${tel}`}>{t.call}
+    </a>
+    <a class="quick__btn" href={wa} target="_blank" rel="noopener">WhatsApp
+    </a>
+  </nav>
+
+  <script>
+    // --- Formularz: wiadomość do WhatsAppa lub poczty, błędy przy polach ---
+    const form = document.getElementById('lead') as HTMLFormElement | null;
+    if (form) {
+      const d = form.dataset;
+      const field = (n: string) => form.elements.namedItem(n) as HTMLInputElement | HTMLTextAreaElement;
+      const required = ['name', 'what'];
+      const status = form.querySelector<HTMLElement>('.form__status');
+      const setError = (n: string, on: boolean) => {
+        const el = field(n);
+        el.setAttribute('aria-invalid', String(on));
+        const msg = document.getElementById(`e-${n}`);
+        if (msg) msg.hidden = !on;
+      };
+      const build = () => {
+        const f = new FormData(form);
+        const line = (label = '', key: string) => `${label}: ${f.get(key) || ''}`;
+        return [
+          line(d.lName, 'name'),
+          line(d.lPhone, 'phone'),
+          line(d.lWho, 'who'),
+          line(d.lWhere, 'where'),
+          '',
+          `${d.lWhat}:`,
+          `${f.get('what') || ''}`,
+        ].join('\n');
+      };
+      const valid = () => {
+        const empty = required.filter((n) => field(n).value.trim() === '');
+        required.forEach((n) => setError(n, empty.includes(n)));
+        if (empty.length) field(empty[0]).focus();
+        return empty.length === 0;
+      };
+      // Błąd znika, gdy tylko pole zostanie uzupełnione
+      required.forEach((n) =>
+        field(n).addEventListener('input', () => {
+          if (field(n).getAttribute('aria-invalid') === 'true' && field(n).value.trim() !== '') setError(n, false);
+        }),
+      );
+      form.querySelectorAll<HTMLButtonElement>('[data-send]').forEach((b) =>
+        b.addEventListener('click', () => {
+          if (status) status.textContent = '';
+          if (!valid()) return;
+          const text = build();
+          if (b.dataset.send === 'wa') {
+            window.open(`https://wa.me/${d.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+            if (status) status.textContent = d.sentWa || '';
+          } else {
+            const subject = `handyman.karkonosze – ${field('who').value}`;
+            location.href = `mailto:${d.mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+            if (status) status.textContent = d.sentMail || '';
+          }
+        }),
+      );
+    }
+
+    // --- Dziennik: przycisk pauzy (WCAG 2.2.2) ---
+    const log = document.querySelector<HTMLElement>('[data-log]');
+    const toggle = log?.querySelector<HTMLButtonElement>('[data-log-toggle]');
+    toggle?.addEventListener('click', () => {
+      const paused = toggle.getAttribute('aria-pressed') !== 'true';
+      toggle.setAttribute('aria-pressed', String(paused));
+      log?.classList.toggle('is-paused', paused);
+    });
+
+    // --- Pasek szybkiego kontaktu: chowa się, gdy formularz jest na ekranie ---
+    const quick = document.querySelector<HTMLElement>('[data-quick]');
+    const contact = document.getElementById('kontakt');
+    if (quick && contact && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([en]) => quick.classList.toggle('is-hidden', en.isIntersecting), { threshold: 0.15 }).observe(contact);
+    }
+  </script>
+</Base>

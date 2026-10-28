@@ -7,15 +7,12 @@ import { privacyPath } from '../i18n/privacy';
 // llms.txt: zwięzły opis firmy dla wyszukiwarek AI (GEO). Generowany z tych samych treści co strona.
 export const GET: APIRoute = () => {
   const pl = content.pl;
-  const en = content.en;
   const lines = [
     `# ${site.name}`,
     '',
     `> ${pl.meta.description}`,
-    `> ${en.meta.description}`,
     '',
     `Obszar działania: do ${site.radiusKm} km od Jeleniej Góry (${site.areas.join(', ')}), ${site.region}.`,
-    'Języki obsługi: polski, niemiecki, angielski.',
     `Dla kogo: ${pl.contact.form.whoOptions.join(', ')}.`,
     '',
     '## Usługi',
@@ -39,10 +36,8 @@ export const GET: APIRoute = () => {
     `## ${pl.faq.title}`,
     ...pl.faq.items.flatMap((f) => [`### ${f.q}`, f.a, '']),
     '## Strony',
-    `- [Polski](${ORIGIN}/pl/)`,
-    `- [Deutsch](${ORIGIN}/de/)`,
-    `- [English](${ORIGIN}/en/)`,
-    `- [Polityka prywatności](${ORIGIN}${privacyPath('pl')})`,
+    `- [Strona główna](${ORIGIN}/)`,
+    `- [Polityka prywatności](${ORIGIN}${privacyPath})`,
     ...(site.contactReady ? ['', '## Kontakt', `- Telefon: ${site.phone}`, `- E-mail: ${site.email}`] : []),
     '',
   ];

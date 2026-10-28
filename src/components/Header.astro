@@ -1,28 +1,20 @@
 ---
 import Mark from './Mark.astro';
 import { content } from '../i18n/content';
-import { locales, site, type Lang } from '../config';
+import { site, type Lang } from '../config';
 
 interface Props {
   lang: Lang;
   /** Na podstronach kotwice menu prowadzą do strony głównej */
   sub?: boolean;
-  /** Adres tej samej strony w innych językach (przełącznik języka) */
-  alternates?: Record<Lang, string>;
 }
 const { lang, sub = false } = Astro.props;
-const home = sub ? `/${lang}/` : '';
-const alt = Astro.props.alternates ?? (Object.fromEntries(locales.map((l) => [l, `/${l}/`])) as Record<Lang, string>);
+const home = sub ? '/' : '';
 const t = content[lang];
 
 const brandSub = t.brand.sub;
-const navLabel: Record<Lang, string> = { pl: 'Menu główne', de: 'Hauptmenü', en: 'Main menu' };
-const langLabel: Record<Lang, string> = { pl: 'Język', de: 'Sprache', en: 'Language' };
-const menuLabel: Record<Lang, { open: string; close: string }> = {
-  pl: { open: 'Otwórz menu', close: 'Zamknij menu' },
-  de: { open: 'Menü öffnen', close: 'Menü schließen' },
-  en: { open: 'Open menu', close: 'Close menu' },
-};
+const navLabel = 'Menu główne';
+const menuLabel = { open: 'Otwórz menu', close: 'Zamknij menu' };
 const [word1, word2] = site.name.split('.');
 // WhatsApp na komputerze: sama ikona obok przycisku (na telefonie jest dolny pasek szybkiego kontaktu)
 const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreeting)}`;
@@ -35,14 +27,14 @@ const links = [
   { id: 'realizacja', label: t.nav.work },
 ];
 ---
-<header class="top" data-top data-label-open={menuLabel[lang].open} data-label-close={menuLabel[lang].close}>
+<header class="top" data-top data-label-open={menuLabel.open} data-label-close={menuLabel.close}>
   <div class="top__scene" aria-hidden="true">
     <span class="top__strip"></span>
     <span class="top__sniezka"></span>
     <span class="top__forest"></span>
   </div>
   <div class="top__in">
-    <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub}`}>
+    <a class="brand" href="/" aria-label={`${site.name} – ${brandSub}`}>
       <Mark class="brand__mark" />
       <span class="brand__text">
         <span class="brand__name">{word1}<span class="brand__dot">.</span>{word2}</span>
@@ -50,31 +42,21 @@ const links = [
       </span>
     </a>
 
-    <nav class="nav" id="nav" aria-label={navLabel[lang]}>
+    <nav class="nav" id="nav" aria-label={navLabel}>
       <ul class="nav__list">
         {links.map((l) => (
           <li class="nav__item"><a class="nav__link" href={`${home}#${l.id}`} data-spy={l.id}>{l.label}</a></li>
         ))}
       </ul>
       <div class="nav__extra">
-        <ul class="lang" aria-label={langLabel[lang]}>
-          {locales.map((l) => (
-            <li><a href={alt[l]} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
-          ))}
-        </ul>
         <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
       </div>
     </nav>
 
     <div class="top__end">
-      <ul class="lang" aria-label={langLabel[lang]}>
-        {locales.map((l) => (
-          <li><a href={alt[l]} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
-        ))}
-      </ul>
       <a class="wa-link" href={wa} target="_blank" rel="noopener" aria-label={t.contact.whatsappDirect}>WhatsApp</a>
       <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
-      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel[lang].open} data-burger><span class="burger__label">Menu</span></button>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel.open} data-burger><span class="burger__label">Menu</span></button>
     </div>
   </div>
 </header>
@@ -122,15 +104,6 @@ const links = [
       if (e.key === 'Escape' && top.classList.contains('is-open')) { setPanel(false); burger?.focus(); }
     });
 
-    // Zmiana języka zostawia czytelnika w tej samej sekcji (kotwice są wspólne dla PL/DE/EN)
-    top.querySelectorAll<HTMLAnchorElement>('.lang a').forEach((a) =>
-      a.addEventListener('click', () => {
-        const current = document.querySelector('main > section.is-seen-last');
-        const hash = current?.id ? `#${current.id}` : location.hash;
-        if (hash) a.href = a.pathname + hash;
-      }),
-    );
-
     // Current section underline
     // Obserwujemy wszystkie sekcje: te bez linku w menu czyszczą podkreślenie
     const spies = [...top.querySelectorAll<HTMLElement>('[data-spy]')];
@@ -143,7 +116,6 @@ const links = [
     const io = new IntersectionObserver((entries) => {
       entries.forEach((en) => {
         if (!en.isIntersecting) return;
-        sections.forEach((s) => s.classList.toggle('is-seen-last', s === en.target));
         mark((en.target as HTMLElement).id || null);
       });
     }, { rootMargin: '-40% 0px -55% 0px' });

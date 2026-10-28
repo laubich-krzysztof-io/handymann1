@@ -1,16 +1,16 @@
 import { content } from '../i18n/content';
-import { locales, site, type Lang } from '../config';
+import { site, type Lang } from '../config';
 
 export const ORIGIN = 'https://handymann.vercel.app';
 /** Tekst do danych strukturalnych: twarde spacje (typografia na stronie) jako zwykłe */
 const plain = (v: string) => v.replace(/\u00a0/g, ' ');
 
-export const ogLocale: Record<Lang, string> = { pl: 'pl_PL', de: 'de_DE', en: 'en_GB' };
+export const ogLocale: Record<Lang, string> = { pl: 'pl_PL' };
 
 /** JSON-LD graph: business, website and the page, linked by @id. No invented facts: contact only when real. */
 export function jsonLd(lang: Lang) {
   const t = content[lang];
-  const pageUrl = `${ORIGIN}/${lang}/`;
+  const pageUrl = `${ORIGIN}/`;
   const bizId = `${ORIGIN}/#business`;
   const p = site.pricing;
   const pr = t.pricing;
@@ -31,7 +31,7 @@ export function jsonLd(lang: Lang) {
     logo: `${ORIGIN}/img/logo-512.png`,
     image: `${ORIGIN}/img/og.png`,
     description: t.meta.description,
-    knowsLanguage: ['pl', 'de', 'en'],
+    knowsLanguage: ['pl'],
     // Promień od Jeleniej Góry plus miejscowości wymienione na stronie (jedno zdanie w sekcji „Cennik”)
     areaServed: [
       {
@@ -71,7 +71,7 @@ export function jsonLd(lang: Lang) {
         '@id': `${ORIGIN}/#website`,
         url: `${ORIGIN}/`,
         name: site.name,
-        inLanguage: [...locales],
+        inLanguage: 'pl',
         publisher: { '@id': bizId },
       },
       {

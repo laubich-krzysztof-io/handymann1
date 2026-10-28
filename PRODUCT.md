@@ -16,10 +16,10 @@ handyman.karkonosze is one craftsman's repair and property-care service: plumbin
 The same person every time, who knows the property; faults are logged and fixed before guests notice; transparent published rates (net, gross with 23% VAT) and a worked sample bill. Within 30 km of Jelenia Góra.
 
 ## Operating Context
-Season-driven hospitality; reports arrive by phone, WhatsApp (often with a photo) or the site form, which hands the message to WhatsApp or e-mail. Quote from a photo, exact quote on site, invoice with labour and materials listed separately. Trilingual audience: Polish, German, English.
+Season-driven hospitality; reports arrive by phone, WhatsApp (often with a photo) or the site form, which hands the message to WhatsApp or e-mail. Quote from a photo, exact quote on site, invoice with labour and materials listed separately. Polish-only site and service (German and English versions removed on the user's request, 2026-10-28).
 
 ## Capabilities and Constraints
-Astro static site on Vercel, routes /pl/ /de/ /en/ plus privacy pages. Prices live in src/config.ts: first hour incl. travel 200 zł net, each further started 30 min 70 zł net, parts at cost, urgent same day +50%, nights 22–6 and holidays +150%, care from 450 zł net/month (4 h, travel included, response within 24 h). Service area: radius 30 km from Jelenia Góra. Domain not bought yet; site stays noindex until launch. Company name, NIP and address still open.
+Astro static site on Vercel, Polish only: home at / and privacy page at /prywatnosc/ (old /pl/, /de/, /en/ addresses redirect to /). Prices live in src/config.ts: first hour incl. travel 200 zł net, each further started 30 min 70 zł net, parts at cost, urgent same day +50%, nights 22–6 and holidays +150%, care from 450 zł net/month (4 h, travel included, response within 24 h). Service area: radius 30 km from Jelenia Góra. Domain not bought yet; site stays noindex until launch. Company name, NIP and address still open.
 
 ## Brand Commitments
 Name and wordmark "handyman.karkonosze" in lowercase. The logo mark (tree, house, stethoscope) stays. Śnieżka with the observatory ("Spodek") stays as the mountain motif, may be drawn differently. Avoid black-with-gold "luxury". Quiet, not AI-slop. Green palette is not binding for the premium variant.

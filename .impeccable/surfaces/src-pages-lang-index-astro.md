@@ -1,11 +1,11 @@
 ---
 version: 1
 slug: "src-pages-lang-index-astro"
-primary_target: "src/pages/[lang]/index.astro"
+primary_target: "src/pages/index.astro"
 related_targets: []
 ---
 
-# Surface: home page (/pl/ /de/ /en/), premium variant on branch `premium`
+# Surface: home page (/), Polish only, premium variant on branch `premium`
 
 Mode: Persuade. Audience: owners of better guesthouses, 4-star hotels, aparthotels and investment apartments in the Karkonosze. Action: report a fault or ask about regular care. Proof: published net/gross rates, worked sample bill, SEP licence, the same person; nothing invented. User rejected the map world and the architectural-drawing world; pinned: premium, no graphics, no SVG illustrations or icons, existing content only.
 
