@@ -1,0 +1,68 @@
+---
+import { content } from '../i18n/content';
+import { redesign } from '../i18n/redesign';
+import type { Lang } from '../config';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = content[lang];
+const r = redesign[lang];
+const photos = ['tasma', 'malowanie', 'detal', 'gotowe'] as const;
+---
+
+<div class="work-gallery" data-gallery>
+  <div class="work-gallery__stage">
+    {photos.map((photo, i) => (
+      <figure
+        id={`photo-${photo}`}
+        class:list={['work-gallery__photo', { 'is-active': i === 1 }]}
+        data-photo={i}
+      >
+        <img
+          src={`/img/mural-${photo}-1600.webp`}
+          srcset={`/img/mural-${photo}-900.webp ${i >= 2 ? 675 : 900}w, /img/mural-${photo}-1600.webp ${i >= 2 ? 1200 : 1600}w`}
+          sizes="(min-width: 800px) 50vw, 100vw"
+          alt={t.work.photos[photo]}
+          width={i >= 2 ? 1200 : 1600}
+          height={i >= 2 ? 1600 : 1200}
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span>{r.workTabs[i]}</span>
+          <span>{String(i + 1).padStart(2, '0')} / 04</span>
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+  <div class="work-gallery__controls" aria-label={t.work.title} hidden>
+    {photos.map((photo, i) => (
+      <button
+        type="button"
+        data-photo-button={i}
+        aria-pressed={i === 1 ? 'true' : 'false'}
+        aria-controls={`photo-${photo}`}
+      >
+        {r.workTabs[i]}
+      </button>
+    ))}
+  </div>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+    const photos = [...gallery.querySelectorAll<HTMLElement>('[data-photo]')];
+    const controls = gallery.querySelector<HTMLElement>('.work-gallery__controls')!;
+    const buttons = [...controls.querySelectorAll<HTMLButtonElement>('[data-photo-button]')];
+    controls.hidden = false;
+    const select = (index: number) => {
+      photos.forEach((photo, i) => {
+        photo.hidden = i !== index;
+        photo.classList.toggle('is-active', i === index);
+      });
+      buttons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)));
+    };
+    select(1);
+    buttons.forEach((button, i) => button.addEventListener('click', () => select(i)));
+  });
+</script>

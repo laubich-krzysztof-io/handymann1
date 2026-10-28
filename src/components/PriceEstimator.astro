@@ -1,0 +1,125 @@
+---
+import { site, type Lang } from '../config';
+import { redesign } from '../i18n/redesign';
+import { estimateVisit, money } from '../lib/estimate';
+import Icon from './Icon.astro';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = redesign[lang].calculator;
+const rates = {
+  firstHour: site.pricing.firstHour,
+  halfHour: site.pricing.halfHour,
+  vatPct: site.pricing.vatPct,
+};
+const initial = estimateVisit(60, 0, rates);
+---
+
+<aside
+  class="calculator"
+  aria-labelledby="calculator-title"
+  data-calculator
+  data-lang={lang}
+  data-rates={JSON.stringify(rates)}
+>
+  <div class="calculator__heading">
+    <Icon name="wrench" />
+    <span class="eyebrow">{t.intro}</span>
+  </div>
+  <h3 id="calculator-title">{t.title}</h3>
+  <div class="calculator__fields">
+    <div class="field">
+      <label for="estimate-time">{t.time}</label>
+      <select id="estimate-time" name="minutes" disabled>
+        {Array.from({ length: 11 }, (_, i) => 60 + i * 30).map((minutes) => (
+          <option value={minutes}>
+            {Math.floor(minutes / 60)} h{minutes % 60 ? ' 30 min' : ''}
+          </option>
+        ))}
+      </select>
+    </div>
+    <div class="field">
+      <label for="estimate-materials">{t.materials}</label>
+      <input
+        id="estimate-materials"
+        name="materials"
+        type="number"
+        inputmode="decimal"
+        min="0"
+        max="1000000"
+        step="0.01"
+        value="0"
+        aria-describedby="estimate-error"
+        disabled
+      />
+    </div>
+  </div>
+  <p id="estimate-error" class="field__error" hidden>
+    {t.invalid}
+  </p>
+  <div class="calculator__result" aria-live="polite" aria-atomic="true">
+    <dl class="calculator__breakdown">
+      <div>
+        <dt>{t.net}</dt>
+        <dd data-net>{money(initial.net, lang)}</dd>
+      </div>
+      <div>
+        <dt>
+          {t.vat} {rates.vatPct}%
+        </dt>
+        <dd data-vat>{money(initial.vat, lang)}</dd>
+      </div>
+    </dl>
+    <p class="calculator__total">
+      <span>{t.total}</span>
+      <strong data-total>{money(initial.gross, lang)}</strong>
+    </p>
+  </div>
+  <p class="fine">{t.note.replace('{radius}', String(site.radiusKm))}</p>
+  <a class="btn btn--dark" href="#kontakt">
+    {t.cta}
+    <Icon name="arrow" />
+  </a>
+  <noscript>
+    <p class="fine">{t.noJs}</p>
+  </noscript>
+</aside>
+<script>
+  import { estimateVisit, money, type Rates } from '../lib/estimate';
+  document.querySelectorAll<HTMLElement>('[data-calculator]').forEach((calculator) => {
+    const rates: Rates = JSON.parse(calculator.dataset.rates || '{}');
+    const lang = calculator.dataset.lang || 'pl';
+    const time = calculator.querySelector<HTMLSelectElement>('[name="minutes"]')!;
+    const materials = calculator.querySelector<HTMLInputElement>('[name="materials"]')!;
+    time.disabled = false;
+    materials.disabled = false;
+    const error = calculator.querySelector<HTMLElement>('#estimate-error')!;
+    const update = () => {
+      const valid =
+        materials.validity.valid &&
+        (materials.value === '' || Number.isFinite(materials.valueAsNumber));
+      materials.setAttribute('aria-invalid', String(!valid));
+      error.hidden = valid;
+      if (!valid) {
+        ['net', 'vat', 'total'].forEach((key) => {
+          calculator.querySelector<HTMLElement>(`[data-${key}]`)!.textContent = '—';
+        });
+        return;
+      }
+      const result = estimateVisit(
+        Number(time.value),
+        materials.value === '' ? 0 : materials.valueAsNumber,
+        rates,
+      );
+      calculator.querySelector<HTMLElement>('[data-net]')!.textContent = money(result.net, lang);
+      calculator.querySelector<HTMLElement>('[data-vat]')!.textContent = money(result.vat, lang);
+      calculator.querySelector<HTMLElement>('[data-total]')!.textContent = money(
+        result.gross,
+        lang,
+      );
+    };
+    time.addEventListener('change', update);
+    materials.addEventListener('input', update);
+  });
+</script>

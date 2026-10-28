@@ -30,20 +30,20 @@ export const privacy: Record<Lang, Privacy> = {
     title: 'Polityka prywatności',
     description: `Jakie dane trafiają do ${site.name}, po co i jakie masz prawa. Formularz niczego nie zapisuje na stronie, a strona nie używa cookies.`,
     lead: 'Krótko i konkretnie: jakie dane do mnie trafiają, po co i jakie masz prawa.',
-    updated: 'Aktualizacja: 20 października 2026',
+    updated: 'Aktualizacja: 28 października 2026',
     back: 'Wróć na stronę główną',
     sections: [
       { h: 'Kto jest administratorem', p: [`Administratorem Twoich danych jest ${admin}. W sprawach danych osobowych napisz na ${reach}.`] },
       {
         h: 'Jakie dane do mnie trafiają',
         p: [
-          'Tylko te, które sam podasz: imię i nazwisko, telefon, kim jesteś (pensjonat, firma, osoba prywatna), miejsce i opis usterki oraz zdjęcia, jeśli je dołączysz. Przy zleceniu także dane potrzebne do rachunku lub faktury.',
+          'Tylko te, które sam podasz: imię i nazwisko, telefon, rodzaj pracy, miejsce i opis usterki oraz zdjęcia, jeśli je dołączysz. Przy zleceniu także dane potrzebne do rachunku lub faktury.',
         ],
       },
       {
         h: 'Jak działa formularz',
         p: [
-          'Formularz nie zapisuje niczego na tej stronie. Po kliknięciu otwiera WhatsAppa albo Twój program pocztowy z gotową wiadomością, a wysyłasz ją sam.',
+          'Formularz nie zapisuje niczego na tej stronie. Przygotowuje link do WhatsAppa albo Twojego programu pocztowego. Osobnym przyciskiem otwierasz gotową wiadomość i wysyłasz ją sam.',
           'Wiadomość wysłana przez WhatsAppa przechodzi przez serwis WhatsApp Ireland Limited (Meta), na zasadach jego polityki prywatności.',
         ],
       },
@@ -90,20 +90,20 @@ export const privacy: Record<Lang, Privacy> = {
     heading: 'Daten\u00adschutz\u00aderklärung',
     description: `Welche Daten ${site.name} erhält, wozu und welche Rechte Sie haben. Das Formular speichert nichts auf der Website, Cookies werden nicht verwendet.`,
     lead: 'Kurz und konkret: welche Daten bei mir ankommen, wozu und welche Rechte Sie haben.',
-    updated: 'Stand: 20. Oktober 2026',
+    updated: 'Stand: 28. Oktober 2026',
     back: 'Zur Startseite',
     sections: [
       { h: 'Verantwortlicher', p: [`Verantwortlich für Ihre Daten ist ${admin}. In Datenschutzfragen schreiben Sie an ${reach}.`] },
       {
         h: 'Welche Daten ich erhalte',
         p: [
-          'Nur die, die Sie selbst angeben: Name, Telefonnummer, wer Sie sind (Pension, Firma, Privatperson), Ort und Beschreibung des Schadens sowie Fotos, wenn Sie welche anhängen. Bei einem Auftrag zusätzlich die Angaben für die Rechnung.',
+          'Nur die, die Sie selbst angeben: Name, Telefonnummer, Art der Arbeit, Ort und Beschreibung des Schadens sowie Fotos, wenn Sie welche anhängen. Bei einem Auftrag zusätzlich die Angaben für die Rechnung.',
         ],
       },
       {
         h: 'So funktioniert das Formular',
         p: [
-          'Das Formular speichert nichts auf dieser Website. Nach dem Klick öffnet sich WhatsApp oder Ihr E-Mail-Programm mit einer fertigen Nachricht, die Sie selbst absenden.',
+          'Das Formular speichert nichts auf dieser Website. Es bereitet einen Link zu WhatsApp oder Ihrem E-Mail-Programm vor. Über eine separate Schaltfläche öffnen Sie die fertige Nachricht und senden sie selbst ab.',
           'Eine über WhatsApp gesendete Nachricht läuft über den Dienst der WhatsApp Ireland Limited (Meta) nach deren Datenschutzbestimmungen.',
         ],
       },
@@ -149,20 +149,20 @@ export const privacy: Record<Lang, Privacy> = {
     title: 'Privacy policy',
     description: `What data reaches ${site.name}, why, and what your rights are. The form stores nothing on the site, and the site uses no cookies.`,
     lead: 'Short and specific: what data reaches me, why, and what your rights are.',
-    updated: 'Last updated: 20 October 2026',
+    updated: 'Last updated: 28 October 2026',
     back: 'Back to the home page',
     sections: [
       { h: 'Who is responsible', p: [`The controller of your data is ${admin}. For anything about your personal data, write to ${reach}.`] },
       {
         h: 'What data reaches me',
         p: [
-          'Only what you provide: your name, phone number, who you are (guesthouse, business, private owner), the place and description of the fault, and photos if you attach them. For a job, also the details needed for the invoice.',
+          'Only what you provide: your name, phone number, type of work, the place and description of the fault, and photos if you attach them. For a job, also the details needed for the invoice.',
         ],
       },
       {
         h: 'How the form works',
         p: [
-          'The form stores nothing on this site. When you click, it opens WhatsApp or your email app with a ready message, and you send it yourself.',
+          'The form stores nothing on this site. It prepares a link to WhatsApp or your email app. You open the ready message with a separate button and send it yourself.',
           'A message sent by WhatsApp passes through the service of WhatsApp Ireland Limited (Meta), under its own privacy policy.',
         ],
       },

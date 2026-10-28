@@ -1,0 +1,187 @@
+---
+import { content } from '../i18n/content';
+import { redesign } from '../i18n/redesign';
+import { privacyPath } from '../i18n/privacy';
+import { site, type Lang } from '../config';
+import Icon from './Icon.astro';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = content[lang];
+const r = redesign[lang];
+const f = t.contact.form;
+---
+
+<form
+  id="lead"
+  class="form"
+  novalidate
+  data-wa={site.whatsapp}
+  data-mail={site.email}
+  data-greeting={t.waGreeting}
+  data-subject={r.messageSubject}
+  data-l-name={f.name}
+  data-l-phone={f.phone}
+  data-l-service={r.serviceLabel}
+  data-l-where={f.where}
+  data-l-what={f.what}
+  data-sent-wa={r.preparedWa}
+  data-sent-mail={r.preparedMail}
+  data-link-wa={r.openWa}
+  data-link-mail={r.openMail}
+>
+  <p class="form__intro">{r.formIntro}</p>
+  <fieldset disabled class="form__fields">
+    <legend class="sr-only">{t.contact.title}</legend>
+    <div class="field">
+      <label for="f-name">
+        {f.name} <span aria-hidden="true">*</span>
+        <span class="sr-only"> ({f.required})</span>
+      </label>
+      <input
+        id="f-name"
+        name="name"
+        autocomplete="name"
+        required
+        maxlength="120"
+        aria-describedby="e-name"
+      />
+      <p class="field__error" id="e-name" hidden>
+        {f.errName}
+      </p>
+    </div>
+    <div class="field">
+      <label for="f-phone">{f.phone}</label>
+      <input
+        id="f-phone"
+        name="phone"
+        type="tel"
+        autocomplete="tel"
+        inputmode="tel"
+        maxlength="40"
+      />
+    </div>
+    <div class="field">
+      <label for="f-service">{r.serviceLabel}</label>
+      <select id="f-service" name="service">
+        <option value="">{r.serviceAny}</option>
+        {t.services.items.map((item) => (
+          <option>{item.name}</option>
+        ))}
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-where">{f.where}</label>
+      <input
+        id="f-where"
+        name="where"
+        autocomplete="address-level2"
+        placeholder="Karpacz, Jelenia Góra…"
+        maxlength="200"
+      />
+    </div>
+    <div class="field field--wide">
+      <label for="f-what">
+        {f.what} <span aria-hidden="true">*</span>
+        <span class="sr-only"> ({f.required})</span>
+      </label>
+      <textarea
+        id="f-what"
+        name="what"
+        rows="4"
+        required
+        maxlength="2000"
+        aria-describedby="e-what"
+        placeholder={f.whatPlaceholder}
+      ></textarea>
+      <p class="field__error" id="e-what" hidden>
+        {f.errWhat}
+      </p>
+    </div>
+    <div class="form__actions field--wide">
+      <button class="btn btn--dark" type="submit" data-send="wa">
+        {r.sendWa}
+        <Icon name="arrow" />
+      </button>
+      <button class="text-button" type="submit" data-send="mail">
+        {r.sendMail}
+      </button>
+    </div>
+  </fieldset>
+  <div class="form__result" hidden>
+    <p class="form__status" role="status" aria-live="polite"></p>
+    <a class="btn btn--dark" data-message-link target="_blank" rel="noopener"></a>
+  </div>
+  <p class="fine">
+    {f.hint} <a href={privacyPath(lang)}>{f.privacy}</a>.
+  </p>
+  <noscript>
+    <p class="fine">{r.noJs}</p>
+  </noscript>
+</form>
+<script>
+  const form = document.querySelector<HTMLFormElement>('#lead');
+  if (form) {
+    form.querySelector('fieldset')!.disabled = false;
+    const field = (name: string) =>
+      form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    const required = ['name', 'what'];
+    const result = form.querySelector<HTMLElement>('.form__result')!;
+    const status = form.querySelector<HTMLElement>('.form__status')!;
+    const link = form.querySelector<HTMLAnchorElement>('[data-message-link]')!;
+    const setError = (name: string, invalid: boolean) => {
+      field(name).setAttribute('aria-invalid', String(invalid));
+      document.getElementById(`e-${name}`)!.hidden = !invalid;
+    };
+    form.addEventListener('input', () => {
+      result.hidden = true;
+      required.forEach((name) => {
+        if (field(name).value.trim()) setError(name, false);
+      });
+    });
+    form.addEventListener('change', () => {
+      result.hidden = true;
+    });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      result.hidden = true;
+      const empty = required.filter((name) => !field(name).value.trim());
+      required.forEach((name) => setError(name, empty.includes(name)));
+      if (empty.length) {
+        field(empty[0]).focus();
+        return;
+      }
+      const d = form.dataset;
+      const lines = [
+        [d.lName, 'name'],
+        [d.lPhone, 'phone'],
+        [d.lService, 'service'],
+        [d.lWhere, 'where'],
+        [d.lWhat, 'what'],
+      ];
+      const message = [
+        d.greeting,
+        '',
+        ...lines
+          .filter(([, name]) => field(name!).value.trim())
+          .map(([label, name]) => `${label}: ${field(name!).value.trim()}`),
+      ].join('\n');
+      const channel = (event.submitter as HTMLButtonElement | null)?.dataset.send ?? 'wa';
+      link.href =
+        channel === 'wa'
+          ? `https://wa.me/${d.wa}?text=${encodeURIComponent(message)}`
+          : `mailto:${d.mail}?subject=${encodeURIComponent(d.subject!)}&body=${encodeURIComponent(message)}`;
+      link.textContent = (channel === 'wa' ? d.linkWa : d.linkMail)!;
+      status.textContent = (channel === 'wa' ? d.sentWa : d.sentMail)!;
+      result.hidden = false;
+      link.focus();
+    });
+    document.querySelectorAll<HTMLAnchorElement>('[data-service]').forEach((link) => {
+      link.addEventListener('click', () => {
+        field('service').value = link.dataset.service || '';
+        result.hidden = true;
+      });
+    });
+  }
+</script>

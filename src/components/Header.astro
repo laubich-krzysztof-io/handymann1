@@ -1,158 +1,117 @@
 ---
 import Mark from './Mark.astro';
+import Icon from './Icon.astro';
 import { content } from '../i18n/content';
 import { locales, site, type Lang } from '../config';
-
 interface Props {
   lang: Lang;
-  /** Na podstronach kotwice menu prowadzą do strony głównej */
   sub?: boolean;
-  /** Adres tej samej strony w innych językach (przełącznik języka) */
   alternates?: Record<Lang, string>;
 }
 const { lang, sub = false } = Astro.props;
-const home = sub ? `/${lang}/` : '';
-const alt = Astro.props.alternates ?? (Object.fromEntries(locales.map((l) => [l, `/${l}/`])) as Record<Lang, string>);
 const t = content[lang];
-
-const brandSub = t.brand.sub;
-const navLabel: Record<Lang, string> = { pl: 'Menu główne', de: 'Hauptmenü', en: 'Main menu' };
-const langLabel: Record<Lang, string> = { pl: 'Język', de: 'Sprache', en: 'Language' };
-const menuLabel: Record<Lang, { open: string; close: string }> = {
-  pl: { open: 'Otwórz menu', close: 'Zamknij menu' },
-  de: { open: 'Menü öffnen', close: 'Menü schließen' },
-  en: { open: 'Open menu', close: 'Close menu' },
-};
-const [word1, word2] = site.name.split('.');
-// WhatsApp na komputerze: sama ikona obok przycisku (na telefonie jest dolny pasek szybkiego kontaktu)
-const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreeting)}`;
-const waPath = 'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z'; // znak WhatsApp, Simple Icons (CC0)
-// Menu w kolejności sekcji na stronie
+const home = sub ? `/${lang}/` : '';
+const alt = Astro.props.alternates ?? Object.fromEntries(locales.map((l) => [l, `/${l}/`]));
+const labels = {
+  pl: ['Menu główne', 'Język', 'Otwórz menu', 'Zamknij menu'],
+  de: ['Hauptmenü', 'Sprache', 'Menü öffnen', 'Menü schließen'],
+  en: ['Main menu', 'Language', 'Open menu', 'Close menu'],
+}[lang];
 const links = [
-  { id: 'uslugi', label: t.nav.services },
-  { id: 'opieka', label: t.nav.care },
-  { id: 'jak', label: t.nav.process },
-  { id: 'cennik', label: t.nav.prices },
-  { id: 'realizacja', label: t.nav.work },
+  ['uslugi', t.nav.services],
+  ['realizacja', t.nav.work],
+  ['opieka', t.nav.care],
+  ['cennik', t.nav.prices],
 ];
 ---
-<header class="top" data-top data-label-open={menuLabel[lang].open} data-label-close={menuLabel[lang].close}>
-  <div class="top__scene" aria-hidden="true">
-    <span class="top__strip"></span>
-    <span class="top__sniezka"></span>
-    <span class="top__forest"></span>
-  </div>
-  <div class="top__in">
-    <a class="brand" href={`/${lang}/`} aria-label={`${site.name} – ${brandSub}`}>
+
+<header class="top" data-header>
+  <div class="wrap top__in">
+    <a class="brand" href={`/${lang}/`} aria-label={site.name}>
       <Mark class="brand__mark" />
       <span class="brand__text">
-        <span class="brand__name">{word1}<span class="brand__dot">.</span>{word2}</span>
-        <span class="brand__sub">{brandSub}</span>
+        <strong>
+          handyman<span>.</span>
+        </strong>
+        <span>karkonosze</span>
       </span>
     </a>
-
-    <nav class="nav" id="nav" aria-label={navLabel[lang]}>
-      <ul class="nav__list">
-        {links.map((l) => (
-          <li class="nav__item"><a class="nav__link" href={`${home}#${l.id}`} data-spy={l.id}>{l.label}</a></li>
-        ))}
-      </ul>
-      <div class="nav__extra">
-        <ul class="lang" aria-label={langLabel[lang]}>
-          {locales.map((l) => (
-            <li><a href={alt[l]} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
-          ))}
-        </ul>
-        <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
-      </div>
-    </nav>
-
-    <div class="top__end">
-      <ul class="lang" aria-label={langLabel[lang]}>
-        {locales.map((l) => (
-          <li><a href={alt[l]} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a></li>
-        ))}
-      </ul>
-      <a class="wa-link" href={wa} target="_blank" rel="noopener" aria-label={t.contact.whatsappDirect} title={t.contact.whatsappDirect}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d={waPath} /></svg>
+    <nav class="nav" id="main-navigation" aria-label={labels[0]}>
+      {links.map(([id, label]) => (
+        <a href={`${home}#${id}`}>{label}</a>
+      ))}
+      <a class="nav__mobile-contact" href={`${home}#kontakt`}>
+        {t.hero.primary}
+        <Icon name="arrow" />
       </a>
-      <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
-      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel[lang].open} data-burger>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="burger__a" d="M4 7h16" /><path class="burger__b" d="M4 12h16" /><path class="burger__c" d="M4 17h16" /></svg>
+    </nav>
+    <div class="top__end">
+      <ul class="lang" aria-label={labels[1]}>
+        {locales.map((l) => (
+          <li>
+            <a href={alt[l]} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>
+              {l.toUpperCase()}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a class="top__call" href={`tel:${site.phone.replace(/\s/g, '')}`}>
+        <Icon name="phone" />
+        <span>{site.phone}</span>
+      </a>
+      <button
+        class="burger"
+        type="button"
+        aria-controls="main-navigation"
+        aria-expanded="false"
+        aria-label={labels[2]}
+        data-open-label={labels[2]}
+        data-close-label={labels[3]}
+        hidden
+      >
+        <span></span>
+        <span></span>
       </button>
     </div>
   </div>
 </header>
-<div class="top-space" aria-hidden="true"></div>
-
 <script>
-  const top = document.querySelector<HTMLElement>('[data-top]');
-  if (top) {
-    // Compact bar after the first scroll
-    let ticking = false;
-    // Hysteresis: collapse past 56px, expand only back near the top (no flicker on small scrolls)
-    const compact = () => {
-      const y = window.scrollY;
-      const on = top.classList.contains('is-compact');
-      if (!on && y > 56) top.classList.add('is-compact');
-      else if (on && y < 8) top.classList.remove('is-compact');
-      ticking = false;
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const toggle = header?.querySelector<HTMLButtonElement>('.burger');
+  const nav = header?.querySelector<HTMLElement>('.nav');
+  if (header && toggle && nav) {
+    header.classList.add('is-enhanced');
+    toggle.hidden = false;
+    const setOpen = (open: boolean, restoreFocus = false) => {
+      header.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute(
+        'aria-label',
+        (open ? toggle.dataset.closeLabel : toggle.dataset.openLabel)!,
+      );
+      if (restoreFocus) toggle.focus();
     };
-    window.addEventListener('scroll', () => {
-      if (!ticking) { ticking = true; requestAnimationFrame(compact); }
-    }, { passive: true });
-    // Pierwszy odczyt w klatce animacji: bez wymuszonego przeliczania układu przy starcie
-    requestAnimationFrame(() => {
-      compact();
-      // Wejście pejzażu (Śnieżka z mgły) tylko gdy strona startuje u góry
-      if (window.scrollY < 56) top.classList.add('is-intro');
-    });
-
-    // Mobile panel
-    const burger = top.querySelector<HTMLButtonElement>('[data-burger]');
-    const setPanel = (open: boolean) => {
-      top.classList.toggle('is-open', open);
-      burger?.setAttribute('aria-expanded', String(open));
-      burger?.setAttribute('aria-label', (open ? top.dataset.labelClose : top.dataset.labelOpen) || '');
-    };
-    burger?.addEventListener('click', () => setPanel(!top.classList.contains('is-open')));
-
-    document.addEventListener('click', (e) => {
-      if (!top.contains(e.target as Node)) setPanel(false);
-    });
-    top.querySelectorAll<HTMLAnchorElement>('.nav a').forEach((a) =>
-      a.addEventListener('click', () => setPanel(false)),
+    toggle.addEventListener('click', () =>
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true'),
     );
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && top.classList.contains('is-open')) { setPanel(false); burger?.focus(); }
+    nav
+      .querySelectorAll('a')
+      .forEach((link) => link.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true')
+        setOpen(false, true);
     });
-
-    // Zmiana języka zostawia czytelnika w tej samej sekcji (kotwice są wspólne dla PL/DE/EN)
-    top.querySelectorAll<HTMLAnchorElement>('.lang a').forEach((a) =>
-      a.addEventListener('click', () => {
-        const current = document.querySelector('main > section.is-seen-last');
-        const hash = current?.id ? `#${current.id}` : location.hash;
-        if (hash) a.href = a.pathname + hash;
+    document.addEventListener('click', (event) => {
+      if (!header.contains(event.target as Node)) setOpen(false);
+    });
+    header.addEventListener('focusout', (event) => {
+      if (!header.contains(event.relatedTarget as Node)) setOpen(false);
+    });
+    matchMedia('(min-width: 1100px)').addEventListener('change', () => setOpen(false));
+    header.querySelectorAll<HTMLAnchorElement>('.lang a').forEach((link) =>
+      link.addEventListener('click', () => {
+        link.hash = location.hash;
       }),
     );
-
-    // Current section underline
-    // Obserwujemy wszystkie sekcje: te bez linku w menu czyszczą podkreślenie
-    const spies = [...top.querySelectorAll<HTMLElement>('[data-spy]')];
-    const sections = [...document.querySelectorAll<HTMLElement>('main > section')];
-    const mark = (id: string | null) => spies.forEach((el) => {
-      const on = el.dataset.spy === id;
-      el.classList.toggle('is-current', on);
-      on ? el.setAttribute('aria-current', 'location') : el.removeAttribute('aria-current');
-    });
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (!en.isIntersecting) return;
-        sections.forEach((s) => s.classList.toggle('is-seen-last', s === en.target));
-        mark((en.target as HTMLElement).id || null);
-      });
-    }, { rootMargin: '-40% 0px -55% 0px' });
-    sections.forEach((s) => io.observe(s));
-    window.addEventListener('scroll', () => { if (window.scrollY < 80) mark(null); }, { passive: true });
   }
 </script>
