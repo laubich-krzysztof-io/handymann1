@@ -1,11 +1,13 @@
 ---
-import '@fontsource-variable/brygada-1918/wght.css';
-import '@fontsource-variable/brygada-1918/wght-italic.css';
-import '@fontsource-variable/albert-sans/wght.css';
-import '../styles/luxe.css';
-// Te dwa pliki niosą tekst otwarcia (łacina + polskie znaki): przeglądarka pobiera je od razu, nie po CSS
-import brygadaLatin from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-wght-normal.woff2?url';
-import brygadaLatinExt from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-ext-wght-normal.woff2?url';
+// Kroje jak w referencji (Cyprianerhof): Garamond do nagłówków, Mona Sans do tekstu i interfejsu
+import '@fontsource-variable/eb-garamond/wght.css';
+import '@fontsource-variable/eb-garamond/wght-italic.css';
+import '@fontsource-variable/mona-sans/wght.css';
+import '../styles/ref.css';
+// Pliki z tekstem otwarcia i wstępu (łacina + polskie znaki): przeglądarka pobiera je od razu, nie po CSS
+import garamondLatin from '@fontsource-variable/eb-garamond/files/eb-garamond-latin-wght-normal.woff2?url';
+import garamondLatinExt from '@fontsource-variable/eb-garamond/files/eb-garamond-latin-ext-wght-normal.woff2?url';
+import monaLatin from '@fontsource-variable/mona-sans/files/mona-sans-latin-wght-normal.woff2?url';
 import { site, type Lang } from '../config';
 import { ORIGIN, jsonLd, ogLocale } from '../lib/seo';
 
@@ -37,9 +39,10 @@ const indexable = site.indexable && !noindex;
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content={indexable ? 'index, follow, max-image-preview:large' : noindex ? 'noindex, follow' : 'noindex, nofollow'} />
-    <meta name="theme-color" content="#F7F4EE" />
-    <link rel="preload" href={brygadaLatin} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={brygadaLatinExt} as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#2D2D2D" />
+    <link rel="preload" href={garamondLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={garamondLatinExt} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monaLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonical} />
@@ -59,18 +62,10 @@ const indexable = site.indexable && !noindex;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     {ld && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
-    <!-- Ruch: otwarcie ukryte tylko do startu animacji; gdyby skrypt się nie wczytał, treść pokaże się po 2,5 s -->
-    <script is:inline>
-      (function () {
-        var d = document.documentElement;
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        d.classList.add('motion');
-        window.__motionFallback = setTimeout(function () { d.classList.remove('motion'); }, 2500);
-      })();
-    </script>
+    <!-- Bez JavaScriptu wszystkie zakładki są widoczne jedna pod drugą -->
+    <noscript><style>[role="tabpanel"][hidden] { display: block !important; } .themes__tabs, .pills { display: none !important; }</style></noscript>
   </head>
   <body>
     <slot />
-    <script>import '../scripts/motion';</script>
   </body>
 </html>

@@ -1,26 +1,26 @@
 ---
+// Stopka jak w referencji: jasna, jedno pytanie z przyciskiem, pod spodem dane i linki.
 import Mark from './Mark.astro';
 import { content } from '../i18n/content';
 import { privacyPath } from '../i18n/privacy';
 import { site, type Lang } from '../config';
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props { lang: Lang; sub?: boolean }
+const { lang, sub = false } = Astro.props;
 const t = content[lang];
 const tel = site.phone.replace(/\s/g, '');
 const legal = [site.company || site.name, site.address, site.nip && `NIP ${site.nip}`].filter(Boolean).join(', ');
 ---
 <footer class="foot">
   <div class="wrap foot__in">
-    <div class="foot__top">
-      <span class="foot__brand"><Mark class="foot__mark" />{site.name}</span>
-      <p class="foot__contact">
-        <a href={`tel:${tel}`}>{site.phone}</a>
-        <a href={`mailto:${site.email}`}>{site.email}</a>
-      </p>
+    <div class="foot__ask">
+      <p>Chcą Państwo zapytać o coś jeszcze?</p>
+      <a class="btn btn--dark" href={`tel:${tel}`}>Zadzwoń: {site.phone}</a>
     </div>
     <div class="foot__legal">
+      <span class="foot__brand"><Mark class="foot__mark" />{site.name}</span>
       <span>{t.brand.sub}. {t.footer.area}.</span>
+      <a href={`mailto:${site.email}`}>{site.email}</a>
       <a href={privacyPath}>{t.footer.privacy}</a>
       <span>© {new Date().getFullYear()} {legal}. {t.footer.rights}</span>
     </div>

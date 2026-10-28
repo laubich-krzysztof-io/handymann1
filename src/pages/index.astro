@@ -1,220 +1,321 @@
 ---
+// Strona główna w układzie wzorowanym na holiday.cyprianerhof.com (gałąź „referencja”).
+// Kolejność jak w referencji: otwarcie na zdjęciu, wstęp, bloki z zakładkami, wyróżniki,
+// ciemny pas z kartami (cennik), szczegóły z zakładkami, galeria, cytat, liczby, mapa, pytania, zapytanie, stopka.
+// Wszystkie fakty z obecnej strony (content.ts, config.ts); zdjęcia w src/photos.ts.
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Mark from '../components/Mark.astro';
+import Photo from '../components/Photo.astro';
 import { privacyPath } from '../i18n/privacy';
 import { content } from '../i18n/content';
+import { tabs, pillars, priceCards, stats, mapTowns, project } from '../i18n/ref';
+import { photos } from '../photos';
 import { site } from '../config';
 
 const t = content.pl;
 const pr = t.pricing;
+const P = site.pricing;
 const tel = site.phone.replace(/\s/g, '');
-// Numer w kontakcie: kierunkowy mniejszy, sam numer w skali nagłówka
 const [cc, ...rest] = site.phone.split(' ');
-const local = rest.join(' ');
+const local = rest.join(' ');
 const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreeting)}`;
-// Trzy zdjęcia w jednym rzędzie; --ar = proporcje, więc w rzędzie mają równą wysokość bez kadrowania
-const photos = [
-  { id: 'malowanie', w: 1600, h: 1200 },
-  { id: 'detal', w: 1200, h: 1600 },
-  { id: 'gotowe', w: 1200, h: 1600 },
-] as const;
+
+// Mapa stref: środek w Jeleniej Górze, skala w pikselach na kilometr
+const MAP = { w: 760, h: 560, cx: 410, cy: 290, s: 8.6 };
+const pts = mapTowns.map((m) => ({ ...m, ...project(m.lat, m.lng, MAP.s, MAP.cx, MAP.cy) }));
+const ring30 = 30 * MAP.s;
+// Strefa 1 jako miękki obszar wokół jej miejscowości (otoczka wypukła)
+type Pt = (typeof pts)[number];
+const z1 = pts.filter((p) => p.zone === 1);
+const hull = (() => {
+  const a = [...z1].sort((p, q) => p.x - q.x || p.y - q.y);
+  const cross = (o: Pt, p: Pt, q: Pt) => (p.x - o.x) * (q.y - o.y) - (p.y - o.y) * (q.x - o.x);
+  const lo: Pt[] = []; const hi: Pt[] = [];
+  for (const p of a) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+  for (const p of [...a].reverse()) { while (hi.length >= 2 && cross(hi[hi.length - 2], hi[hi.length - 1], p) <= 0) hi.pop(); hi.push(p); }
+  return [...lo.slice(0, -1), ...hi.slice(0, -1)].map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+})();
+const labelPos = (p: { x: number; y: number; label?: string }) => {
+  const d = 12;
+  switch (p.label) {
+    case 'l': return { x: p.x - d, y: p.y + 4, a: 'end' };
+    case 'r': return { x: p.x + d, y: p.y + 4, a: 'start' };
+    case 't': return { x: p.x, y: p.y - d, a: 'middle' };
+    default: return { x: p.x, y: p.y + d + 10, a: 'middle' };
+  }
+};
+
+const icons: Record<string, string> = {
+  coin: '<circle cx="12" cy="12" r="8.5"/><path d="M9 9.5c0-1.2 1.3-2 3-2s3 .8 3 2-1.3 1.7-3 2.2-3 1-3 2.3 1.3 2 3 2 3-.8 3-2M12 6v1.5M12 16.5V18"/>',
+  pin: '<path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0C18.5 14.9 12 21 12 21z"/><circle cx="12" cy="10" r="2.4"/>',
+  drop: '<path d="M12 3.5s-6 6.6-6 10.6a6 6 0 0 0 12 0C18 10.1 12 3.5 12 3.5z"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  bolt: '<path d="M13 3 5.5 13.5H11L10 21l7.5-10.5H12L13 3z"/>',
+  house: '<path d="M4 11.5 12 4.5l8 7"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-5h4v5"/>',
+  calendar: '<rect x="4" y="5.5" width="16" height="14.5" rx="1.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+  check: '<path d="M5 12.5l4.2 4.2L19 7"/>',
+  camera: '<path d="M4 8.5h3.2L9 6h6l1.8 2.5H20V18H4z"/><circle cx="12" cy="13" r="3.2"/>',
+};
+const Icon = (name: string) => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`;
+const tabIcon: Record<string, string> = { hydraulika: 'drop', elektryka: 'bolt', montaz: 'house', opieka: 'calendar' };
+
+const work = [
+  { shot: photos.hero, caption: t.work.photos.malowanie.caption },
+  { shot: photos.montaz[0], caption: 'Taśmowanie przed malowaniem' },
+  { shot: photos.montaz[1], caption: t.work.photos.detal.caption },
+  { shot: { src: '/img/mural-gotowe-1600.webp', alt: t.work.photos.gotowe.alt, w: 1200, h: 1600 }, caption: t.work.photos.gotowe.caption },
+];
 ---
 <Base lang="pl" htmlLang={t.htmlLang} title={t.meta.title} description={t.meta.description} imageAlt={`${site.name} – ${t.brand.sub}`}>
   <a class="skip" href="#main">Przejdź do treści</a>
-
   <Header lang="pl" />
 
   <main id="main" tabindex="-1">
-    <section class="hero" data-hero>
-      <div class="wrap hero__in">
-        <h1>{t.hero.title}</h1>
-        <div class="hero__side">
-          <div class="hero__main">
-            <p class="lead">{t.hero.lead}</p>
-            <div class="actions" data-hero-actions>
-              <a class="btn" href="#kontakt">{t.hero.primary}</a>
-              <a class="call-link" href={`tel:${tel}`}>{site.phone}</a>
+    <!-- Otwarcie na cały ekran: zdjęcie, jedno zdanie, przycisk -->
+    <section class="hero" aria-label="Otwarcie">
+      <div class="hero__media">
+        <Photo shot={photos.hero} eager sizes="100vw" />
+      </div>
+      <div class="hero__in">
+        <p class="hero__line">{t.hero.title}</p>
+        <a class="btn btn--outline" href="#kontakt">{t.hero.primary}</a>
+      </div>
+    </section>
+
+    <!-- Wstęp wyśrodkowany: tytuł, podtytuł, akapit -->
+    <section class="intro" aria-labelledby="intro-h">
+      <div class="wrap intro__in" data-reveal>
+        <h1 id="intro-h">Serwis i opieka nad obiektami</h1>
+        <p class="intro__sub">Hydraulika, elektryka i drobne remonty w Karkonoszach</p>
+        <p class="intro__text">{t.hero.lead} {pr.lead}</p>
+      </div>
+    </section>
+
+    <!-- Bloki tematyczne z zakładkami (jak Active / Wellbeing / Cuisine…) -->
+    <section id="uslugi" class="themes" aria-labelledby="uslugi-h">
+      <h2 id="uslugi-h" class="sr-only">{t.services.title}</h2>
+      <div class="wrap">
+        <div class="themes__box" data-tabs>
+          <div class="themes__tabs" role="tablist" aria-label={t.services.title} aria-orientation="vertical">
+            {tabs.map((tab, i) => {
+              const thumb = tab.photos ? photos[tab.photos].find((s) => s.src) : null;
+              return (
+                <button class="themes__tab" type="button" role="tab" id={`tab-${tab.id}`} aria-controls={tab.id} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={tab.id}>
+                  <span class="themes__thumb" aria-hidden="true">{thumb?.src ? <img src={thumb.src.replace('-1600.', '-900.')} alt="" width="56" height="56" loading="lazy" /> : <Fragment set:html={Icon(tabIcon[tab.id])} />}</span>
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          {tabs.map((tab, i) => (
+            <div class="themes__panel" role="tabpanel" id={tab.id} aria-labelledby={`tab-${tab.id}`} data-panel={tab.id} hidden={i !== 0 ? true : undefined} tabindex="-1">
+              <div class="themes__text">
+                <h3>{tab.title}</h3>
+                <p class="themes__intro">{tab.intro}</p>
+                {tab.line && <p class="themes__line">{tab.line}</p>}
+                <ul class="themes__list">{tab.bullets.map((b) => <li>{b}</li>)}</ul>
+                {tab.cta && <a class="btn btn--yellow" href="#kontakt" data-topic="1">{tab.cta}</a>}
+              </div>
+              {tab.photos ? (
+                <div class="themes__grid">
+                  {photos[tab.photos].map((s) => <Photo shot={s} sizes="(min-width: 64rem) 16vw, 45vw" />)}
+                </div>
+              ) : tab.visit && (
+                <div class="visit" role="group" aria-labelledby="visit-h">
+                  <p class="visit__head"><span class="visit__title" id="visit-h">{tab.visit.title}</span><span class="pill">{tab.visit.label}</span></p>
+                  <ul>
+                    {tab.visit.entries.map((e) => (
+                      <li><span class="visit__where">{e.where}</span><span class="visit__what">{e.what}</span><span class="visit__done"><Fragment set:html={Icon('check')} />{e.done}</span></li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
-          </div>
-          <div class="proof">
-            <p class="proof__line">
-              <span>{t.hero.proof.label}</span>
-              <span class="proof__price">{t.hero.proof.price}</span>
-            </p>
-            <p class="proof__sub">
-              <span>{t.hero.proof.gross}, {t.hero.proof.area}.</span>
-              <a href="#cennik">{t.hero.proof.link}</a>
-            </p>
-          </div>
+          ))}
         </div>
       </div>
     </section>
 
-    <section id="uslugi" class="section" aria-labelledby="uslugi-h">
+    <!-- Wyróżniki (jak „What sets us apart”) -->
+    <section class="pillars" aria-labelledby="pillars-h">
       <div class="wrap">
-        <div class="section__head">
-          <h2 id="uslugi-h">{t.services.title}</h2>
-          <p class="lead">{t.services.lead}</p>
-        </div>
-        <ul class="svc" data-rule>
-          {t.services.items.map((s) => (
-            <li class="svc__item">
-              <h3>{s.name}</h3>
-              <p>{s.text}</p>
+        <h2 id="pillars-h" class="title" data-reveal>Na czym można polegać</h2>
+        <ul class="pillars__grid">
+          {pillars.map((p) => (
+            <li class="card" data-reveal>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
             </li>
           ))}
         </ul>
-        <p class="credential">{t.services.note}</p>
       </div>
     </section>
 
-    <section id="opieka" class="section section--stone" aria-labelledby="opieka-h">
-      <div class="wrap care">
-        <div class="care__head">
-          <h2 id="opieka-h">{t.care.title}</h2>
-          <p class="care__quote">{t.care.quote}</p>
-          <p class="lead">{t.care.lead}</p>
+    <!-- Ciemny pas z kartami (jak „Top offers”): cennik -->
+    <section id="cennik" class="band" aria-labelledby="cennik-h">
+      <div class="band__bg" aria-hidden="true"><Photo shot={photos.band} sizes="100vw" /></div>
+      <div class="wrap band__in">
+        <div class="band__head" data-reveal>
+          <span class="band__mark"><Mark /></span>
+          <h2 id="cennik-h" class="title title--light">{pr.title}</h2>
+          <p class="band__kicker">{pr.fine}</p>
         </div>
-        <div class="care__body">
-          <div class="care__main">
-            <ul class="care__points" data-rule>
-              {t.care.points.map((p) => (
-                <li>
-                  <h3>{p.title}</h3>
-                  <p>{p.text}</p>
-                </li>
-              ))}
-            </ul>
-            <a class="btn" href="#kontakt" data-topic="1">{t.care.cta}</a>
+        <ul class="offers">
+          {priceCards.map((c) => (
+            <li class="offer" data-reveal>
+              <span class="pill">{c.badge}</span>
+              <h3>{c.title}</h3>
+              <p class="offer__price">{c.price} <span>netto</span></p>
+              <p class="offer__gross">{c.gross}</p>
+              <p class="offer__note">{c.note}</p>
+              <div class="offer__btns">
+                <a class="btn btn--lav" href="#szczegoly">Szczegóły</a>
+                <a class="btn btn--yellow" href="#kontakt" data-topic={c.topic}>Zapytaj</a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Szczegóły cennika z zakładkami (jak „Rooms” z przełącznikiem typów) -->
+    <section id="szczegoly" class="details" aria-labelledby="szczegoly-h">
+      <div class="wrap">
+        <h2 id="szczegoly-h" class="title" data-reveal>Szczegóły cennika</h2>
+        <div data-tabs class="details__wrap">
+          <div class="pills" role="tablist" aria-label="Szczegóły cennika">
+            <button class="pills__btn" type="button" role="tab" id="tab-doplaty" aria-controls="doplaty" aria-selected="true" tabindex="0" data-tab="doplaty">Dopłaty i zasady</button>
+            <button class="pills__btn" type="button" role="tab" id="tab-rachunek" aria-controls="rachunek" aria-selected="false" tabindex="-1" data-tab="rachunek">Przykładowy rachunek</button>
           </div>
-          <div class="visit" role="group" aria-labelledby="visit-h" data-rule>
-            <p class="visit__head">
-              <span class="visit__title" id="visit-h">{t.care.visit.title}</span>
-              <span class="label">{t.care.visit.label}</span>
-            </p>
-            <ul>
-              {t.care.visit.entries.map((e) => (
-                <li>
-                  <span class="visit__where">{e.where}</span>
-                  <span class="visit__what">{e.what}</span>
-                  <span class="visit__done">{e.done}</span>
-                </li>
-              ))}
-            </ul>
+
+          <div class="details__panel" role="tabpanel" id="doplaty" aria-labelledby="tab-doplaty" data-panel="doplaty" tabindex="-1">
+            <div class="card details__card">
+              <h3>Dopłaty</h3>
+              <ul class="rows">
+                {pr.extras.map((x) => <li><span>{x.label}</span><span class="rows__val">{x.price}</span></li>)}
+                <li><span>{pr.rates[3].label}</span><span class="rows__val">{pr.rates[3].price}</span></li>
+              </ul>
+              <p class="details__fine">{pr.surcharges} {pr.rates[3].note}</p>
+            </div>
+            <div class="card details__card">
+              <h3>{pr.care.title} <span class="details__per">{pr.care.per}</span></h3>
+              <p class="details__big">{pr.care.price} <span>netto</span></p>
+              <p class="details__fine">{pr.care.gross} brutto</p>
+              <ul class="ticks">{pr.care.points.map((p) => <li><Fragment set:html={Icon('check')} /><span>{p}</span></li>)}</ul>
+            </div>
+          </div>
+
+          <div class="details__panel" role="tabpanel" id="rachunek" aria-labelledby="tab-rachunek" data-panel="rachunek" hidden tabindex="-1">
+            <div class="bill card" role="group" aria-labelledby="bill-h">
+              <p class="bill__title" id="bill-h">{pr.bill.title}</p>
+              <p class="bill__meta"><span>{pr.bill.place}</span><span>{pr.bill.job}</span><span>{pr.bill.time}</span></p>
+              <table class="bill__lines">
+                <tbody>{pr.bill.lines.map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}</tbody>
+                <tfoot>
+                  <tr class="bill__sub"><th scope="row">{pr.bill.subtotal[0]}</th><td>{pr.bill.subtotal[1]}</td></tr>
+                  <tr><th scope="row">{pr.bill.vat[0]}</th><td>{pr.bill.vat[1]}</td></tr>
+                  <tr class="bill__total"><th scope="row">{pr.bill.total[0]}</th><td>{pr.bill.total[1]}</td></tr>
+                </tfoot>
+              </table>
+              <p class="bill__foot"><span class="pill pill--lav">{pr.bill.status}</span><span>{pr.bill.note}</span></p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="cennik" class="section section--frost" aria-labelledby="cennik-h">
-      <div class="wrap price">
-        <div class="section__head price__head">
-          <h2 id="cennik-h">{pr.title}</h2>
-          <p class="lead">{pr.lead}</p>
-        </div>
+    <!-- Galeria (jak „Picture gallery”) -->
+    <section id="realizacja" class="gallery" aria-labelledby="realizacja-h">
+      <div class="wrap">
+        <h2 id="realizacja-h" class="title" data-reveal>{t.work.title}</h2>
+        <p class="gallery__lead" data-reveal>{t.work.lead} <span>{t.work.meta}</span></p>
+        <ul class="gallery__grid">
+          {work.map((w) => (
+            <li data-reveal>
+              <figure>
+                <div class="gallery__frame"><Photo shot={w.shot} sizes="(min-width: 64rem) 25vw, 50vw" /><span class="gallery__ico" set:html={Icon('camera')} /></div>
+                <figcaption>{w.caption}</figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
 
-        <div class="price__rates">
-          <p class="rates__legend">{pr.fine}</p>
-          <dl class="rates" data-rule>
-            {pr.rates.map((r) => (
-              <div class="rates__row">
-                <dt>{r.label}</dt>
-                <dd class:list={['rates__price', { 'rates__price--text': r.text }]}>
-                  <span>{r.price}</span>
-                  {r.gross && <span class="rates__gross">{r.gross} {pr.grossLabel}</span>}
-                </dd>
-                {r.note && <dd class="rates__note">{r.note}</dd>}
+    <!-- Cytat (w referencji: opinie gości; tu bez wymyślonych opinii, zdanie z oferty) -->
+    <section class="quote" aria-label={t.care.title}>
+      <div class="wrap quote__in" data-reveal>
+        <p class="quote__label">{t.care.title}</p>
+        <blockquote><p>„{t.care.quote}”</p></blockquote>
+        <a class="btn btn--lav" href="#opieka">{t.care.cta}</a>
+      </div>
+    </section>
+
+    <!-- Liczby (jak pas z sześcioma kartami) -->
+    <section class="stats" aria-label="W liczbach">
+      <div class="wrap">
+        <ul class="stats__grid">
+          {stats.map((s) => (
+            <li class="stat" data-reveal>
+              <span class="stat__tile" aria-hidden="true" set:html={Icon(s.icon)} />
+              <span class="stat__body">
+                <span class="stat__num">{s.value}<small>{s.unit}</small></span>
+                <span class="stat__label">{s.label}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Mapa (jak „How to find us”): strefy dojazdu -->
+    <section class="map" aria-labelledby="map-h">
+      <div class="wrap">
+        <h2 id="map-h" class="title" data-reveal>{pr.zones.title}</h2>
+        <div class="map__box" data-reveal>
+          <svg class="map__svg" viewBox={`0 0 ${MAP.w} ${MAP.h}`} role="img" aria-labelledby="map-t map-d">
+            <title id="map-t">Mapa stref dojazdu wokół Jeleniej Góry</title>
+            <desc id="map-d">{pr.zones.items.map((z) => `${z.name}, ${z.price}: ${z.text}`).join(' ')}</desc>
+            <circle class="map__ring" cx={MAP.cx} cy={MAP.cy} r={ring30} />
+            <text class="map__ringlabel" x={MAP.cx} y={MAP.cy - ring30 - 10} text-anchor="middle">30 km</text>
+            <polygon class="map__zone1" points={hull} />
+            {pts.filter((p) => p.name !== 'Jelenia Góra').map((p) => {
+              const l = labelPos(p);
+              return (
+                <g class:list={['map__town', `map__town--z${p.zone}`, { 'map__town--minor': p.minor }]}>
+                  <circle cx={p.x} cy={p.y} r={p.zone === 1 ? 4.5 : 4} />
+                  <text x={l.x} y={l.y} text-anchor={l.a}>{p.name}</text>
+                </g>
+              );
+            })}
+            <g class="map__center">
+              <circle cx={MAP.cx} cy={MAP.cy} r="22" />
+              <text x={MAP.cx} y={MAP.cy + 5} text-anchor="middle">JG</text>
+              <text class="map__centerlabel" x={MAP.cx + 30} y={MAP.cy - 18}>Jelenia Góra</text>
+            </g>
+          </svg>
+          <div class="map__card">
+            {pr.zones.items.map((z, i) => (
+              <div class="map__row">
+                <p class="map__zone"><span class:list={['map__dot', `map__dot--z${i + 1}`]} aria-hidden="true"></span>{z.name}: <strong>{z.price}</strong></p>
+                <p>{z.text}</p>
               </div>
             ))}
-            <div class="rates__row">
-              <dt>{pr.care.title} <span class="rates__per">{pr.care.per}</span></dt>
-              <dd class="rates__price">
-                <span>{pr.care.price}</span>
-                <span class="rates__gross">{pr.care.gross} {pr.grossLabel}</span>
-              </dd>
-              <dd class="rates__note">{pr.care.points.join(', ')}.</dd>
-            </div>
-          </dl>
-          <ul class="rates__extras">
-            {pr.extras.map((x) => <li><span>{x.label}</span> <span class="rates__extra">{x.price}</span></li>)}
-            <li class="rates__fine">{pr.surcharges}</li>
-          </ul>
-          <div class="zones" aria-labelledby="zones-h">
-            <p class="zones__title label" id="zones-h">{pr.zones.title}</p>
-            <dl>
-              {pr.zones.items.map((z) => (
-                <div class="zones__row">
-                  <dt><span class="zones__name">{z.name}</span> <span class="zones__price">{z.price}</span></dt>
-                  <dd>{z.text}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
-        </div>
-
-        <div class="bill" role="group" aria-labelledby="bill-h">
-          <div class="bill__sheet">
-            <p class="bill__title" id="bill-h">{pr.bill.title}</p>
-            <p class="bill__meta">
-              <span>{pr.bill.place}</span>
-              <span>{pr.bill.job}</span>
-              <span>{pr.bill.time}</span>
-            </p>
-            <table class="bill__lines">
-              <tbody>
-                {pr.bill.lines.map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}
-              </tbody>
-              <tfoot>
-                <tr class="bill__sub"><th scope="row">{pr.bill.subtotal[0]}</th><td>{pr.bill.subtotal[1]}</td></tr>
-                <tr><th scope="row">{pr.bill.vat[0]}</th><td>{pr.bill.vat[1]}</td></tr>
-                <tr class="bill__total"><th scope="row">{pr.bill.total[0]}</th><td>{pr.bill.total[1]}</td></tr>
-              </tfoot>
-            </table>
-            <p class="bill__status label">{pr.bill.status}</p>
-          </div>
-          <p class="bill__note">{pr.bill.note}</p>
         </div>
       </div>
     </section>
 
-    <section id="realizacja" class="section" aria-labelledby="realizacja-h">
-      <div class="wrap">
-        <div class="section__head work__head">
-          <h2 id="realizacja-h">{t.work.title}</h2>
-          <p class="lead">{t.work.lead}</p>
-          <p class="work__meta">{t.work.meta}</p>
-        </div>
-        <div class="work__row">
-          {photos.map((p, i) => (
-            <figure class:list={['work__photo', { 'work__photo--wide': i === 0 }]} style={`--ar: ${(p.w / p.h).toFixed(3)}`}>
-              <div class="work__frame"><img
-                src={`/img/mural-${p.id}-1600.webp`}
-                srcset={`/img/mural-${p.id}-900.webp 900w, /img/mural-${p.id}-1600.webp 1600w`}
-                sizes={i === 0 ? '(min-width: 64rem) 50vw, 92vw' : '(min-width: 64rem) 25vw, 46vw'}
-                width={p.w} height={p.h}
-                alt={t.work.photos[p.id].alt}
-                loading="lazy" decoding="async"
-              /></div>
-              <figcaption>{t.work.photos[p.id].caption}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <section id="pytania" class="section section--stone section--quiet" aria-labelledby="pytania-h">
-      <div class="wrap faq">
-        <div class="faq__head">
-          <h2 id="pytania-h">{t.faq.title}</h2>
-          <a class="text-link" href="#kontakt">{t.faq.more}</a>
-        </div>
-        <div class="faq__list" data-rule>
+    <!-- Częste pytania -->
+    <section id="pytania" class="faq" aria-labelledby="pytania-h">
+      <div class="wrap faq__in">
+        <h2 id="pytania-h" class="title" data-reveal>{t.faq.title}</h2>
+        <div class="faq__list">
           {t.faq.items.map((f) => (
-            <details class="faq__item">
-              <summary>
-                <span>{f.q}</span><i class="faq__sign" aria-hidden="true"></i>
-              </summary>
+            <details class="faq__item card">
+              <summary><span>{f.q}</span><i class="faq__sign" aria-hidden="true"></i></summary>
               <p>{f.a}</p>
             </details>
           ))}
@@ -222,158 +323,92 @@ const photos = [
       </div>
     </section>
 
-    <section id="kontakt" class="contact" aria-labelledby="kontakt-h">
-      <div class="wrap contact__in">
-        <div class="contact__lead">
-          <h2 id="kontakt-h" class="h-statement">{t.contact.title}</h2>
-          <ol class="steps" data-rule>
+    <!-- Zapytanie na ciemnym tle (jak „Your non-binding enquiry”) -->
+    <section id="kontakt" class="enquiry" aria-labelledby="kontakt-h">
+      <div class="wrap enquiry__in">
+        <div class="enquiry__main">
+          <h2 id="kontakt-h" class="title title--light">{t.contact.title}</h2>
+          <form id="lead" class="form" novalidate data-wa={site.whatsapp} data-mail={site.email}
+            data-l-name={t.contact.form.name} data-l-phone={t.contact.form.phone} data-l-topic={t.contact.form.topic}
+            data-l-who={t.contact.form.who} data-l-where={t.contact.form.where} data-l-what={t.contact.form.what}
+            data-sent-wa={t.contact.form.sentWa} data-blocked-wa={t.contact.form.blockedWa} data-sent-mail={t.contact.form.sentMail}>
+            <div class="form__pair">
+              <div class="field">
+                <label for="f-topic">{t.contact.form.topic}</label>
+                <select id="f-topic" name="topic">{t.contact.form.topicOptions.map((o) => <option value={o}>{o}</option>)}</select>
+              </div>
+              <div class="field">
+                <label for="f-who">{t.contact.form.who}</label>
+                <select id="f-who" name="who">{t.contact.form.whoOptions.map((o) => <option value={o}>{o}</option>)}</select>
+              </div>
+            </div>
+            <div class="form__pair">
+              <div class="field">
+                <label for="f-name">{t.contact.form.name}</label>
+                <input id="f-name" name="name" autocomplete="name" required aria-describedby="e-name" />
+                <p id="e-name" class="field__error" hidden>{t.contact.form.errName}</p>
+              </div>
+              <div class="field">
+                <label for="f-phone">{t.contact.form.phone} <span class="field__opt">({t.contact.form.optional})</span></label>
+                <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-where">{t.contact.form.where} <span class="field__opt">({t.contact.form.optional})</span></label>
+              <input id="f-where" name="where" placeholder={t.contact.form.wherePlaceholder} />
+            </div>
+            <div class="field">
+              <label for="f-what">{t.contact.form.what}</label>
+              <textarea id="f-what" name="what" rows="4" required aria-describedby="e-what" placeholder={t.contact.form.whatPlaceholder}></textarea>
+              <p id="e-what" class="field__error" hidden>{t.contact.form.errWhat}</p>
+            </div>
+            <div class="form__send">
+              <button class="btn btn--yellow btn--wide" type="button" data-send="wa">{t.contact.form.whatsapp}</button>
+              <button class="btn btn--outline btn--wide" type="button" data-send="mail">{t.contact.form.email}</button>
+            </div>
+            <p class="form__status" role="status" aria-live="polite"></p>
+            <p class="form__fine">{t.contact.form.hint} <a href={privacyPath}>{t.contact.form.privacy}</a>.</p>
+          </form>
+        </div>
+
+        <div class="steps-card card" role="group" aria-labelledby="steps-h">
+          <div class="steps-card__head">
+            <h3 id="steps-h">Jak wygląda zlecenie</h3>
+            <span class="steps-card__mark"><Mark /></span>
+          </div>
+          <ol class="steps">
             {t.contact.steps.map((s) => (
-              <li>
-                <h3>{s.title}</h3>
-                <p>{s.text}</p>
-              </li>
+              <li><Fragment set:html={Icon('check')} /><span><strong>{s.title}.</strong> {s.text}</span></li>
             ))}
           </ol>
           <div class="direct">
-            <p class="label">{t.contact.direct}</p>
-            <a class="direct__tel" href={`tel:${tel}`} aria-label={site.phone}><span class="direct__cc">{cc}</span>{local}</a>
+            <p class="direct__label">{t.contact.direct}</p>
+            <a class="direct__tel" href={`tel:${tel}`} aria-label={site.phone}><span>{cc}</span> {local}</a>
             <p class="direct__links">
               <a href={wa} target="_blank" rel="noopener">{t.contact.whatsappDirect}</a>
               <a href={`mailto:${site.email}`}>{site.email}</a>
             </p>
           </div>
         </div>
-
-        <form id="lead" class="form" novalidate data-wa={site.whatsapp} data-mail={site.email}
-          data-l-name={t.contact.form.name} data-l-phone={t.contact.form.phone} data-l-topic={t.contact.form.topic}
-          data-l-who={t.contact.form.who} data-l-where={t.contact.form.where} data-l-what={t.contact.form.what}
-          data-sent-wa={t.contact.form.sentWa} data-blocked-wa={t.contact.form.blockedWa} data-sent-mail={t.contact.form.sentMail}>
-          <div class="field">
-            <label for="f-name">{t.contact.form.name}</label>
-            <input id="f-name" name="name" autocomplete="name" required aria-describedby="e-name" />
-            <p id="e-name" class="field__error" hidden>{t.contact.form.errName}</p>
-          </div>
-          <div class="field">
-            <label for="f-phone">{t.contact.form.phone} <span class="field__opt">({t.contact.form.optional})</span></label>
-            <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
-          </div>
-          <div class="field__pair">
-            <div class="field">
-              <label for="f-topic">{t.contact.form.topic}</label>
-              <select id="f-topic" name="topic">
-                {t.contact.form.topicOptions.map((o) => <option value={o}>{o}</option>)}
-              </select>
-            </div>
-            <div class="field">
-              <label for="f-who">{t.contact.form.who}</label>
-              <select id="f-who" name="who">
-                {t.contact.form.whoOptions.map((o) => <option value={o}>{o}</option>)}
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="f-where">{t.contact.form.where} <span class="field__opt">({t.contact.form.optional})</span></label>
-            <input id="f-where" name="where" placeholder={t.contact.form.wherePlaceholder} />
-          </div>
-          <div class="field">
-            <label for="f-what">{t.contact.form.what}</label>
-            <textarea id="f-what" name="what" rows="4" required aria-describedby="e-what" placeholder={t.contact.form.whatPlaceholder}></textarea>
-            <p id="e-what" class="field__error" hidden>{t.contact.form.errWhat}</p>
-          </div>
-          <div class="form__send">
-            <button class="btn" type="button" data-send="wa">{t.contact.form.whatsapp}</button>
-            <button class="btn btn--ghost" type="button" data-send="mail">{t.contact.form.email}</button>
-          </div>
-          <p class="form__status" role="status" aria-live="polite"></p>
-          <p class="form__fine">{t.contact.form.hint} <a href={privacyPath}>{t.contact.form.privacy}</a>.</p>
-        </form>
       </div>
     </section>
   </main>
 
   <Footer lang="pl" />
 
+  <!-- Pływająca karta jak odznaka ocen w referencji: tu najważniejsza stawka -->
+  <aside class="float-wrap" aria-label="Najważniejsza stawka">
+  <a class="float" href="#cennik" data-float aria-label={`Cennik: pierwsza godzina z dojazdem ${P.firstHour} zł netto`}>
+    <span class="float__top">Pierwsza godzina</span>
+    <span class="float__num">{P.firstHour}<small>zł</small></span>
+    <span class="float__sub">netto, z dojazdem</span>
+  </a>
+  </aside>
+
   <nav class="quick is-hidden" aria-label="Szybki kontakt" data-quick>
     <a class="quick__btn quick__btn--call" href={`tel:${tel}`}>{t.call}</a>
     <a class="quick__btn" href={wa} target="_blank" rel="noopener">WhatsApp</a>
   </nav>
 
-  <script>
-    // --- Formularz: wiadomość do WhatsAppa lub poczty, błędy przy polach ---
-    const form = document.getElementById('lead') as HTMLFormElement | null;
-    if (form) {
-      const d = form.dataset;
-      const field = (n: string) => form.elements.namedItem(n) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-      const required = ['name', 'what'];
-      const status = form.querySelector<HTMLElement>('.form__status');
-      const setError = (n: string, on: boolean) => {
-        const el = field(n);
-        el.setAttribute('aria-invalid', String(on));
-        const msg = document.getElementById(`e-${n}`);
-        if (msg) msg.hidden = !on;
-      };
-      const build = () => {
-        const f = new FormData(form);
-        const line = (label = '', key: string) => `${label}: ${f.get(key) || ''}`;
-        return [
-          line(d.lName, 'name'),
-          line(d.lPhone, 'phone'),
-          line(d.lTopic, 'topic'),
-          line(d.lWho, 'who'),
-          line(d.lWhere, 'where'),
-          '',
-          `${d.lWhat}:`,
-          `${f.get('what') || ''}`,
-        ].join('\n');
-      };
-      const valid = () => {
-        const empty = required.filter((n) => field(n).value.trim() === '');
-        required.forEach((n) => setError(n, empty.includes(n)));
-        if (empty.length) field(empty[0]).focus();
-        return empty.length === 0;
-      };
-      // Błąd znika, gdy tylko pole zostanie uzupełnione
-      required.forEach((n) =>
-        field(n).addEventListener('input', () => {
-          if (field(n).getAttribute('aria-invalid') === 'true' && field(n).value.trim() !== '') setError(n, false);
-        }),
-      );
-      form.querySelectorAll<HTMLButtonElement>('[data-send]').forEach((b) =>
-        b.addEventListener('click', () => {
-          if (status) status.textContent = '';
-          if (!valid()) return;
-          const text = build();
-          if (b.dataset.send === 'wa') {
-            // Bez „noopener” w window.open, bo wtedy przeglądarka zawsze zwraca null i nie wiemy, czy okno się otworzyło
-            const w = window.open(`https://wa.me/${d.wa}?text=${encodeURIComponent(text)}`, '_blank');
-            if (w) w.opener = null;
-            if (status) status.textContent = (w ? d.sentWa : d.blockedWa) || '';
-          } else {
-            const subject = `handyman.karkonosze – ${field('topic').value}`;
-            location.href = `mailto:${d.mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
-            if (status) status.textContent = d.sentMail || '';
-          }
-        }),
-      );
-      // „Zapytaj o stałą opiekę” ustawia temat formularza
-      document.querySelectorAll<HTMLAnchorElement>('[data-topic]').forEach((a) =>
-        a.addEventListener('click', () => {
-          const topic = field('topic') as HTMLSelectElement;
-          topic.selectedIndex = Number(a.dataset.topic) || 0;
-        }),
-      );
-    }
-
-    // --- Pasek szybkiego kontaktu na telefonie: dopiero gdy przyciski z otwarcia zniknęły, chowa się przy formularzu ---
-    const quick = document.querySelector<HTMLElement>('[data-quick]');
-    const heroActions = document.querySelector('[data-hero-actions]');
-    const contact = document.getElementById('kontakt');
-    if (quick && heroActions && contact && 'IntersectionObserver' in window) {
-      let heroSeen = true;
-      let contactSeen = false;
-      const update = () => quick.classList.toggle('is-hidden', heroSeen || contactSeen);
-      new IntersectionObserver(([en]) => { heroSeen = en.isIntersecting || en.boundingClientRect.top > 0; update(); }).observe(heroActions);
-      new IntersectionObserver(([en]) => { contactSeen = en.isIntersecting; update(); }, { threshold: 0.15 }).observe(contact);
-    }
-  </script>
+  <script>import '../scripts/ref';</script>
 </Base>

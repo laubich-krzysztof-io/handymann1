@@ -1,25 +1,21 @@
 ---
+// Nagłówek jak w referencji: przezroczysty na zdjęciu otwarcia, po przewinięciu grafitowy pasek.
+// Po prawej menu i żółty przycisk zgłoszenia; na telefonie „Menu” otwiera panel na cały ekran.
 import Mark from './Mark.astro';
 import { content } from '../i18n/content';
 import { site, type Lang } from '../config';
 
 interface Props {
   lang: Lang;
-  /** Na podstronach kotwice menu prowadzą do strony głównej */
+  /** Podstrona: pasek od razu grafitowy, kotwice prowadzą do strony głównej */
   sub?: boolean;
 }
 const { lang, sub = false } = Astro.props;
 const home = sub ? '/' : '';
 const t = content[lang];
-
-const brandSub = t.brand.sub;
-const navLabel = 'Menu główne';
-const menuLabel = { open: 'Otwórz menu', close: 'Zamknij menu' };
 const tel = site.phone.replace(/\s/g, '');
-const [word1, word2] = site.name.split('.');
-// WhatsApp na komputerze: sama ikona obok przycisku (na telefonie jest dolny pasek szybkiego kontaktu)
 const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreeting)}`;
-// Menu w kolejności sekcji na stronie
+const [word1, word2] = site.name.split('.');
 const links = [
   { id: 'uslugi', label: t.nav.services },
   { id: 'opieka', label: t.nav.care },
@@ -27,112 +23,60 @@ const links = [
   { id: 'realizacja', label: t.nav.work },
 ];
 ---
-<header class="top" data-top data-label-open={menuLabel.open} data-label-close={menuLabel.close}>
-  <div class="top__scene" aria-hidden="true">
-    <span class="top__strip"></span>
-    <span class="top__sniezka"></span>
-    <span class="top__forest"></span>
-  </div>
+<header class:list={['top', { 'is-solid': sub, 'top--sub': sub }]} data-top>
   <div class="top__in">
-    <a class="brand" href="/" aria-label={`${site.name} – ${brandSub}`}>
+    <a class="brand" href="/" aria-label={`${site.name} – ${t.brand.sub}`}>
       <Mark class="brand__mark" />
-      <span class="brand__text">
-        <span class="brand__name">{word1}<span class="brand__dot">.</span>{word2}</span>
-        <span class="brand__sub">{brandSub}</span>
-      </span>
+      <span class="brand__name"><span>{word1}</span><span>.{word2}</span></span>
     </a>
-
-    <nav class="nav" id="nav" aria-label={navLabel}>
+    <nav class="nav" id="nav" aria-label="Menu główne">
       <ul class="nav__list">
-        {links.map((l) => (
-          <li class="nav__item"><a class="nav__link" href={`${home}#${l.id}`} data-spy={l.id}>{l.label}</a></li>
-        ))}
+        {links.map((l) => <li><a class="nav__link" href={`${home}#${l.id}`}>{l.label}</a></li>)}
       </ul>
       <div class="nav__extra">
         <a class="nav__tel" href={`tel:${tel}`}>{site.phone}</a>
         <a class="nav__wa" href={wa} target="_blank" rel="noopener">WhatsApp</a>
-        <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
       </div>
     </nav>
-
-    <div class="top__end">
-      <a class="wa-link" href={wa} target="_blank" rel="noopener" aria-label={t.contact.whatsappDirect}>WhatsApp</a>
-      <a class="cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
-      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label={menuLabel.open} data-burger><span class="burger__label" data-burger-label>Menu</span></button>
-    </div>
+    <a class="btn btn--yellow top__cta" href={`${home}#kontakt`}>{t.hero.primary}</a>
+    <button class="burger" type="button" aria-expanded="false" aria-controls="nav" data-burger>
+      <span class="burger__bars" aria-hidden="true"></span><span class="burger__label" data-burger-label>Menu</span>
+    </button>
   </div>
 </header>
-<div class="top-space" aria-hidden="true"></div>
 
 <script>
   const top = document.querySelector<HTMLElement>('[data-top]');
   if (top) {
-    // Compact bar after the first scroll
+    const sub = top.classList.contains('top--sub');
+    // Grafitowy pasek po zjechaniu z otwarcia
     let ticking = false;
-    // Hysteresis: collapse past 56px, expand only back near the top (no flicker on small scrolls)
-    const compact = () => {
-      const y = window.scrollY;
-      const on = top.classList.contains('is-compact');
-      if (!on && y > 56) top.classList.add('is-compact');
-      else if (on && y < 8) top.classList.remove('is-compact');
+    const solid = () => {
+      if (!sub) top.classList.toggle('is-solid', window.scrollY > 40);
       ticking = false;
     };
-    window.addEventListener('scroll', () => {
-      if (!ticking) { ticking = true; requestAnimationFrame(compact); }
-    }, { passive: true });
-    // Pierwszy odczyt w klatce animacji: bez wymuszonego przeliczania układu przy starcie
-    requestAnimationFrame(() => {
-      compact();
-      // Wejście pejzażu (Śnieżka z mgły) tylko gdy strona startuje u góry
-      if (window.scrollY < 56) top.classList.add('is-intro');
-    });
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(solid); } }, { passive: true });
+    requestAnimationFrame(solid);
 
-    // Mobile panel
     const burger = top.querySelector<HTMLButtonElement>('[data-burger]');
     const label = top.querySelector<HTMLElement>('[data-burger-label]');
-    const setPanel = (open: boolean) => {
+    const set = (open: boolean) => {
       top.classList.toggle('is-open', open);
+      document.documentElement.classList.toggle('menu-open', open);
       burger?.setAttribute('aria-expanded', String(open));
-      burger?.setAttribute('aria-label', (open ? top.dataset.labelClose : top.dataset.labelOpen) || '');
       if (label) label.textContent = open ? 'Zamknij' : 'Menu';
     };
     burger?.addEventListener('click', () => {
       const open = !top.classList.contains('is-open');
-      setPanel(open);
-      // Po otwarciu kursor przechodzi do pierwszej pozycji menu (inaczej Tab ucieka pod panel)
+      set(open);
       if (open) top.querySelector<HTMLAnchorElement>('.nav a')?.focus();
     });
-    // Menu zamyka się, gdy kursor klawiatury opuści nagłówek
-    top.addEventListener('focusout', (e) => {
-      if (top.classList.contains('is-open') && !top.contains(e.relatedTarget as Node | null)) setPanel(false);
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!top.contains(e.target as Node)) setPanel(false);
-    });
-    top.querySelectorAll<HTMLAnchorElement>('.nav a').forEach((a) =>
-      a.addEventListener('click', () => setPanel(false)),
-    );
+    top.querySelectorAll('.nav a').forEach((a) => a.addEventListener('click', () => set(false)));
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && top.classList.contains('is-open')) { setPanel(false); burger?.focus(); }
+      if (e.key === 'Escape' && top.classList.contains('is-open')) { set(false); burger?.focus(); }
     });
-
-    // Current section underline
-    // Obserwujemy wszystkie sekcje: te bez linku w menu czyszczą podkreślenie
-    const spies = [...top.querySelectorAll<HTMLElement>('[data-spy]')];
-    const sections = [...document.querySelectorAll<HTMLElement>('main > section')];
-    const mark = (id: string | null) => spies.forEach((el) => {
-      const on = el.dataset.spy === id;
-      el.classList.toggle('is-current', on);
-      on ? el.setAttribute('aria-current', 'location') : el.removeAttribute('aria-current');
+    top.addEventListener('focusout', (e) => {
+      if (top.classList.contains('is-open') && !top.contains(e.relatedTarget as Node | null)) set(false);
     });
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (!en.isIntersecting) return;
-        mark((en.target as HTMLElement).id || null);
-      });
-    }, { rootMargin: '-40% 0px -55% 0px' });
-    sections.forEach((s) => io.observe(s));
-    window.addEventListener('scroll', () => { if (window.scrollY < 80) mark(null); }, { passive: true });
   }
 </script>

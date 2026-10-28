@@ -1,0 +1,27 @@
+---
+// Zdjęcie albo podpisana ramka „do uzupełnienia” (src/photos.ts). Ramka ma te same proporcje co zdjęcie,
+// więc po podmianie pliku układ się nie zmienia.
+import type { Shot } from '../photos';
+interface Props { shot: Shot; class?: string; sizes?: string; eager?: boolean }
+const { shot, class: cls, sizes = '(min-width: 64rem) 25vw, 50vw', eager = false } = Astro.props;
+const small = shot.src?.replace('-1600.', '-900.');
+---
+{shot.src ? (
+  <img
+    class:list={['ph', cls]}
+    src={shot.src}
+    srcset={small && small !== shot.src ? `${small} 900w, ${shot.src} 1600w` : undefined}
+    sizes={sizes}
+    width={shot.w ?? 1600}
+    height={shot.h ?? 1200}
+    alt={shot.alt}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    fetchpriority={eager ? 'high' : undefined}
+  />
+) : (
+  <div class:list={['ph', 'ph--empty', cls]} role="img" aria-label={`Miejsce na zdjęcie: ${shot.alt}`}>
+    <span class="ph__label">Zdjęcie do uzupełnienia</span>
+    <span class="ph__what">{shot.alt}</span>
+  </div>
+)}
