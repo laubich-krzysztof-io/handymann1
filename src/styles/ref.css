@@ -284,34 +284,6 @@ main:focus, [role="tabpanel"]:focus { outline: none; }
 @media (max-width: 63.99rem) { .stats__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 39.99rem) { .stats__grid { grid-template-columns: minmax(0, 1fr); } }
 
-/* ---------- Mapa stref ---------- */
-.map { padding-block: clamp(4rem, 8vw, 6rem); background: var(--card); }
-.map__box { position: relative; margin-top: 1.6rem; }
-.map__svg { display: block; width: 100%; max-width: 60rem; height: auto; margin-inline: auto; font-family: var(--sans); }
-.map__ring { fill: none; stroke: var(--ink); stroke-width: 1; stroke-dasharray: 4 6; opacity: .55; }
-.map__ringlabel { font-size: 13px; fill: var(--muted); }
-.map__zone1 { fill: var(--lav); stroke: var(--lav); stroke-width: 54; stroke-linejoin: round; opacity: .55; }
-.map__town circle { stroke: var(--ink); stroke-width: 1.4; }
-.map__town--z1 circle { fill: var(--ink); }
-.map__town--z2 circle { fill: var(--card); }
-.map__town text { font-size: 13px; fill: var(--ink); font-weight: 400; paint-order: stroke; stroke: var(--card); stroke-width: 4px; stroke-linejoin: round; }
-.map__center circle { fill: var(--ink); }
-.map__center text { font: 700 15px var(--serif); fill: var(--on-dark); }
-.map__center .map__centerlabel { font: 700 18px var(--serif); fill: var(--ink); paint-order: stroke; stroke: var(--card); stroke-width: 5px; }
-.map__card { display: grid; gap: 1rem; max-width: 26rem; margin: 1.4rem auto 0; padding: 1.3rem 1.4rem; border-radius: var(--r); background: var(--card); box-shadow: 0 6px 30px rgba(0, 0, 0, .1); font-size: .9rem; line-height: 1.45; }
-.map__zone { display: flex; align-items: center; gap: .5rem; margin-bottom: .2rem; font-weight: 400; }
-.map__dot { width: .8rem; height: .8rem; border-radius: 50%; border: 1.4px solid var(--ink); flex: none; }
-.map__dot--z1 { background: var(--ink); box-shadow: 0 0 0 4px var(--lav); }
-.map__dot--z2 { background: var(--card); }
-@media (min-width: 64rem) { .map__card { position: absolute; left: 0; bottom: 0; margin: 0; } }
-/* Telefon: większe podpisy, tylko główne miejscowości (pełna lista jest w karcie pod mapą) */
-@media (max-width: 47.99rem) {
-  .map__town text { font-size: 22px; stroke-width: 6px; }
-  .map__town--minor text { display: none; }
-  .map__ringlabel { font-size: 20px; }
-  .map__center .map__centerlabel { font-size: 26px; }
-}
-
 /* ---------- Częste pytania ---------- */
 .faq { padding-block: clamp(4rem, 8vw, 6rem); }
 .faq__list { display: grid; gap: .6rem; max-width: 52rem; margin: 2rem auto 0; }
@@ -425,3 +397,91 @@ main:focus, [role="tabpanel"]:focus { outline: none; }
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
 .themes__box > *, .enquiry__in > *, .details__panel > * { min-width: 0; }
+
+/* =========================================================================
+   Strefy dojazdu: wyszukiwarka miejscowości + mapa z prawdziwych granic gmin
+   ========================================================================= */
+.zones { padding-block: clamp(4rem, 8vw, 6rem); background: var(--card); }
+.zones__lead { margin-top: .7rem; text-align: center; color: var(--muted); }
+.zones__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: 'check map' 'lists map'; grid-template-rows: auto 1fr; gap: 1.2rem; margin-top: 2.2rem; align-items: start; }
+.zones__check, .zones__lists { padding: clamp(1.3rem, 2.4vw, 1.9rem); background: var(--bg); box-shadow: none; }
+.zones__check { grid-area: check; }
+.zones__lists { grid-area: lists; display: grid; gap: 1.5rem; }
+.check { display: grid; gap: .5rem; }
+.check__label { font: 600 .74rem/1.3 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.check__field input { width: 100%; min-height: 3.4rem; padding: .8rem 1rem; border: 1px solid #b9b9b9; border-radius: var(--r); background: var(--card); color: var(--ink); font: 400 1.1rem/1.3 var(--sans); }
+.check__field input:focus-visible { outline: 2px solid #5b62d6; outline-offset: 0; border-color: #5b62d6; }
+.check__result { min-height: 1.6em; font-size: 1rem; line-height: 1.45; }
+.check__result:not(:empty) { padding: .85rem 1rem; border-radius: var(--r); background: var(--card); border-left: 4px solid var(--ink); }
+.check__result[data-zone="1"] { border-left-color: #6c72e0; background: var(--lav-soft); }
+.check__result[data-zone="2"] { border-left-color: #d8b400; background: #fff8d6; }
+.check__result strong { font-weight: 600; }
+.zone { display: grid; gap: .55rem; }
+.zone + .zone { padding-top: 1.3rem; border-top: 1px solid var(--line); }
+.zone__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem 1rem; }
+.zone__name { font: 700 1.3rem/1.2 var(--serif); }
+.zone__price { display: inline-flex; align-items: center; min-height: 1.8rem; padding: .2rem .7rem; border-radius: 999px; font: 600 .82rem/1.2 var(--sans); }
+.zone--1 .zone__price { background: var(--lav); }
+.zone--2 .zone__price { background: var(--yellow); }
+.zone__rule { font-size: .9rem; line-height: 1.45; color: var(--muted); }
+.zone__towns { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chip { min-height: 2.4rem; padding: .35rem .75rem; border: 1px solid #cfcfcf; border-radius: 999px; background: var(--card); color: var(--ink); font: 400 .88rem/1.2 var(--sans); cursor: pointer; transition: background-color .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--on-dark); }
+@media (hover: hover) { .chip:hover { border-color: var(--ink); } }
+.zones__fine { font-size: .88rem; color: var(--muted); }
+
+.zones__map { grid-area: map; position: sticky; top: 6rem; margin: 0; padding: .6rem .6rem 1rem; border: 1px solid var(--line); box-shadow: none; }
+.zmap { display: block; width: 100%; height: auto; font-family: var(--sans); }
+.zmap__abroad { fill: #e7e7e7; }
+.zmap__z2 { fill: #eef0ff; }
+.zmap__gm path { fill: none; stroke: var(--ink); stroke-width: .8; stroke-linejoin: round; }
+.zmap__gm--far path { stroke-opacity: .1; }
+.zmap__gm:not(.zmap__gm--far) path { stroke-opacity: .2; }
+.zmap__z1 { fill: rgba(202, 206, 255, .85); stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; }
+.zmap__border { fill: none; stroke: var(--ink); stroke-width: 1.3; stroke-dasharray: 7 3 1.5 3; opacity: .7; }
+.zmap__ring { fill: none; stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 5; opacity: .55; }
+.zmap__note { font-size: 12px; fill: var(--muted); }
+/* Nazwy gmin strefy 1 (kursywa, bez punktu): widać, skąd bierze się granica strefy */
+.zmap__gmname text { font: italic 400 13px var(--serif); fill: #4a4f8f; dominant-baseline: central; }
+.zmap__cz { font: 600 13px var(--sans); letter-spacing: .32em; fill: #8a8a8a; }
+.zmap__peak path { fill: var(--ink); }
+.zmap__peak text { font: italic 400 15px var(--serif); fill: var(--ink); }
+.zmap text { paint-order: stroke; stroke: rgba(255, 255, 255, .92); stroke-width: 4px; stroke-linejoin: round; }
+.zmap__cz, .zmap__note { stroke: none; }
+.zmap__town circle { stroke: var(--ink); stroke-width: 1.3; transition: r .25s var(--ease); }
+.zmap__town--z1 circle { fill: var(--ink); }
+.zmap__town--z2 circle, .zmap__town--z0 circle { fill: var(--card); }
+/* Na mapie tylko główne miejscowości; pozostałe pojawiają się po wybraniu w wyszukiwarce */
+.zmap__town:not(.is-major):not(.is-picked) { display: none; }
+.zmap__town text { font-size: 13px; fill: var(--ink); dominant-baseline: central; }
+.zmap__town text.zmap__below { dominant-baseline: hanging; }
+.zmap__town text, .zmap__gmname { transition: opacity .2s var(--ease); }
+/* Po wybraniu miejscowości: tylko jej podpis i Jelenia Góra, reszta punktów bez nazw */
+.zmap.has-pick .zmap__town:not(.is-picked) text { opacity: 0; }
+.zmap.has-pick .zmap__gmname { opacity: .35; }
+.zmap__town.is-picked text { font-weight: 600; }
+.zmap__town.is-picked circle { r: 7; fill: var(--yellow); stroke-width: 2; }
+.zmap__jg circle { fill: var(--ink); }
+.zmap__jg text { font: 700 17px var(--serif); fill: var(--ink); }
+.zmap__jg.is-picked circle { fill: var(--yellow); stroke: var(--ink); stroke-width: 2; }
+.zmap__legend { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1.4rem; padding: .7rem .6rem 0; font-size: .86rem; }
+.zmap__key { display: inline-block; width: .95rem; height: .95rem; margin-right: .45rem; vertical-align: -.12em; border: 1px solid var(--ink); border-radius: 2px; }
+.zmap__key--z1 { background: var(--lav); }
+.zmap__key--z2 { background: #eef0ff; border-style: dashed; }
+.zmap__src { margin-left: auto; font-size: .78rem; color: var(--muted); }
+/* Węższy ekran: wyszukiwarka, mapa, potem listy miejscowości */
+@media (max-width: 63.99rem) {
+  .zones__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'check' 'map' 'lists'; grid-template-rows: none; }
+  .zones__map { position: static; }
+}
+/* Telefon: większe podpisy na mapie (widać tylko główne miejscowości i wybraną) */
+@media (max-width: 47.99rem) {
+  .zmap__town text { font-size: 20px; }
+  .zmap__jg text { font-size: 23px; }
+  .zmap__peak text { font-size: 19px; }
+  .zmap__note { font-size: 17px; }
+  .zmap__cz { font-size: 17px; }
+  .zmap text { stroke-width: 5px; }
+  .zmap__src { margin-left: 0; }
+  .zmap__gmname { display: none; }
+}

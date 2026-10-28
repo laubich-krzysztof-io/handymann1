@@ -10,7 +10,8 @@ import Mark from '../components/Mark.astro';
 import Photo from '../components/Photo.astro';
 import { privacyPath } from '../i18n/privacy';
 import { content } from '../i18n/content';
-import { tabs, pillars, priceCards, stats, mapTowns, project } from '../i18n/ref';
+import { tabs, pillars, priceCards, stats } from '../i18n/ref';
+import zonesMap from '../data/zones-map.json';
 import { photos } from '../photos';
 import { site } from '../config';
 
@@ -22,31 +23,11 @@ const [cc, ...rest] = site.phone.split(' ');
 const local = rest.join(' ');
 const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(t.waGreeting)}`;
 
-// Mapa stref: środek w Jeleniej Górze, skala w pikselach na kilometr
-const MAP = { w: 760, h: 560, cx: 410, cy: 290, s: 8.6 };
-const pts = mapTowns.map((m) => ({ ...m, ...project(m.lat, m.lng, MAP.s, MAP.cx, MAP.cy) }));
-const ring30 = 30 * MAP.s;
-// Strefa 1 jako miękki obszar wokół jej miejscowości (otoczka wypukła)
-type Pt = (typeof pts)[number];
-const z1 = pts.filter((p) => p.zone === 1);
-const hull = (() => {
-  const a = [...z1].sort((p, q) => p.x - q.x || p.y - q.y);
-  const cross = (o: Pt, p: Pt, q: Pt) => (p.x - o.x) * (q.y - o.y) - (p.y - o.y) * (q.x - o.x);
-  const lo: Pt[] = []; const hi: Pt[] = [];
-  for (const p of a) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
-  for (const p of [...a].reverse()) { while (hi.length >= 2 && cross(hi[hi.length - 2], hi[hi.length - 1], p) <= 0) hi.pop(); hi.push(p); }
-  return [...lo.slice(0, -1), ...hi.slice(0, -1)].map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-})();
-const labelPos = (p: { x: number; y: number; label?: string }) => {
-  const d = 12;
-  switch (p.label) {
-    case 'l': return { x: p.x - d, y: p.y + 4, a: 'end' };
-    case 'r': return { x: p.x + d, y: p.y + 4, a: 'start' };
-    case 't': return { x: p.x, y: p.y - d, a: 'middle' };
-    default: return { x: p.x, y: p.y + d + 10, a: 'middle' };
-  }
-};
-
+// Mapa stref z prawdziwych granic gmin (scripts/build-zones-map.py → src/data/zones-map.json)
+const zm = zonesMap;
+const [vx, vy, vw, vh] = zm.crop;
+const zoneTowns = (z: number) => zm.towns.filter((tw) => tw.zone === z).map((tw) => tw.name);
+const checkerData = JSON.stringify(zm.towns.map((tw) => [tw.name, tw.zone]));
 const icons: Record<string, string> = {
   coin: '<circle cx="12" cy="12" r="8.5"/><path d="M9 9.5c0-1.2 1.3-2 3-2s3 .8 3 2-1.3 1.7-3 2.2-3 1-3 2.3 1.3 2 3 2 3-.8 3-2M12 6v1.5M12 16.5V18"/>',
   pin: '<path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0C18.5 14.9 12 21 12 21z"/><circle cx="12" cy="10" r="2.4"/>',
@@ -171,7 +152,7 @@ const work = [
               <p class="offer__gross">{c.gross}</p>
               <p class="offer__note">{c.note}</p>
               <div class="offer__btns">
-                <a class="btn btn--lav" href="#szczegoly">Szczegóły</a>
+                <a class="btn btn--lav" href={(c as { href?: string }).href ?? '#szczegoly'}>Szczegóły</a>
                 <a class="btn btn--yellow" href="#kontakt" data-topic={c.topic}>Zapytaj</a>
               </div>
             </li>
@@ -270,40 +251,74 @@ const work = [
       </div>
     </section>
 
-    <!-- Mapa (jak „How to find us”): strefy dojazdu -->
-    <section class="map" aria-labelledby="map-h">
+    <!-- Strefy dojazdu: najpierw odpowiedź na pytanie klienta („czy u mnie płacę za dojazd?”), obok prawdziwa mapa gmin -->
+    <section id="strefy" class="zones" aria-labelledby="strefy-h">
       <div class="wrap">
-        <h2 id="map-h" class="title" data-reveal>{pr.zones.title}</h2>
-        <div class="map__box" data-reveal>
-          <svg class="map__svg" viewBox={`0 0 ${MAP.w} ${MAP.h}`} role="img" aria-labelledby="map-t map-d">
-            <title id="map-t">Mapa stref dojazdu wokół Jeleniej Góry</title>
-            <desc id="map-d">{pr.zones.items.map((z) => `${z.name}, ${z.price}: ${z.text}`).join(' ')}</desc>
-            <circle class="map__ring" cx={MAP.cx} cy={MAP.cy} r={ring30} />
-            <text class="map__ringlabel" x={MAP.cx} y={MAP.cy - ring30 - 10} text-anchor="middle">30 km</text>
-            <polygon class="map__zone1" points={hull} />
-            {pts.filter((p) => p.name !== 'Jelenia Góra').map((p) => {
-              const l = labelPos(p);
-              return (
-                <g class:list={['map__town', `map__town--z${p.zone}`, { 'map__town--minor': p.minor }]}>
-                  <circle cx={p.x} cy={p.y} r={p.zone === 1 ? 4.5 : 4} />
-                  <text x={l.x} y={l.y} text-anchor={l.a}>{p.name}</text>
-                </g>
-              );
-            })}
-            <g class="map__center">
-              <circle cx={MAP.cx} cy={MAP.cy} r="22" />
-              <text x={MAP.cx} y={MAP.cy + 5} text-anchor="middle">JG</text>
-              <text class="map__centerlabel" x={MAP.cx + 30} y={MAP.cy - 18}>Jelenia Góra</text>
-            </g>
-          </svg>
-          <div class="map__card">
+        <h2 id="strefy-h" class="title" data-reveal>{pr.zones.title}</h2>
+        <p class="zones__lead" data-reveal>Proszę wpisać miejscowość, a od razu widać, czy dojazd jest w cenie.</p>
+        <div class="zones__grid">
+          <div class="zones__check card" data-reveal>
+            <div class="check" data-check data-towns={checkerData} data-z1={pr.zones.items[0].price} data-z2={pr.zones.items[1].price}>
+              <label class="check__label" for="town">Miejscowość</label>
+              <div class="check__field">
+                <input id="town" type="text" list="towns" autocomplete="off" placeholder="np. Karpacz" aria-describedby="town-result" />
+                <datalist id="towns">{zm.towns.map((tw) => <option value={tw.name} />)}</datalist>
+              </div>
+              <p id="town-result" class="check__result" role="status" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="zones__lists card" data-reveal>
             {pr.zones.items.map((z, i) => (
-              <div class="map__row">
-                <p class="map__zone"><span class:list={['map__dot', `map__dot--z${i + 1}`]} aria-hidden="true"></span>{z.name}: <strong>{z.price}</strong></p>
-                <p>{z.text}</p>
+              <div class:list={['zone', `zone--${i + 1}`]}>
+                <p class="zone__head"><span class="zone__name">{z.name}</span><span class="zone__price">{z.price}</span></p>
+                <p class="zone__rule">{i === 0 ? site.zones.one : 'Pozostałe miejscowości do 30 km od Jeleniej Góry, między innymi:'}</p>
+                <ul class="zone__towns">
+                  {zoneTowns(i + 1).map((n) => <li><button type="button" class="chip" data-town={n}>{n}</button></li>)}
+                </ul>
               </div>
             ))}
+            <p class="zones__fine">Dalej niż 30 km: dojazd ustalam osobno, proszę zapytać.</p>
           </div>
+
+          <figure class="zones__map card" data-reveal>
+            <svg class="zmap" viewBox={`${vx} ${vy} ${vw} ${vh}`} role="img" aria-labelledby="zmap-t zmap-d" data-zmap>
+              <title id="zmap-t">Mapa stref dojazdu wokół Jeleniej Góry</title>
+              <desc id="zmap-d">Strefa 1, dojazd w cenie: {site.zones.one}. Strefa 2, {pr.zones.items[1].price}: pozostała część Polski w promieniu 30 km od Jeleniej Góry. Na południu granica z Czechami i Śnieżka.</desc>
+              <defs><clipPath id="zmap-c"><circle cx={zm.circle.cx} cy={zm.circle.cy} r={zm.circle.r} /></clipPath></defs>
+              <path class="zmap__abroad" d={zm.outside} />
+              <path class="zmap__z2" d={zm.zone2} />
+              <g class="zmap__gm zmap__gm--far">{zm.gminas.map((g) => <path d={g.d} />)}</g>
+              <g class="zmap__gm" clip-path="url(#zmap-c)">{zm.gminas.map((g) => <path d={g.d} />)}</g>
+              <path class="zmap__z1" d={zm.zone1} />
+              <path class="zmap__border" d={zm.poland} />
+              <g class="zmap__gmname" aria-hidden="true">{zm.gmLabels.map((g) => <text x={g.x} y={g.y} text-anchor="middle">{g.name}</text>)}</g>
+              <circle class="zmap__ring" cx={zm.circle.cx} cy={zm.circle.cy} r={zm.circle.r} />
+              <text class="zmap__note" x={zm.note.x} y={zm.note.y}>30 km</text>
+              <text class="zmap__cz" x={zm.czechy.x} y={zm.czechy.y} text-anchor="middle">CZECHY</text>
+              <g class="zmap__peak">
+                <path d={`M${zm.sniezka.x},${zm.sniezka.y - 9} l8,13 h-16z`} />
+                <text x={zm.sniezka.x} y={zm.sniezka.y + 20} text-anchor="middle">Śnieżka</text>
+              </g>
+              {zm.towns.map((tw) => tw.name === 'Jelenia Góra' ? null : (
+                <g class:list={['zmap__town', `zmap__town--z${tw.zone}`, { 'is-major': tw.major }]} data-town={tw.name}>
+                  <circle cx={tw.x} cy={tw.y} r="4" />
+                  {tw.side === 'below'
+                    ? <text class="zmap__below" x={tw.x} y={tw.y + 8} text-anchor="middle">{tw.name}</text>
+                    : <text x={tw.x + (tw.side === 'start' ? 9 : -9)} y={tw.y} text-anchor={tw.side}>{tw.name}</text>}
+                </g>
+              ))}
+              <g class="zmap__jg" data-town="Jelenia Góra">
+                <circle cx={zm.jg.x} cy={zm.jg.y} r="7" />
+                <text x={zm.jg.x + 12} y={zm.jg.y - 10}>Jelenia Góra</text>
+              </g>
+            </svg>
+            <figcaption class="zmap__legend">
+              <span><i class="zmap__key zmap__key--z1" aria-hidden="true"></i>{pr.zones.items[0].name}: {pr.zones.items[0].price}</span>
+              <span><i class="zmap__key zmap__key--z2" aria-hidden="true"></i>{pr.zones.items[1].name}: {pr.zones.items[1].price}</span>
+              <span class="zmap__src">{zm.source}</span>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>

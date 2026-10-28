@@ -139,3 +139,54 @@ if (hero && contact && 'IntersectionObserver' in window) {
   new IntersectionObserver(([en]) => { inHero = en.isIntersecting; update(); }, { threshold: 0.35 }).observe(hero);
   new IntersectionObserver(([en]) => { inContact = en.isIntersecting; update(); }, { threshold: 0.1 }).observe(contact);
 }
+
+/* ---------- Strefy dojazdu: wyszukiwarka miejscowości, podświetlenie na mapie ---------- */
+const check = document.querySelector<HTMLElement>('[data-check]');
+if (check) {
+  const towns: [string, number][] = JSON.parse(check.dataset.towns || '[]');
+  const input = check.querySelector<HTMLInputElement>('input')!;
+  const out = check.querySelector<HTMLElement>('.check__result')!;
+  const map = document.querySelector<SVGElement>('[data-zmap]');
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('.chip[data-town]')];
+  // Jak w Dyspozytorze: bez polskich znaków, małe litery, myślnik = spacja
+  const norm = (v: string) => v.toLowerCase().replace(/ł/g, 'l').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[-\s]+/g, ' ').trim();
+  const index = towns.map(([name, zone]) => ({ name, zone, key: norm(name) }));
+  const jg = map?.querySelector('.zmap__jg');
+  const pick = (name: string | null) => {
+    map?.classList.toggle('has-pick', name !== null);
+    map?.querySelectorAll('[data-town]').forEach((g) => {
+      const on = g.getAttribute('data-town') === name;
+      g.classList.toggle('is-picked', on);
+      // Wybrana miejscowość rysowana nad pozostałymi podpisami
+      if (on && jg && g !== jg) jg.before(g);
+    });
+    chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.town === name)));
+  };
+  const say = (zone: number | null, parts: (string | HTMLElement)[]) => {
+    out.replaceChildren(...parts);
+    if (zone === null) out.removeAttribute('data-zone'); else out.dataset.zone = String(zone);
+  };
+  const strong = (t: string) => { const b = document.createElement('strong'); b.textContent = t; return b; };
+  const update = () => {
+    const v = norm(input.value);
+    if (!v) { say(null, []); pick(null); return; }
+    const exact = index.find((t) => t.key === v);
+    const starts = index.filter((t) => t.key.startsWith(v));
+    const hit = exact ?? (starts.length === 1 && v.length >= 2 ? starts[0] : null);
+    if (hit) {
+      pick(hit.name);
+      say(hit.zone, hit.zone === 1
+        ? [strong(hit.name), `: strefa 1, ${check.dataset.z1}. Płacą Państwo tylko za czas pracy.`]
+        : hit.zone === 2
+          ? [strong(hit.name), `: strefa 2, ${check.dataset.z2}.`]
+          : [strong(hit.name), ': dalej niż 30 km, dojazd ustalam osobno. Proszę zapytać.']);
+      return;
+    }
+    pick(null);
+    if (starts.length > 1 && v.length >= 2) { say(null, [`Pasuje kilka miejscowości: ${starts.slice(0, 4).map((t) => t.name).join(', ')}…`]); return; }
+    if (v.length >= 3) say(0, ['Tej miejscowości nie mam na liście. Do 30 km od Jeleniej Góry to strefa 2, dalej dojazd ustalam osobno. Proszę zapytać, sprawdzę.']);
+    else say(null, []);
+  };
+  input.addEventListener('input', update);
+  chips.forEach((c) => c.addEventListener('click', () => { input.value = c.dataset.town || ''; update(); }));
+}

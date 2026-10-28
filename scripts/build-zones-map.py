@@ -1,0 +1,124 @@
+"""Generuje src/data/zones-map.json: mapę stref dojazdu z prawdziwych granic gmin.
+
+Źródło granic: Geoportal (PRG), przez github.com/waszkiewiczja/GeoJSON-Polska-Wojewodztwa-Powiaty-Gminy
+(gminy.json, polska.json; WGS84, uproszczone). Uruchomienie:
+    python3 scripts/build-zones-map.py <katalog z gminy.json i polska.json>
+Strefa 1 = gminy z ZONE1 (jak w config.ts i w Dyspozytorze). Strefa 2 = reszta Polski do 30 km od Jeleniej Góry.
+"""
+import json, math, sys
+from shapely.geometry import shape, Point, Polygon, box, mapping
+from shapely.ops import unary_union
+import shapely
+
+SRC = sys.argv[1]
+OUT = 'src/data/zones-map.json'
+LAT0, LNG0 = 50.9044, 15.7194          # Jelenia Góra
+KX = math.cos(math.radians(LAT0)) * 111.32
+KY = 110.57
+W, H = 800, 640
+S = 8.4                                 # pikseli na kilometr
+CX, CY = W / 2, H / 2 - 6
+ZONE1 = {'0261011', '0206082', '0206072', '0206031', '0206062', '0206092'}
+
+def proj(lng, lat, z=None):
+    return (CX + (lng - LNG0) * KX * S, CY + (LAT0 - lat) * KY * S)
+
+def to_px(geom):
+    return shapely.transform(geom, lambda c: [proj(x, y) for x, y in c])
+
+view = box(-4, -4, W + 4, H + 4)
+
+def path(geom, prec=0):
+    geom = geom.intersection(view)
+    polys = [geom] if geom.geom_type == 'Polygon' else [g for g in getattr(geom, 'geoms', []) if g.geom_type == 'Polygon']
+    out = []
+    for p in polys:
+        for ring in [p.exterior, *p.interiors]:
+            pts = list(ring.coords)
+            if len(pts) < 3: continue
+            seq = [f'{x:.{prec}f},{y:.{prec}f}' for x, y in pts[:-1]]
+            seq = [c for i, c in enumerate(seq) if i == 0 or c != seq[i - 1]]   # bez powtórzeń po zaokrągleniu
+            out.append('M' + 'L'.join(seq) + 'Z')
+    return ''.join(out)
+
+gm = json.load(open(f'{SRC}/gminy.json'))
+pl = json.load(open(f'{SRC}/polska.json'))
+poland = to_px(unary_union([shape(f['geometry']) for f in pl['features']])).buffer(0)
+
+gminas, z1, gm_labels = [], [], []
+# Miejsca podpisów gmin strefy 1 (lng, lat), gdy środek kształtu wypada niezręcznie
+GM_LABEL = {'0206031': (15.600, 50.857), '0206092': (15.620, 50.935)}   # Piechowice, Stara Kamienica
+for f in gm['features']:
+    g = to_px(shape(f['geometry'])).buffer(0)
+    if not g.intersects(view): continue
+    code = f['properties']['JPT_KOD_JE']
+    gminas.append({'name': f['properties']['JPT_NAZWA_'], 'zone1': code in ZONE1, 'd': path(g)})
+    if code in ZONE1:
+        z1.append(g)
+        if code != '0261011':   # miasto Jelenia Góra ma własny podpis
+            pt = g.representative_point() if code not in GM_LABEL else Point(proj(*GM_LABEL[code]))
+            assert g.buffer(1).contains(pt), f['properties']['JPT_NAZWA_']
+            gm_labels.append({'name': f['properties']['JPT_NAZWA_'], 'x': round(pt.x, 1), 'y': round(pt.y, 1)})
+
+zone1 = unary_union(z1).buffer(0)
+circle = Point(CX, CY).buffer(30 * S, 128)
+zone2 = circle.intersection(poland).difference(zone1)
+outside = box(0, 0, W, H).difference(poland)
+
+# Miejscowości do wyszukiwarki i na mapę (współrzędne jak w Dyspozytorze, lib/area.ts).
+# Strefa liczona z geometrii: punkt w gminach strefy 1 → 1, w okręgu 30 km → 2, dalej → 0 (poza obszarem).
+# side: podpis po prawej (start), po lewej (end) albo pod punktem (below); major: podpis zawsze widoczny (pozostałe tylko po wybraniu w wyszukiwarce)
+TOWNS = [
+    ('Jelenia Góra', 50.9044, 15.7194, 'start', True), ('Cieplice', 50.865, 15.678, 'end', False),
+    ('Sobieszów', 50.862, 15.645, 'end', False), ('Jagniątków', 50.8346, 15.6098, 'end', False),
+    ('Podgórzyn', 50.8331, 15.6797, 'start', False), ('Przesieka', 50.8165, 15.6347, 'end', False),
+    ('Sosnówka', 50.8236, 15.7175, 'start', False), ('Miłków', 50.8075, 15.7317, 'start', False),
+    ('Ściegny', 50.8, 15.735, 'start', False), ('Zachełmie', 50.8274, 15.6545, 'end', False),
+    ('Borowice', 50.7833, 15.6833, 'end', False), ('Staniszów', 50.8686, 15.7339, 'start', False),
+    ('Mysłakowice', 50.8435, 15.7854, 'start', False), ('Łomnica', 50.8647, 15.7717, 'start', False),
+    ('Piechowice', 50.8503, 15.5891, 'end', False), ('Jeżów Sudecki', 50.9417, 15.7086, 'end', False),
+    ('Stara Kamienica', 50.9204, 15.6016, 'end', False), ('Wojcieszyce', 50.8706, 15.6197, 'end', False),
+    ('Karpacz', 50.7766, 15.7556, 'end', True), ('Kowary', 50.7929, 15.8356, 'start', True),
+    ('Szklarska Poręba', 50.8273, 15.523, 'start', True), ('Świeradów-Zdrój', 50.9091, 15.3366, 'start', True),
+    ('Janowice Wielkie', 50.881, 15.925, 'end', False), ('Mirsk', 50.9706, 15.3856, 'start', False),
+    ('Gryfów Śląski', 51.0302, 15.42, 'start', False), ('Lubomierz', 51.0122, 15.5094, 'start', False),
+    ('Wleń', 51.0153, 15.6739, 'start', False), ('Lwówek Śląski', 51.1103, 15.5869, 'start', True),
+    ('Kamienna Góra', 50.7836, 16.0303, 'below', True), ('Bolków', 50.9223, 16.1006, 'end', False),
+    ('Lubawka', 50.7044, 15.9997, 'end', False), ('Złotoryja', 51.1266, 15.9198, 'end', False),
+]
+towns = []
+for name, lat, lng, side, major in TOWNS:
+    x, y = proj(lng, lat)
+    p_ = Point(x, y)
+    zone = 1 if zone1.buffer(0.5).contains(p_) else (2 if circle.contains(p_) else 0)
+    towns.append({'name': name, 'x': round(x, 1), 'y': round(y, 1), 'side': side, 'major': major, 'zone': zone})
+EXPECT1 = {'Jelenia Góra', 'Cieplice', 'Sobieszów', 'Jagniątków', 'Podgórzyn', 'Przesieka', 'Sosnówka', 'Miłków', 'Ściegny',
+           'Zachełmie', 'Borowice', 'Staniszów', 'Mysłakowice', 'Łomnica', 'Piechowice', 'Jeżów Sudecki', 'Stara Kamienica', 'Wojcieszyce'}
+for t in towns:
+    if (t['zone'] == 1) != (t['name'] in EXPECT1): print('UWAGA, strefa z mapy inna niż w tabeli:', t['name'], t['zone'])
+jg = proj(LNG0, LAT0)
+sn = proj(15.7399, 50.7360)   # Śnieżka
+cz = proj(15.60, 50.705)      # podpis „Czechy”
+r = 30 * S
+nt = (CX + r * math.cos(math.radians(-42)) + 10, CY + r * math.sin(math.radians(-42)) - 4)   # podpis „30 km” tuż za okręgiem
+crop = [round(CX - r - 14), round(CY - r - 14), round(2 * r + 28), round(2 * r + 28)]
+
+data = {
+    'w': W, 'h': H,
+    'outside': path(outside),
+    'poland': path(poland),
+    'gminas': gminas,
+    'zone1': path(zone1),
+    'zone2': path(zone2),
+    'circle': {'cx': CX, 'cy': CY, 'r': 30 * S},
+    'note': {'x': round(nt[0], 1), 'y': round(nt[1], 1)},
+    'crop': crop,
+    'jg': {'x': round(jg[0], 1), 'y': round(jg[1], 1)},
+    'sniezka': {'x': round(sn[0], 1), 'y': round(sn[1], 1)},
+    'czechy': {'x': round(cz[0], 1), 'y': round(cz[1], 1)},
+    'towns': towns,
+    'gmLabels': gm_labels,
+    'source': 'Granice gmin: Geoportal (PRG), 2025',
+}
+json.dump(data, open(OUT, 'w'), ensure_ascii=False, separators=(',', ':'))
+print(OUT, len(gminas), 'gmin', round(len(json.dumps(data)) / 1024), 'KB')

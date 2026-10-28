@@ -60,7 +60,7 @@ export const pillars = [
 export const priceCards = [
   { badge: 'Strefa 1', title: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: `${money(gross(P.firstHour))} brutto`, note: 'Dojazd w cenie: Jelenia Góra i najbliższa okolica.', topic: 0 },
   { badge: 'Robocizna', title: 'Każde kolejne rozpoczęte 30 minut', price: zl(P.halfHour), gross: `${money(gross(P.halfHour))} brutto`, note: 'Liczone od pierwszej minuty po pierwszej godzinie.', topic: 0 },
-  { badge: 'Strefa 2', title: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))} brutto`, note: 'Np. Karpacz, Kowary, Szklarska Poręba, Świeradów-Zdrój. Raz za wizytę.', topic: 0 },
+  { badge: 'Strefa 2', title: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))} brutto`, note: 'Np. Karpacz, Kowary, Szklarska Poręba, Świeradów-Zdrój. Raz za wizytę.', topic: 0, href: '#strefy' },
   { badge: 'Miesięcznie', title: t.pricing.care.title, price: `od ${zl(P.careFrom)}`, gross: `od ${money(gross(P.careFrom))} brutto`, note: `${P.careHours} godziny pracy, dojazdy w cenie, reakcja w ciągu ${P.careResponseH} godzin.`, topic: 1 },
 ];
 
@@ -73,33 +73,3 @@ export const stats = [
   { value: String(P.careHours), unit: 'h', label: 'pracy w miesięcznym pakiecie opieki', icon: 'house' },
   { value: '0', unit: '%', label: 'dopłaty w soboty i niedziele w dzień', icon: 'calendar' },
 ];
-
-/** Mapa stref: miejscowości z przybliżonymi współrzędnymi (te same co w Dyspozytorze, lib/area.ts) */
-// minor: podpis ukryty na telefonie (za mało miejsca)
-export const mapTowns: { name: string; lat: number; lng: number; zone: 1 | 2; label?: 'l' | 'r' | 't' | 'b'; minor?: boolean }[] = [
-  { name: 'Jelenia Góra', lat: 50.9044, lng: 15.7194, zone: 1 },
-  { name: 'Cieplice', lat: 50.865, lng: 15.678, zone: 1, label: 'l', minor: true },
-  { name: 'Piechowice', lat: 50.8503, lng: 15.5891, zone: 1, label: 'b', minor: true },
-  { name: 'Podgórzyn', lat: 50.8331, lng: 15.6797, zone: 1, label: 'b', minor: true },
-  { name: 'Mysłakowice', lat: 50.8435, lng: 15.7854, zone: 1, label: 'r', minor: true },
-  { name: 'Jeżów Sudecki', lat: 50.9417, lng: 15.7086, zone: 1, label: 't', minor: true },
-  { name: 'Stara Kamienica', lat: 50.9204, lng: 15.6016, zone: 1, label: 'l', minor: true },
-  { name: 'Karpacz', lat: 50.7766, lng: 15.7556, zone: 2, label: 'b' },
-  { name: 'Kowary', lat: 50.7929, lng: 15.8356, zone: 2, label: 'r' },
-  { name: 'Szklarska Poręba', lat: 50.8273, lng: 15.523, zone: 2, label: 'b' },
-  { name: 'Świeradów-Zdrój', lat: 50.9091, lng: 15.3366, zone: 2, label: 'b' },
-  { name: 'Janowice Wielkie', lat: 50.881, lng: 15.925, zone: 2, label: 'r', minor: true },
-  { name: 'Lwówek Śląski', lat: 51.1103, lng: 15.5869, zone: 2, label: 't' },
-  { name: 'Kamienna Góra', lat: 50.7836, lng: 16.0303, zone: 2, label: 'b' },
-  { name: 'Mirsk', lat: 50.9706, lng: 15.3856, zone: 2, label: 't', minor: true },
-  { name: 'Lubomierz', lat: 51.0122, lng: 15.5094, zone: 2, label: 't', minor: true },
-];
-
-/** Rzut współrzędnych na płaszczyznę mapy (km od Jeleniej Góry → piksele SVG) */
-export function project(lat: number, lng: number, scale: number, cx: number, cy: number) {
-  const lat0 = site.center.lat;
-  const lng0 = site.center.lng;
-  const x = (lng - lng0) * Math.cos((lat0 * Math.PI) / 180) * 111.32;
-  const y = (lat0 - lat) * 110.57;
-  return { x: cx + x * scale, y: cy + y * scale };
-}
