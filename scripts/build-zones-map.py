@@ -92,11 +92,15 @@ TOWNS = [
     ('Kamienna Góra', 50.7836, 16.0303, 'below', False), ('Bolków', 50.9223, 16.1006, 'end', False),
     ('Lubawka', 50.7044, 15.9997, 'end', False), ('Złotoryja', 51.1266, 15.9198, 'end', False),
 ]
+# Miejscowości spoza obszaru mimo promienia: wycinane z strefy 2 razem z konturem
+EXCLUDE = {'Janowice Wielkie', 'Wleń'}
+excluded = []
 towns = []
 for name, lat, lng, side, major in TOWNS:
     x, y = proj(lng, lat)
     p_ = Point(x, y)
     zone = 1 if zone1.buffer(0.5).contains(p_) else (2 if zone2.buffer(0.5).contains(p_) else 0)
+    if name in EXCLUDE: zone = 0   # wypadają z obszaru (nie dojeżdżam), choć leżą w promieniu
     towns.append({'name': name, 'x': round(x, 1), 'y': round(y, 1), 'side': side, 'major': major, 'zone': zone})
 EXPECT1 = {'Jelenia Góra', 'Cieplice', 'Sobieszów', 'Jagniątków', 'Podgórzyn', 'Przesieka', 'Sosnówka', 'Miłków', 'Ściegny',
            'Zachełmie', 'Borowice', 'Staniszów', 'Mysłakowice', 'Łomnica', 'Piechowice', 'Jeżów Sudecki', 'Stara Kamienica', 'Wojcieszyce'}
@@ -127,6 +131,8 @@ for line in open(KONTURY, encoding='utf-8'):
         c = polylabel(max(polys, key=lambda q: q.area), 0.5)
         print('punkt przesunięty do środka konturu:', name, (t['x'], t['y']), '->', (round(c.x, 1), round(c.y, 1)))
         t['x'], t['y'] = round(c.x, 1), round(c.y, 1)
+    if name in EXCLUDE: excluded.extend(polys)
+zone2 = zone2.difference(unary_union(excluded)).buffer(0)
 for t in towns:
     t['c'] = shapes.get(t['name'], '') if t['zone'] else ''
 jg = proj(LNG0, LAT0)

@@ -60,7 +60,7 @@ export const pillars = [
 export const priceCards = [
   { badge: 'Strefa 1', title: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: `${money(gross(P.firstHour))} brutto`, note: 'Dojazd w cenie: Jelenia Góra i najbliższa okolica.', topic: 0 },
   { badge: 'Robocizna', title: 'Każde kolejne rozpoczęte 30 minut', price: zl(P.halfHour), gross: `${money(gross(P.halfHour))} brutto`, note: 'Liczone od pierwszej minuty po pierwszej godzinie.', topic: 0 },
-  { badge: 'Strefa 2', title: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))} brutto`, note: 'Np. Karpacz, Kowary, Szklarska Poręba, Wleń. Raz za wizytę.', topic: 0, href: '#strefy' },
+  { badge: 'Strefa 2', title: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))} brutto`, note: 'Np. Karpacz, Kowary, Szklarska Poręba. Raz za wizytę.', topic: 0, href: '#strefy' },
   { badge: 'Miesięcznie', title: t.pricing.care.title, price: `od ${zl(P.careFrom)}`, gross: `od ${money(gross(P.careFrom))} brutto`, note: `${P.careHours} godziny pracy, dojazdy w cenie, reakcja w ciągu ${P.careResponseH} godzin.`, topic: 1 },
 ];
 
