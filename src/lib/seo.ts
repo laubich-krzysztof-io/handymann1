@@ -55,6 +55,7 @@ export function jsonLd(lang: Lang) {
     makesOffer: [
       rate(pr.rates[0].label, { price: p.firstHour }, { value: 1, unitCode: 'HUR' }),
       rate(pr.rates[1].label, { price: p.halfHour }, { value: 30, unitCode: 'MIN' }),
+      rate(pr.rates[2].label, { price: p.zone2Travel }, { value: 1, unitCode: 'C62' }),
       rate(pr.care.title, { minPrice: p.careFrom }, { value: 1, unitCode: 'MON' }),
     ],
   };

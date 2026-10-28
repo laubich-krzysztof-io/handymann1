@@ -8,9 +8,13 @@ const money = (n: number) =>
   `${new Intl.NumberFormat('pl-PL', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 }).format(n)}\u00a0zł`;
 const gross = (n: number) => Math.round(n * (100 + P.vatPct)) / 100;
 const R = site.radiusKm;
-// Przykładowy rachunek: 1 h 20 min pracy = pierwsza godzina + jedno rozpoczęte pół godziny + część
-const BILL_PART = 189;
-const BILL_NET = P.firstHour + P.halfHour + BILL_PART;
+// Przykładowy rachunek: pensjonat w strefie 2, trzy usterki przy jednej wizycie, 1 h 30 min pracy
+// = pierwsza godzina + jedno rozpoczęte pół godziny + dojazd do strefy 2 + dwie części
+const BILL_PARTS: [string, number][] = [
+  ['Syfon umywalkowy (cena zakupu)', 42],
+  ['Oprawa LED nad lustrem (cena zakupu)', 89],
+];
+const BILL_NET = P.firstHour + P.halfHour + P.zone2Travel + BILL_PARTS.reduce((s, [, n]) => s + n, 0);
 const BILL_VAT = Math.round(BILL_NET * P.vatPct) / 100;
 const BILL_GROSS = Math.round((BILL_NET + BILL_VAT) * 100) / 100;
 // Polska odmiana liczebnika: 1 godzina, 2–4 godziny, 5+ godzin (12–14 też „godzin”)
@@ -53,7 +57,8 @@ export interface Content {
     net: string;
     grossLabel: string;
     surcharges: string;
-    area: string;
+    /** Strefy dojazdu: nazwa, cena dojazdu, miejscowości */
+    zones: { title: string; items: { name: string; price: string; text: string }[] };
     care: { title: string; price: string; gross: string; per: string; points: string[] };
     bill: {
       title: string;
@@ -130,7 +135,7 @@ const raw: Record<Lang, Content> = {
         label: 'Pierwsza godzina z dojazdem',
         price: zl(P.firstHour),
         gross: `netto, ${money(gross(P.firstHour))} brutto`,
-        area: `w promieniu ${R} km od Jeleniej Góry`,
+        area: 'dojazd w cenie w Jeleniej Górze i okolicy',
         link: 'Pełny cennik',
       },
     },
@@ -167,18 +172,27 @@ const raw: Record<Lang, Content> = {
     },
     pricing: {
       title: 'Ile to kosztuje',
-      lead: 'Płacą Państwo za czas pracy według stawek poniżej.',
+      lead: 'Płacą Państwo za czas pracy według stawek poniżej. Cenę znają Państwo przed rozpoczęciem pracy.',
       rates: [
-        { label: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: money(gross(P.firstHour)) },
+        { label: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: money(gross(P.firstHour)), note: 'Dojazd w cenie w strefie 1: Jelenia Góra i najbliższa okolica.' },
         { label: 'Każde kolejne rozpoczęte 30 minut', price: zl(P.halfHour), gross: money(gross(P.halfHour)) },
-        { label: 'Części i materiały', price: 'po cenie zakupu', note: 'Paragon lub fakturę zakupu dołączam do rachunku.', text: true },
+        { label: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))}`, note: 'Np. Karpacz, Kowary, Szklarska Poręba, Świeradów-Zdrój. Raz za wizytę, niezależnie od czasu pracy.' },
+        { label: 'Części i materiały', price: 'po cenie zakupu', note: 'Paragon lub fakturę dołączam do rachunku. Gdy część trzeba dokupić w trakcie zlecenia, czas zakupu liczę jak czas pracy.', text: true },
       ],
       extras: [
         { label: 'Pilne zlecenie, tego samego dnia', price: `+${P.urgentPct}%` },
         { label: `W nocy (${P.night.from}:00–${P.night.to}:00) i w święta`, price: `+${P.nightPct}%` },
+        { label: 'Soboty i niedziele w dzień', price: 'bez dopłaty' },
+        { label: 'Oględziny bez naprawy', price: 'jak pierwsza godzina' },
       ],
-      surcharges: 'Dopłaty liczę tylko od robocizny, nie od części.',
-      area: `Dojazd w cenie w promieniu ${R} km od Jeleniej Góry: Jelenia Góra z Cieplicami, Karpacz, Szklarska Poręba, Świeradów-Zdrój, Podgórzyn, Mysłakowice, Kowary, Piechowice i miejscowości po drodze.`,
+      surcharges: 'Dopłaty procentowe liczę tylko od robocizny, nie od dojazdu i części.',
+      zones: {
+        title: 'Strefy dojazdu',
+        items: [
+          { name: 'Strefa 1', price: 'dojazd w cenie', text: `${site.zones.one}.` },
+          { name: 'Strefa 2', price: `+${zl(P.zone2Travel)} netto za wizytę`, text: `${site.zones.two}.` },
+        ],
+      },
       care: {
         title: 'Stała opieka nad obiektem',
         price: `od ${zl(P.careFrom)}`,
@@ -186,20 +200,22 @@ const raw: Record<Lang, Content> = {
         per: 'miesięcznie',
         points: [
           `${P.careHours} ${plHours(P.careHours)} pracy w miesiącu`,
-          'dojazdy w cenie',
-          `reakcja w ciągu ${P.careResponseH} godzin`,
+          'dojazdy w cenie w obu strefach',
+          `reakcja w ciągu ${P.careResponseH} godzin, także w weekendy`,
           'lista usterek po każdej wizycie',
+          `praca ponad pakiet: ${zl(P.halfHour)} za 30 minut, bez opłaty za pierwszą godzinę`,
         ],
       },
       bill: {
         title: 'Przykładowy rachunek',
-        place: 'Pensjonat, Szklarska Poręba',
-        job: 'Pokój 7 · kapiąca bateria prysznicowa',
-        time: 'Czas pracy: 1 h 20 min',
+        place: 'Pensjonat, Szklarska Poręba (strefa 2)',
+        job: 'Pokoje 4 i 7 · syfon, klamka, oświetlenie nad lustrem',
+        time: 'Czas pracy: 1 h 30 min, trzy usterki przy jednej wizycie',
         lines: [
-          ['Pierwsza godzina z dojazdem', zl(P.firstHour)],
+          ['Pierwsza godzina pracy', zl(P.firstHour)],
           ['Kolejne rozpoczęte 30 min', zl(P.halfHour)],
-          ['Bateria prysznicowa (cena zakupu)', zl(BILL_PART)],
+          ['Dojazd do strefy 2', zl(P.zone2Travel)],
+          ...BILL_PARTS.map(([k, n]) => [k, zl(n)] as [string, string]),
         ],
         subtotal: ['Razem netto', zl(BILL_NET)],
         vat: [`VAT ${P.vatPct}%`, money(BILL_VAT)],
@@ -225,19 +241,20 @@ const raw: Record<Lang, Content> = {
       title: 'Częste pytania',
       more: 'Inne pytanie? Proszę zadzwonić albo napisać.',
       items: [
-        { q: 'Czy dojeżdża Pan do Karpacza, Szklarskiej Poręby i Świeradowa-Zdroju?', a: `Tak. Pracuję w promieniu ${R} km od Jeleniej Góry, a dojazd jest wliczony w pierwszą godzinę pracy.` },
-        { q: 'Jak szybko może Pan przyjechać?', a: `Termin ustalamy przy zgłoszeniu. Gdy naprawa musi być zrobiona tego samego dnia, do robocizny doliczam ${P.urgentPct}%. Przy stałej opiece reaguję w ciągu ${P.careResponseH} godzin.` },
-        { q: 'Czy wystawia Pan fakturę VAT?', a: 'Tak. Robocizna i materiały są na niej wpisane osobno.' },
-        { q: 'Czym stała opieka różni się od jednorazowego zlecenia?', a: `Przychodzę w ustalonym rytmie, spisuję usterki i usuwam je, zanim zauważą je goście. Abonament zaczyna się od ${zl(P.careFrom)} netto miesięcznie: ${P.careHours} ${plHours(P.careHours)} pracy, dojazdy w cenie i reakcja w ciągu ${P.careResponseH} godzin.` },
+        { q: 'Czy dojeżdża Pan do Karpacza, Szklarskiej Poręby i Świeradowa-Zdroju?', a: `Tak. W strefie 1 (${site.zones.one}) dojazd jest w cenie pierwszej godziny. Karpacz, Szklarska Poręba, Świeradów-Zdrój i pozostałe miejscowości do ${R} km od Jeleniej Góry to strefa 2: doliczam ${zl(P.zone2Travel)} netto za wizytę.` },
+        { q: 'Jak szybko może Pan przyjechać?', a: `Termin ustalamy przy zgłoszeniu. Gdy naprawa musi być zrobiona tego samego dnia, do robocizny doliczam ${P.urgentPct}%, w nocy i w święta ${P.nightPct}%. W soboty i niedziele w dzień pracuję bez dopłat. Przy stałej opiece reaguję w ciągu ${P.careResponseH} godzin.` },
+        { q: 'Ile kosztuje przyjazd, jeśli nic nie naprawimy?', a: `Oględziny i wycena na miejscu kosztują tyle co pierwsza godzina: ${zl(P.firstHour)} netto, w strefie 2 z dopłatą ${zl(P.zone2Travel)} za dojazd. Jeśli naprawę zlecą Państwo przy tej samej wizycie, oględziny są już w cenie.` },
+        { q: 'Czy wystawia Pan fakturę VAT?', a: 'Tak. Robocizna, dojazd i materiały są na niej wpisane osobno.' },
+        { q: 'Czym stała opieka różni się od jednorazowego zlecenia?', a: `Przychodzę w ustalonym rytmie, spisuję usterki i usuwam je, zanim zauważą je goście. Pakiet kosztuje od ${zl(P.careFrom)} netto miesięcznie: ${P.careHours} ${plHours(P.careHours)} pracy, dojazdy w cenie w obu strefach i reakcja w ciągu ${P.careResponseH} godzin, także w weekendy. Pracę ponad pakiet liczę po ${zl(P.halfHour)} za każde rozpoczęte 30 minut, bez opłaty za pierwszą godzinę. Niewykorzystane godziny nie przechodzą na kolejny miesiąc.` },
       ],
     },
     contact: {
       title: 'Proszę opisać, co się dzieje.',
       steps: [
         { title: 'Zgłoszenie', text: 'Telefonicznie, przez WhatsApp albo formularzem, najlepiej ze zdjęciem.' },
-        { title: 'Wycena', text: 'Orientacyjna na podstawie zdjęcia, dokładna po oględzinach na miejscu.' },
+        { title: 'Wycena', text: 'Orientacyjna na podstawie zdjęcia, dokładna po oględzinach na miejscu, zawsze przed rozpoczęciem pracy.' },
         { title: 'Naprawa', text: 'W ustalonym terminie, z narzędziami i podstawowymi częściami. Po pracy sprzątam.' },
-        { title: 'Rozliczenie', text: 'Rachunek lub faktura, z robocizną i materiałami wpisanymi osobno.' },
+        { title: 'Rozliczenie', text: 'Rachunek lub faktura, z robocizną, dojazdem i materiałami wpisanymi osobno.' },
       ],
       direct: 'Telefon i WhatsApp',
       whatsappDirect: 'Wiadomość na WhatsAppie',

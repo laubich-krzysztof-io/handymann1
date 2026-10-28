@@ -28,7 +28,7 @@ export const GET: APIRoute = () => {
     ...pl.pricing.extras.map((x) => `- ${x.label}: ${x.price}`),
     `- ${pl.pricing.surcharges}`,
     `- ${pl.pricing.care.title}: ${pl.pricing.care.price} ${pl.pricing.net} ${pl.pricing.care.per}, ${pl.pricing.care.gross} ${pl.pricing.grossLabel} (${pl.pricing.care.points.join(', ')})`,
-    `- ${pl.pricing.area}`,
+    ...pl.pricing.zones.items.map((z) => `- ${pl.pricing.zones.title}, ${z.name} (${z.price}): ${z.text}`),
     `- ${pl.pricing.fine}`,
     '',
     '## Jak wygląda zlecenie',

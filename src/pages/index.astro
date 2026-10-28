@@ -119,28 +119,38 @@ const photos = [
           <dl class="rates" data-rule>
             {pr.rates.map((r) => (
               <div class="rates__row">
-                <dt>{r.label}{r.note && <span class="rates__note">{r.note}</span>}</dt>
+                <dt>{r.label}</dt>
                 <dd class:list={['rates__price', { 'rates__price--text': r.text }]}>
                   <span>{r.price}</span>
                   {r.gross && <span class="rates__gross">{r.gross} {pr.grossLabel}</span>}
                 </dd>
+                {r.note && <dd class="rates__note">{r.note}</dd>}
               </div>
             ))}
             <div class="rates__row">
-              <dt>{pr.care.title} <span class="rates__per">{pr.care.per}</span>
-                <span class="rates__note">{pr.care.points.join(', ')}.</span>
-              </dt>
+              <dt>{pr.care.title} <span class="rates__per">{pr.care.per}</span></dt>
               <dd class="rates__price">
                 <span>{pr.care.price}</span>
                 <span class="rates__gross">{pr.care.gross} {pr.grossLabel}</span>
               </dd>
+              <dd class="rates__note">{pr.care.points.join(', ')}.</dd>
             </div>
           </dl>
           <ul class="rates__extras">
             {pr.extras.map((x) => <li><span>{x.label}</span> <span class="rates__extra">{x.price}</span></li>)}
             <li class="rates__fine">{pr.surcharges}</li>
           </ul>
-          <p class="price__area">{pr.area}</p>
+          <div class="zones" aria-labelledby="zones-h">
+            <p class="zones__title label" id="zones-h">{pr.zones.title}</p>
+            <dl>
+              {pr.zones.items.map((z) => (
+                <div class="zones__row">
+                  <dt><span class="zones__name">{z.name}</span> <span class="zones__price">{z.price}</span></dt>
+                  <dd>{z.text}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </div>
 
         <aside class="bill" aria-labelledby="bill-h">
