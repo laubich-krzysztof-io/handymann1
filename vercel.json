@@ -58,12 +58,52 @@
       "permanent": true
     },
     {
+      "source": "/de/datenschutz",
+      "destination": "/prywatnosc/",
+      "permanent": true
+    },
+    {
+      "source": "/de/datenschutz/",
+      "destination": "/prywatnosc/",
+      "permanent": true
+    },
+    {
+      "source": "/en/privacy",
+      "destination": "/prywatnosc/",
+      "permanent": true
+    },
+    {
+      "source": "/en/privacy/",
+      "destination": "/prywatnosc/",
+      "permanent": true
+    },
+    {
+      "source": "/de",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/de/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/de/:path*",
       "destination": "/",
       "permanent": true
     },
     {
-      "source": "/de",
+      "source": "/de/:path*/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/en",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/en/",
       "destination": "/",
       "permanent": true
     },
@@ -73,7 +113,7 @@
       "permanent": true
     },
     {
-      "source": "/en",
+      "source": "/en/:path*/",
       "destination": "/",
       "permanent": true
     }
