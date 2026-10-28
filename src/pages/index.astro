@@ -286,11 +286,9 @@ const work = [
             <svg class="zmap" viewBox={`${vx} ${vy} ${vw} ${vh}`} role="img" aria-labelledby="zmap-t zmap-d" data-zmap>
               <title id="zmap-t">Mapa stref dojazdu wokół Jeleniej Góry</title>
               <desc id="zmap-d">Strefa 1, dojazd w cenie: {site.zones.one}. Strefa 2, {pr.zones.items[1].price}: Karpacz, Kowary i Szklarska Poręba w całości oraz pozostała część Polski w promieniu {site.radiusKm} km od Jeleniej Góry. Dalej nie dojeżdżam. Na południu granica z Czechami i Śnieżka.</desc>
-              <defs><clipPath id="zmap-c"><circle cx={zm.circle.cx} cy={zm.circle.cy} r={zm.circle.r} /></clipPath></defs>
               <path class="zmap__abroad" d={zm.outside} />
               <path class="zmap__z2" d={zm.zone2} />
               <g class="zmap__gm zmap__gm--far">{zm.gminas.map((g) => <path d={g.d} />)}</g>
-              <g class="zmap__gm" clip-path="url(#zmap-c)">{zm.gminas.map((g) => <path d={g.d} />)}</g>
               <path class="zmap__z1" d={zm.zone1} />
               <path class="zmap__border" d={zm.poland} />
               <g class="zmap__shapes" aria-hidden="true">{zm.towns.filter((tw) => tw.zone > 0).map((tw) => <path class:list={['zmap__shape', `zmap__shape--z${tw.zone}`]} data-shape={tw.name} d={tw.c} />)}</g>
