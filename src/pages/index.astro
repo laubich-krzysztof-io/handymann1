@@ -256,7 +256,7 @@ const work = [
       <div class="wrap">
         <h2 id="strefy-h" class="title" data-reveal>{pr.zones.title}</h2>
         <p class="zones__lead" data-reveal>Proszę wpisać miejscowość, a od razu widać, czy dojazd jest w cenie.</p>
-        <div class="zones__grid">
+        <div class="zones__solo">
           <div class="zones__check card" data-reveal>
             <div class="check" data-check data-towns={checkerData} data-z1={pr.zones.items[0].price} data-z2={pr.zones.items[1].price}>
               <label class="check__label" for="town">Miejscowość</label>
@@ -268,9 +268,9 @@ const work = [
             </div>
           </div>
 
-          <div class="zones__lists card" data-reveal>
+          <div class="zones__cols">
             {pr.zones.items.map((z, i) => (
-              <div class:list={['zone', `zone--${i + 1}`]}>
+              <div class:list={['zone', `zone--${i + 1}`, 'card']} data-reveal>
                 <p class="zone__head"><span class="zone__name">{z.name}</span><span class="zone__price">{z.price}</span></p>
                 <p class="zone__rule">{i === 0 ? site.zones.one : 'Pozostałe miejscowości do 30 km od Jeleniej Góry, między innymi:'}</p>
                 <ul class="zone__towns">
@@ -278,47 +278,8 @@ const work = [
                 </ul>
               </div>
             ))}
-            <p class="zones__fine">Dalej niż 30 km: dojazd ustalam osobno, proszę zapytać.</p>
           </div>
-
-          <figure class="zones__map card" data-reveal>
-            <svg class="zmap" viewBox={`${vx} ${vy} ${vw} ${vh}`} role="img" aria-labelledby="zmap-t zmap-d" data-zmap>
-              <title id="zmap-t">Mapa stref dojazdu wokół Jeleniej Góry</title>
-              <desc id="zmap-d">Strefa 1, dojazd w cenie: {site.zones.one}. Strefa 2, {pr.zones.items[1].price}: pozostała część Polski w promieniu 30 km od Jeleniej Góry. Na południu granica z Czechami i Śnieżka.</desc>
-              <defs><clipPath id="zmap-c"><circle cx={zm.circle.cx} cy={zm.circle.cy} r={zm.circle.r} /></clipPath></defs>
-              <path class="zmap__abroad" d={zm.outside} />
-              <path class="zmap__z2" d={zm.zone2} />
-              <g class="zmap__gm zmap__gm--far">{zm.gminas.map((g) => <path d={g.d} />)}</g>
-              <g class="zmap__gm" clip-path="url(#zmap-c)">{zm.gminas.map((g) => <path d={g.d} />)}</g>
-              <path class="zmap__z1" d={zm.zone1} />
-              <path class="zmap__border" d={zm.poland} />
-              <g class="zmap__gmname" aria-hidden="true">{zm.gmLabels.map((g) => <text x={g.x} y={g.y} text-anchor="middle">{g.name}</text>)}</g>
-              <circle class="zmap__ring" cx={zm.circle.cx} cy={zm.circle.cy} r={zm.circle.r} />
-              <text class="zmap__note" x={zm.note.x} y={zm.note.y}>30 km</text>
-              <text class="zmap__cz" x={zm.czechy.x} y={zm.czechy.y} text-anchor="middle">CZECHY</text>
-              <g class="zmap__peak">
-                <path d={`M${zm.sniezka.x},${zm.sniezka.y - 9} l8,13 h-16z`} />
-                <text x={zm.sniezka.x} y={zm.sniezka.y + 20} text-anchor="middle">Śnieżka</text>
-              </g>
-              {zm.towns.map((tw) => tw.name === 'Jelenia Góra' ? null : (
-                <g class:list={['zmap__town', `zmap__town--z${tw.zone}`, { 'is-major': tw.major }]} data-town={tw.name}>
-                  <circle cx={tw.x} cy={tw.y} r="4" />
-                  {tw.side === 'below'
-                    ? <text class="zmap__below" x={tw.x} y={tw.y + 8} text-anchor="middle">{tw.name}</text>
-                    : <text x={tw.x + (tw.side === 'start' ? 9 : -9)} y={tw.y} text-anchor={tw.side}>{tw.name}</text>}
-                </g>
-              ))}
-              <g class="zmap__jg" data-town="Jelenia Góra">
-                <circle cx={zm.jg.x} cy={zm.jg.y} r="7" />
-                <text x={zm.jg.x + 12} y={zm.jg.y - 10}>Jelenia Góra</text>
-              </g>
-            </svg>
-            <figcaption class="zmap__legend">
-              <span><i class="zmap__key zmap__key--z1" aria-hidden="true"></i>{pr.zones.items[0].name}: {pr.zones.items[0].price}</span>
-              <span><i class="zmap__key zmap__key--z2" aria-hidden="true"></i>{pr.zones.items[1].name}: {pr.zones.items[1].price}</span>
-              <span class="zmap__src">{zm.source}</span>
-            </figcaption>
-          </figure>
+          <p class="zones__fine" data-reveal>Dalej niż 30 km: dojazd ustalam osobno, proszę zapytać.</p>
         </div>
       </div>
     </section>

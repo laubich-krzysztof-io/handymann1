@@ -485,3 +485,16 @@ main:focus, [role="tabpanel"]:focus { outline: none; }
   .zmap__src { margin-left: 0; }
   .zmap__gmname { display: none; }
 }
+
+/* Wersja bez mapy: wyszukiwarka na środku, pod nią dwie strefy obok siebie */
+.zones__solo { display: grid; gap: 1.2rem; max-width: 62rem; margin: 2.2rem auto 0; }
+.zones__solo .zones__check { grid-area: auto; }
+.zones__solo .zones__check { width: 100%; max-width: 40rem; justify-self: center; padding: clamp(1.4rem, 3vw, 2.2rem); background: var(--bg); }
+.zones__solo .check__field input { min-height: 3.8rem; font-size: 1.2rem; }
+.zones__cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; align-items: start; }
+.zones__cols .zone { padding: clamp(1.3rem, 2.4vw, 1.9rem); box-shadow: none; }
+.zones__cols .zone + .zone { padding-top: clamp(1.3rem, 2.4vw, 1.9rem); border-top: 0; }
+.zones__cols .zone--1 { background: var(--lav-soft); }
+.zones__cols .zone--2 { background: #fffbe8; }
+.zones__solo .zones__fine { text-align: center; }
+@media (max-width: 47.99rem) { .zones__cols { grid-template-columns: minmax(0, 1fr); } }
