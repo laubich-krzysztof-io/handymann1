@@ -177,7 +177,7 @@ const raw: Record<Lang, Content> = {
       rates: [
         { label: 'Pierwsza godzina pracy z dojazdem', price: zl(P.firstHour), gross: money(gross(P.firstHour)), note: 'Dojazd w cenie w strefie 1: Jelenia Góra i najbliższa okolica.' },
         { label: 'Każde kolejne rozpoczęte 30 minut', price: zl(P.halfHour), gross: money(gross(P.halfHour)) },
-        { label: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))}`, note: 'Np. Karpacz, Kowary, Szklarska Poręba, Świeradów-Zdrój. Raz za wizytę, niezależnie od czasu pracy.' },
+        { label: 'Dojazd do strefy 2', price: `+${zl(P.zone2Travel)}`, gross: `+${money(gross(P.zone2Travel))}`, note: 'Np. Karpacz, Kowary, Szklarska Poręba. Raz za wizytę, niezależnie od czasu pracy.' },
         { label: 'Części i materiały', price: 'po cenie zakupu', note: 'Paragon lub fakturę dołączam do rachunku. Gdy część trzeba dokupić w trakcie zlecenia, czas zakupu liczę jak czas pracy.', text: true },
       ],
       extras: [
@@ -242,7 +242,7 @@ const raw: Record<Lang, Content> = {
       title: 'Częste pytania',
       more: 'Inne pytanie? Proszę zadzwonić albo napisać.',
       items: [
-        { q: 'Czy dojeżdża Pan do Karpacza, Szklarskiej Poręby i Świeradowa-Zdroju?', a: `Tak. W strefie 1 (${site.zones.one}) dojazd jest w cenie pierwszej godziny. Karpacz, Szklarska Poręba, Świeradów-Zdrój i pozostałe miejscowości do ${R} km od Jeleniej Góry to strefa 2: doliczam ${zl(P.zone2Travel)} netto za wizytę.` },
+        { q: 'Czy dojeżdża Pan do Karpacza, Kowar i Szklarskiej Poręby?', a: `Tak. W strefie 1 (${site.zones.one}) dojazd jest w cenie pierwszej godziny. Karpacz, Kowary, Szklarska Poręba i pozostałe miejscowości do ${R} km od Jeleniej Góry to strefa 2: doliczam ${zl(P.zone2Travel)} netto za wizytę. ${site.zones.outside}` },
         { q: 'Jak szybko może Pan przyjechać?', a: `Termin ustalamy przy zgłoszeniu. Gdy naprawa musi być zrobiona tego samego dnia, do robocizny doliczam ${P.urgentPct}%, w nocy i w święta ${P.nightPct}%. W soboty i niedziele w dzień pracuję bez dopłat. Przy stałej opiece reaguję w ciągu ${P.careResponseH} godzin.` },
         { q: 'Ile kosztuje przyjazd, jeśli nic nie naprawimy?', a: `Oględziny i wycena na miejscu kosztują tyle co pierwsza godzina: ${zl(P.firstHour)} netto, w strefie 2 z dopłatą ${zl(P.zone2Travel)} za dojazd. Jeśli naprawę zlecą Państwo przy tej samej wizycie, oględziny są już w cenie.` },
         { q: 'Czy wystawia Pan fakturę VAT?', a: 'Tak. Robocizna, dojazd i materiały są na niej wpisane osobno.' },
