@@ -55,7 +55,11 @@ const links = [
           </li>
         ))}
       </ul>
-      <a class="top__call" href={`tel:${site.phone.replace(/\s/g, '')}`}>
+      <a
+        class="top__call"
+        href={`tel:${site.phone.replace(/\s/g, '')}`}
+        aria-label={`${t.call}: ${site.phone}`}
+      >
         <Icon name="phone" />
         <span>{site.phone}</span>
       </a>
@@ -89,6 +93,7 @@ const links = [
         'aria-label',
         (open ? toggle.dataset.closeLabel : toggle.dataset.openLabel)!,
       );
+      if (open) nav.querySelector<HTMLAnchorElement>('a')?.focus();
       if (restoreFocus) toggle.focus();
     };
     toggle.addEventListener('click', () =>
